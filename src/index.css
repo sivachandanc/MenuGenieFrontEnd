@@ -1,1 +1,21 @@
+@font-face {
+    font-family: Tagees;
+    src: url('../src/assets/fonts/Tagesschrift-Regular.ttf');
+  }
+@font-face {
+    font-family: Inter;
+    src: url("../src/assets/fonts/Inter-VariableFont.ttf");
+  }
 @import "tailwindcss";
+
+@theme {
+    --button: oklch(0.85 0.1 140);
+    --button-hover: oklch(0.90 0.1 140);
+    --background: oklch(0.725 0.188 259.24);
+    --card: oklch(0.3704 0.1799 275.26);
+    --accent: oklch(0.8807 0.1244 219.13);
+    --text-main: oklch(0.9578 0.0065 228.19);
+    --text-secondary: oklch(0.9028 0.0158 242.29);
+    --font-inter: Inter , sans-serif;
+    --font-tagees: Tagees , sans-serif;
+}
