@@ -1,10 +1,11 @@
 import NavBar from "./components/navbar/navbar.jsx";
-import MenuGenieGif from "./assets/menu_genie.gif"
+import HeroSection from "./components/hero_section/HeroSection.jsx";
 
 function App() {
   return (
     <div className="min-h-screen bg-[var(--background)]">
       <NavBar />
+      <HeroSection/>
     </div>
   );
 }

@@ -36,7 +36,7 @@ function NavBar() {
             <NavbarItem key={item.name}>
               <Link
                 href={item.href}
-                className="text-[var(--text-main)] font-inter hover:"
+                className="text-[var(--text-main)] font-inter "
               >
                 {item.name}
               </Link>
@@ -48,7 +48,7 @@ function NavBar() {
             <Link href="#" className="text-[var(--text-main)] font-inter">Login</Link>
           </NavbarItem>
           <NavbarItem>
-            <Button as={Link} href="#" variant="flat" className="text-[var(--text-main)] font-inter" >
+            <Button radius="lg" as={Link} href="#" variant="flat" className="text-[var(--text-main)] font-inter bg-[var(--primary)]" >
               Sign Up
             </Button>
           </NavbarItem>
