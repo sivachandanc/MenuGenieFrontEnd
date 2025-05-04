@@ -8,11 +8,11 @@ function NavBar() {
   return (
     <div className="pt-6 flex justify-center">
         
-      <Navbar isBordered className="rounded-full max-w-6xl w-full bg-[#C0C0C0] shadow-md px-2">
+      <Navbar isBordered className="rounded-full max-w-6xl w-full bg-[#FFFFFF] shadow-md px-2">
         <NavbarContent justify="start" className="w-full">
           <NavbarBrand className="flex items-center space-x-2 ml-0">
             <MenuGenieLogo />
-            <p className="hidden sm:block font-bold text-inherit">Menu Genie</p>
+            <p className="hidden sm:block font-bold text-[#1E90FF] font-sans">Menu Genie</p>
           </NavbarBrand>
         </NavbarContent>
       </Navbar>
