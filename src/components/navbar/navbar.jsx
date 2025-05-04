@@ -1,18 +1,18 @@
 import { Navbar, NavbarBrand, NavbarContent } from "@heroui/react";
-import coffeeLogo from "../../assets/coffee_logo.webp";
+import menugenie from "../../assets/menu_genie_logo.png";
 
 function NavBar() {
   const MenuGenieLogo = () => {
-    return <img src={coffeeLogo} className="h-12 w-auto" />;
+    return <img src={menugenie} className="h-15 w-auto" />;
   };
   return (
-    <div className="pt-6 flex justify-center">
+    <div className="pt-2 flex justify-center">
         
-      <Navbar isBordered className="rounded-full max-w-6xl w-full bg-[#FFFFFF] shadow-md px-2">
+      <Navbar isBordered>
         <NavbarContent justify="start" className="w-full">
-          <NavbarBrand className="flex items-center space-x-2 ml-0">
+          <NavbarBrand className="flex items-center space-x-2 ml-0 pl-2.5">
             <MenuGenieLogo />
-            <p className="hidden sm:block font-bold text-[#1E90FF] font-sans">Menu Genie</p>
+            <p className="hidden sm:block text-[var(--text-main)] font-(family-name:--text-font)">MenuGenie</p>
           </NavbarBrand>
         </NavbarContent>
       </Navbar>
