@@ -24,11 +24,9 @@ function NavBar() {
     <div className="pt-2 flex">
       <Navbar isBordered className="w-full  relative justify-between">
         <NavbarContent justify="start">
-          <NavbarBrand className="flex items-center space-x-2 ml-0 pl-2.5">
+          <NavbarBrand className="flex items-center space-x-1 ml-0 pl-2.5">
             <MenuGenieLogo />
-            <p className="hidden sm:block  text-[var(--text-main)] font-tagees">
-              MenuGenie
-            </p>
+            <Button as={Link} to="/" className="hidden sm:block  text-[var(--text-main)] font-tagees">MenuGenie</Button>
           </NavbarBrand>
         </NavbarContent>
         <NavbarContent className="hidden sm:flex space-x-10 gap-4" justify="center">
