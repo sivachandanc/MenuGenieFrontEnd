@@ -1,4 +1,5 @@
 import NavBar from "./components/navbar/navbar.jsx";
+import MenuGenieGif from "./assets/menu_genie.gif"
 
 function App() {
   return (
