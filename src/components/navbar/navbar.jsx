@@ -48,7 +48,7 @@ function NavBar() {
             <Link href="#" className="text-[var(--text-main)] font-inter">Login</Link>
           </NavbarItem>
           <NavbarItem>
-            <Button radius="lg" as={Link} href="#" variant="flat" className="text-[var(--text-main)] font-inter bg-[var(--primary)]" >
+            <Button radius="lg" as={Link} href="#" variant="flat" className="text-black font-inter bg-[var(--button)] hover:bg-[var(--button-hover)] transition-colors duration-300 py-2 px-4 rounded-full" >
               Sign Up
             </Button>
           </NavbarItem>
