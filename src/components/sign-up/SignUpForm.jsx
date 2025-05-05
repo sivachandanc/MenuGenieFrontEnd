@@ -9,6 +9,7 @@ function SignUpForm() {
   const [password, setPassword] = useState("");
   const [confirmedPassword, setConfirmedPassword] = useState("");
   const [error, setError] = useState("");
+  const [submitDisabled, setSubmitButton] = useState(true);
 
   //Getting Superbase URL and Keys from env
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -30,14 +31,39 @@ function SignUpForm() {
     }
 
     console.log("Signup successful:", data);
-    
+
     setError("");
     alert("Registration successful! Check your email for verification link.");
   };
 
+  const handleTermsAcceptedCheckBoxChange = (event) => {
+    if (event.target.checked) {
+      setSubmitButton(false);
+    } else {
+      setSubmitButton(true);
+    }
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (password.length < 6){
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!name) {
+      setError("Name is required");
+      return;
+    }
+    if (!email) {
+      setError("Email is required");
+      return;
+    }
+    if (!emailPattern.test(email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+    if (!password) {
+      setError("Password is required");
+      return;
+    }
+    if (password.length < 6) {
       setError("Length of password should be greater than 6");
       return;
     }
@@ -57,7 +83,7 @@ function SignUpForm() {
           Register
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6" noValidate>
           <div>
             <input
               type="text"
@@ -66,6 +92,7 @@ function SignUpForm() {
               value={name}
               className="w-full px-4 py-2 rounded-md bg-amber-50 focus:outline-none focus:ring-2 focus:ring-[var(--button)]"
               placeholder="Enter your name"
+              required
             />
           </div>
 
@@ -77,6 +104,7 @@ function SignUpForm() {
               value={email}
               className="w-full px-4 py-2 rounded-md bg-amber-50 focus:outline-none focus:ring-2 focus:ring-[var(--button)]"
               placeholder="Enter your email"
+              required
             />
           </div>
 
@@ -88,6 +116,7 @@ function SignUpForm() {
               value={password}
               className="w-full px-4 py-2 rounded-md bg-amber-50 focus:outline-none focus:ring-2 focus:ring-[var(--button)]"
               placeholder="Enter your password"
+              required
             />
           </div>
 
@@ -99,6 +128,7 @@ function SignUpForm() {
               value={confirmedPassword}
               className="w-full px-4 py-2 rounded-md bg-amber-50 focus:outline-none focus:ring-2 focus:ring-[var(--button)]"
               placeholder="Confirm your password"
+              required
             />
           </div>
 
@@ -110,7 +140,12 @@ function SignUpForm() {
           )}
 
           <div className="flex items-center space-x-2">
-            <input type="checkbox" id="terms" className="h-4 w-4" />
+            <input
+              type="checkbox"
+              id="terms"
+              className="h-4 w-4"
+              onChange={handleTermsAcceptedCheckBoxChange}
+            />
             <label htmlFor="terms" className="text-sm text-gray-600">
               I accept all terms & conditions
             </label>
@@ -119,7 +154,12 @@ function SignUpForm() {
           <div>
             <button
               type="submit"
-              className="w-full py-2 rounded-full bg-[var(--button)] text-black font-inter hover:bg-[var(--button-hover)] transition-colors duration-300"
+              className={`w-full py-2 rounded-full text-black font-inter ${
+                submitDisabled
+                  ? "bg-[var(--button-disabled)]"
+                  : "bg-[var(--button)] hover:bg-[var(--button-hover)] transition-colors duration-300"
+              } `}
+              disabled={submitDisabled}
             >
               Register
             </button>
