@@ -92,7 +92,6 @@ function SignUpForm() {
               value={name}
               className="w-full px-4 py-2 rounded-md bg-amber-50 focus:outline-none focus:ring-2 focus:ring-[var(--button)]"
               placeholder="Enter your name"
-              required
             />
           </div>
 
@@ -104,7 +103,6 @@ function SignUpForm() {
               value={email}
               className="w-full px-4 py-2 rounded-md bg-amber-50 focus:outline-none focus:ring-2 focus:ring-[var(--button)]"
               placeholder="Enter your email"
-              required
             />
           </div>
 
@@ -116,7 +114,6 @@ function SignUpForm() {
               value={password}
               className="w-full px-4 py-2 rounded-md bg-amber-50 focus:outline-none focus:ring-2 focus:ring-[var(--button)]"
               placeholder="Enter your password"
-              required
             />
           </div>
 
@@ -128,7 +125,6 @@ function SignUpForm() {
               value={confirmedPassword}
               className="w-full px-4 py-2 rounded-md bg-amber-50 focus:outline-none focus:ring-2 focus:ring-[var(--button)]"
               placeholder="Confirm your password"
-              required
             />
           </div>
 
