@@ -10,6 +10,7 @@ function SignUpForm() {
   const [confirmedPassword, setConfirmedPassword] = useState("");
   const [error, setError] = useState("");
   const [submitDisabled, setSubmitButton] = useState(true);
+  const [registrationProcessing, setRegistrationProcessing] = useState(false);
 
   //Getting Superbase URL and Keys from env
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -26,14 +27,15 @@ function SignUpForm() {
     });
     if (error) {
       console.error("Signup error:", error.message);
-      alert(`Signup failed: ${error.message}`);
+      setError(`Signup failed: ${error.message}`);
+      setRegistrationProcessing(false);
       return;
     }
 
     console.log("Signup successful:", data);
-
+    setSubmitButton(true)
     setError("");
-    alert("Registration successful! Check your email for verification link.");
+    setRegistrationProcessing(false);
   };
 
   const handleTermsAcceptedCheckBoxChange = (event) => {
@@ -46,28 +48,35 @@ function SignUpForm() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    setRegistrationProcessing(true);
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!name) {
+      setRegistrationProcessing(false);
       setError("Name is required");
       return;
     }
     if (!email) {
+      setRegistrationProcessing(false);
       setError("Email is required");
       return;
     }
     if (!emailPattern.test(email)) {
+      setRegistrationProcessing(false);
       setError("Please enter a valid email address");
       return;
     }
     if (!password) {
+      setRegistrationProcessing(false);
       setError("Password is required");
       return;
     }
     if (password.length < 6) {
+      setRegistrationProcessing(false);
       setError("Length of password should be greater than 6");
       return;
     }
     if (password !== confirmedPassword) {
+      setRegistrationProcessing(false);
       setError("Passwords do not match!");
       return;
     }
@@ -155,9 +164,35 @@ function SignUpForm() {
                   ? "bg-[var(--button-disabled)]"
                   : "bg-[var(--button)] hover:bg-[var(--button-hover)] transition-colors duration-300"
               } `}
-              disabled={submitDisabled}
+              disabled={submitDisabled || registrationProcessing}
             >
-              Register
+              <div className="flex justify-center items-center space-x-2">
+                {registrationProcessing && (
+                  <svg
+                    className="animate-spin h-5 w-5 text-black"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                    ></path>
+                  </svg>
+                )}
+                <span>
+                  {registrationProcessing ? "Processing..." : "Register"}
+                </span>
+              </div>
             </button>
           </div>
 
