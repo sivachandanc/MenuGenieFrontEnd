@@ -3,9 +3,9 @@ import {
   NavbarBrand,
   NavbarContent,
   NavbarItem,
-  Link,
   Button,
 } from "@heroui/react";
+import { Link } from "react-router-dom"; 
 import menugenie from "../../assets/menu_genie_logo.png";
 
 function NavBar() {
@@ -24,11 +24,9 @@ function NavBar() {
     <div className="pt-2 flex">
       <Navbar isBordered className="w-full  relative justify-between">
         <NavbarContent justify="start">
-          <NavbarBrand className="flex items-center space-x-2 ml-0 pl-2.5">
+          <NavbarBrand className="flex items-center space-x-1 ml-0 pl-2.5">
             <MenuGenieLogo />
-            <p className="hidden sm:block  text-[var(--text-main)] font-tagees">
-              MenuGenie
-            </p>
+            <Button as={Link} to="/" className="hidden sm:block  text-[var(--text-main)] font-tagees">MenuGenie</Button>
           </NavbarBrand>
         </NavbarContent>
         <NavbarContent className="hidden sm:flex space-x-10 gap-4" justify="center">
@@ -48,7 +46,7 @@ function NavBar() {
             <Link href="#" className="text-[var(--text-main)] font-inter">Login</Link>
           </NavbarItem>
           <NavbarItem>
-            <Button radius="lg" as={Link} href="#" variant="flat" className="text-black font-inter bg-[var(--button)] hover:bg-[var(--button-hover)] transition-colors duration-300 py-2 px-4 rounded-full" >
+            <Button radius="lg" as={Link} to="/sign-up" variant="flat" className="text-black font-inter bg-[var(--button)] hover:bg-[var(--button-hover)] transition-colors duration-300 py-2 px-4 rounded-full" >
               Sign Up
             </Button>
           </NavbarItem>
