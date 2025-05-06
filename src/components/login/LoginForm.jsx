@@ -1,23 +1,16 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { createClient } from "@supabase/supabase-js";
 import ErrorMessage from "../util-components/ErrorMessage";
 
-function LoginForm() {
+function LoginForm({supabaseClient}) {
   const [userEmail, setUserEmail] = useState("");
   const [userPassword, setUserPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [loginProcessing, setLoginProcessing] = useState(false)
 
-  //Getting Superbase URL and Keys from env
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  const supabaseKey = import.meta.env.VITE_SUPABASE_KEY;
-
-  // Creating a superbase client
-  const supabase = createClient(supabaseUrl, supabaseKey);
 
   const login = async () => {
-    let { data, error } = await supabase.auth.signInWithPassword({
+    let { data, error } = await supabaseClient.auth.signInWithPassword({
         email: userEmail,
         password: userPassword
       })

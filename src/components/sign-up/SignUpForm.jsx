@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { createClient } from "@supabase/supabase-js";
 import RegistrationDonePopUp from "./RegistrationDonePopUp";
 import ErrorMessage from "../util-components/ErrorMessage";
 
-function SignUpForm() {
+function SignUpForm({supabaseClient}) {
   // Various states
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -15,16 +14,9 @@ function SignUpForm() {
   const [registrationProcessing, setRegistrationProcessing] = useState(false);
   const [showPopUp, setShowPopUp] = useState(false);
 
-  //Getting Superbase URL and Keys from env
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  const supabaseKey = import.meta.env.VITE_SUPABASE_KEY;
-
-  // Creating a superbase client
-  const supabase = createClient(supabaseUrl, supabaseKey);
-
   // Creating a sinup memchanism
   const signUp = async () => {
-    let { data, error } = await supabase.auth.signUp({
+    let { data, error } = await supabaseClient.auth.signUp({
       email: email,
       password: password,
     });
