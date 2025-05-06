@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { createClient } from "@supabase/supabase-js";
 import RegistrationDonePopUp from "./RegistrationDonePopUp";
+import ErrorMessage from "../util-components/ErrorMessage";
 
 function SignUpForm() {
   // Various states
@@ -141,9 +142,7 @@ function SignUpForm() {
 
             {/* ERROR MESSAGE BLOCK */}
             {error && (
-              <div className="bg-red-100 text-red-700 px-4 py-2 rounded-md text-center text-sm">
-                {error}
-              </div>
+              <ErrorMessage errorMessage={error}/>
             )}
 
             <div className="flex items-center space-x-2">

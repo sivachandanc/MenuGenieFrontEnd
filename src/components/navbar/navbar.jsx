@@ -43,7 +43,7 @@ function NavBar() {
         </NavbarContent>
         <NavbarContent justify="end" className="pr-2.5">
           <NavbarItem className="hidden lg:flex">
-            <Link href="#" className="text-[var(--text-main)] font-inter">Login</Link>
+            <Link to="/login" className="text-[var(--text-main)] font-inter">Login</Link>
           </NavbarItem>
           <NavbarItem>
             <Button radius="lg" as={Link} to="/signup" variant="flat" className="text-black font-inter bg-[var(--button)] hover:bg-[var(--button-hover)] transition-colors duration-300 py-2 px-4 rounded-full" >
