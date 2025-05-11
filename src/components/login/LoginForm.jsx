@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import ErrorMessage from "../util-components/ErrorMessage";
-import { useAuth } from "../../context/AuthContext"; // 👈 context
+import { useAuth } from "../../context/AuthContext";
 
 function LoginForm() {
-  const { signIn } = useAuth(); // 👈 get signIn from context
+  const { signIn } = useAuth();
 
   const [userEmail, setUserEmail] = useState("");
   const [userPassword, setUserPassword] = useState("");
@@ -42,7 +42,7 @@ function LoginForm() {
               name="email"
               onChange={(e) => setUserEmail(e.target.value)}
               value={userEmail}
-              className="w-full px-4 py-2 rounded-md bg-amber-50 focus:outline-none focus:ring-2 focus:ring-[var(--button)]"
+              className="w-full px-4 py-2 rounded-md bg--[var(--background)] focus:outline-none focus:ring-2 focus:ring-[var(--button)] outline-1 outline-black"
               placeholder="Enter your email"
               required
             />
@@ -53,7 +53,7 @@ function LoginForm() {
               name="password"
               onChange={(e) => setUserPassword(e.target.value)}
               value={userPassword}
-              className="w-full px-4 py-2 rounded-md bg-amber-50 focus:outline-none focus:ring-2 focus:ring-[var(--button)]"
+              className="w-full px-4 py-2 rounded-md bg--[var(--background)] focus:outline-none focus:ring-2 focus:ring-[var(--button)] outline-1 outline-black"
               placeholder="Enter your password"
               required
             />

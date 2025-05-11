@@ -5,14 +5,15 @@ import {
   Settings,
   Users,
   BarChart,
+  Utensils,
 } from "lucide-react";
 
 const navItems = [
-  { icon: <Home />, label: "Home" },
-  { icon: <Database />, label: "Database" },
-  { icon: <Users />, label: "Users" },
-  { icon: <BarChart />, label: "Analytics" },
-  { icon: <Settings />, label: "Settings" },
+  { icon: <Utensils />, label: "My Restaraunts" },
+//   { icon: <Database />, label: "Database" },
+//   { icon: <Users />, label: "Users" },
+//   { icon: <BarChart />, label: "Analytics" },
+//   { icon: <Settings />, label: "Settings" },
 ];
 
 function Sidebar() {

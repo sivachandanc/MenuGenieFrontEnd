@@ -69,7 +69,7 @@ function SignUpForm() {
                 name="name"
                 onChange={(e) => setName(e.target.value)}
                 value={name}
-                className="w-full px-4 py-2 rounded-md bg-amber-50 focus:outline-none focus:ring-2 focus:ring-[var(--button)]"
+                className="w-full px-4 py-2 rounded-md bg--[var(--background)] focus:outline-none focus:ring-2 focus:ring-[var(--button)] outline-1 outline-black"
                 placeholder="Enter your name"
               />
             </div>
@@ -80,7 +80,7 @@ function SignUpForm() {
                 name="email"
                 onChange={(e) => setEmail(e.target.value)}
                 value={email}
-                className="w-full px-4 py-2 rounded-md bg-amber-50 focus:outline-none focus:ring-2 focus:ring-[var(--button)]"
+                className="w-full px-4 py-2 rounded-md bg--[var(--background)] focus:outline-none focus:ring-2 focus:ring-[var(--button)] outline-1 outline-black"
                 placeholder="Enter your email"
               />
             </div>
@@ -91,7 +91,7 @@ function SignUpForm() {
                 name="password"
                 onChange={(e) => setPassword(e.target.value)}
                 value={password}
-                className="w-full px-4 py-2 rounded-md bg-amber-50 focus:outline-none focus:ring-2 focus:ring-[var(--button)]"
+                className="w-full px-4 py-2 rounded-md bg--[var(--background)] focus:outline-none focus:ring-2 focus:ring-[var(--button)] outline-1 outline-black"
                 placeholder="Enter your password"
               />
             </div>
@@ -102,7 +102,7 @@ function SignUpForm() {
                 name="confirmed-password"
                 onChange={(e) => setConfirmedPassword(e.target.value)}
                 value={confirmedPassword}
-                className="w-full px-4 py-2 rounded-md bg-amber-50 focus:outline-none focus:ring-2 focus:ring-[var(--button)]"
+                className="w-full px-4 py-2 rounded-md bg--[var(--background)] focus:outline-none focus:ring-2 focus:ring-[var(--button)] outline-1 outline-black"
                 placeholder="Confirm your password"
               />
             </div>
