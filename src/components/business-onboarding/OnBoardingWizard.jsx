@@ -1,10 +1,9 @@
-// src/components/OnboardingWizard.jsx
 import { useState } from "react";
 import BusinessInfoStep from "./BusinessInfoStep";
 import ContactHoursStep from "./ContactHoursStep";
-// import EnhancementsStep from "./EnhancementsStep";
-// import BotCustomizationStep from "./BotCustomizationStep";
-// import ReviewSubmitStep from "./ReviewSubmitStep";
+import EnhancementsStep from "./EnhancementsStep";
+import BotCustomizationStep from "./BotCustomizationStep";
+import ReviewSubmitStep from "./ReviewSubmitStep";
 
 const steps = [
   "Business Info",
@@ -28,9 +27,9 @@ function OnBoardingWizard() {
   const StepComponent = [
     <BusinessInfoStep data={formData} onNext={next} onUpdate={updateData} />, 
     <ContactHoursStep data={formData} onNext={next} onBack={back} onUpdate={updateData} />, 
-    // <EnhancementsStep data={formData} onNext={next} onBack={back} onUpdate={updateData} />, 
-    // <BotCustomizationStep data={formData} onNext={next} onBack={back} onUpdate={updateData} />, 
-    // <ReviewSubmitStep data={formData} onBack={back} />
+    <EnhancementsStep data={formData} onNext={next} onBack={back} onUpdate={updateData} />, 
+    <BotCustomizationStep data={formData} onNext={next} onBack={back} onUpdate={updateData} />, 
+    <ReviewSubmitStep data={formData} onBack={back} />
   ][step];
 
   return (
