@@ -1,38 +1,66 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useAuth } from "./context/AuthContext";
 import NavBar from "./components/navbar/navbar.jsx";
 import HeroSection from "./components/hero-section/HeroSection.jsx";
 import SignUpForm from "./components/sign-up/SignUpForm.jsx";
 import LoginForm from "./components/login/LoginForm.jsx";
 import ChatWindow from "./components/user-chat/ChatWindow.jsx";
-import { createClient } from "@supabase/supabase-js";
+import UserDashBoardLayout from "./components/user/UserDashBoardLayout.jsx";
+
+import PublicRoute from "./routes/PublicRoute";
+import PrivateRoute from "./routes/PrivateRoute";
+
 import { useState } from "react";
 
 function App() {
-  //Getting Superbase URL and Keys from env
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  const supabaseKey = import.meta.env.VITE_SUPABASE_KEY;
+  const { user } = useAuth();
+  const [chatMode, setChatMode] = useState(false);
 
-  const [chatMode, setChatMode] = useState(false)
-
-  // Creating a superbase client
-  const supabaseClient = createClient(supabaseUrl, supabaseKey);
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-[var(--background)]">
-        {!chatMode && <NavBar />}
+        {!chatMode && !user && <NavBar />}
         <Routes>
-          <Route path="/" element={<HeroSection />} />
+          {/* Public Routes */}
+          <Route
+            path="/"
+            element={
+              <PublicRoute>
+                <HeroSection />
+              </PublicRoute>
+            }
+          />
           <Route
             path="/signup"
-            element={<SignUpForm supabaseClient={supabaseClient} />}
+            element={
+              <PublicRoute>
+                <SignUpForm />
+              </PublicRoute>
+            }
           />
           <Route
             path="/login"
-            element={<LoginForm supabaseClient={supabaseClient} />}
+            element={
+              <PublicRoute>
+                <LoginForm />
+              </PublicRoute>
+            }
           />
-          <Route 
-            path="/chat-with-menu/:businessID" 
-            element={<ChatWindow setChatMode={setChatMode}/>} // 👈 added this
+
+          {/* Authenticated Dashboard Route */}
+          <Route
+            path="/dashboard"
+            element={
+              <PrivateRoute>
+                <UserDashBoardLayout />
+              </PrivateRoute>
+            }
+          />
+
+          {/* Chat route can be public or private depending on use case */}
+          <Route
+            path="/chat-with-menu/:businessID"
+            element={<ChatWindow setChatMode={setChatMode} />}
           />
         </Routes>
       </div>
