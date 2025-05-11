@@ -2,7 +2,6 @@
 import { useState } from "react";
 import BusinessInfoStep from "./BusinessInfoStep";
 import ContactHoursStep from "./ContactHoursStep";
-// import MenuUploadStep from "./MenuUploadStep";
 // import EnhancementsStep from "./EnhancementsStep";
 // import BotCustomizationStep from "./BotCustomizationStep";
 // import ReviewSubmitStep from "./ReviewSubmitStep";
@@ -10,7 +9,6 @@ import ContactHoursStep from "./ContactHoursStep";
 const steps = [
   "Business Info",
   "Contact & Hours",
-  "Menu Upload",
   "Enhancements",
   "Bot Customization",
   "Review & Submit",
@@ -30,7 +28,6 @@ function OnBoardingWizard() {
   const StepComponent = [
     <BusinessInfoStep data={formData} onNext={next} onUpdate={updateData} />, 
     <ContactHoursStep data={formData} onNext={next} onBack={back} onUpdate={updateData} />, 
-    // <MenuUploadStep data={formData} onNext={next} onBack={back} onUpdate={updateData} />, 
     // <EnhancementsStep data={formData} onNext={next} onBack={back} onUpdate={updateData} />, 
     // <BotCustomizationStep data={formData} onNext={next} onBack={back} onUpdate={updateData} />, 
     // <ReviewSubmitStep data={formData} onBack={back} />
