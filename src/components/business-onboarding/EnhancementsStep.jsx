@@ -4,6 +4,8 @@ function EnhancementsStep({ data, onUpdate, onNext, onBack }) {
   const [topItems, setTopItems] = useState(data.topItems || "");
   const [ownershipTags, setOwnershipTags] = useState(data.ownershipTags || []);
 
+  const businessType = data.business_type || "";
+
   const ownershipOptions = [
     { label: "Veteran Owned", emoji: "🎖️" },
     { label: "Female Owned", emoji: "👩‍💼" },
@@ -11,6 +13,21 @@ function EnhancementsStep({ data, onUpdate, onNext, onBack }) {
     { label: "Black Owned", emoji: "✊🏿" },
     { label: "First Responder Owned", emoji: "🚒" },
   ];
+
+  const getPlaceholder = () => {
+    switch (businessType) {
+      case "cafe":
+        return "e.g., Cappuccino, Blueberry Muffin";
+      case "restaurant":
+        return "e.g., Butter Chicken, Paneer Tikka";
+      case "food_truck":
+        return "e.g., Tacos, Loaded Fries";
+      case "bakery":
+        return "e.g., Croissants, Custom Cakes";
+      default:
+        return "e.g., Signature dishes or top-sellers";
+    }
+  };
 
   const toggleTag = (tag) => {
     if (ownershipTags.includes(tag)) {
@@ -36,13 +53,13 @@ function EnhancementsStep({ data, onUpdate, onNext, onBack }) {
         <input
           type="text"
           className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-          placeholder="e.g., Butter Chicken, Paneer Tikka"
+          placeholder={getPlaceholder()}
           value={topItems}
           onChange={(e) => setTopItems(e.target.value)}
         />
       </div>
 
-      {/* Ownership Tags as Emoji Buttons */}
+      {/* Ownership Tags */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Ownership Tags (optional)

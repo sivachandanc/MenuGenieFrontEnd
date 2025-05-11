@@ -5,6 +5,7 @@ import EnhancementsStep from "./EnhancementsStep";
 import BotCustomizationStep from "./BotCustomizationStep";
 import ReviewSubmitStep from "./ReviewSubmitStep";
 
+//TODO: Need to add process to persist the data
 const steps = [
   "Business Info",
   "Contact & Hours",
