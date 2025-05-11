@@ -9,28 +9,43 @@ import "react-clock/dist/Clock.css";
 function ContactHoursStep({ data, onUpdate, onNext, onBack }) {
   const [email, setEmail] = useState(data.email || "");
   const [phone, setPhone] = useState(data.phone || "");
+  const [website, setWebsite] = useState(data.website || "");
   const [openingTime, setOpeningTime] = useState(data.openingTime || "");
   const [closingTime, setClosingTime] = useState(data.closingTime || "");
   const [error, setError] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(email)) {
       setError("Please enter a valid email address");
       return;
     }
+
     if (!phone || phone.trim().length < 6) {
       setError("Phone number is required and must be valid");
       return;
     }
+
     if (!openingTime || !closingTime) {
       setError("Please provide opening and closing times");
       return;
     }
 
+    let finalWebsite = website.trim();
+    if (finalWebsite && !/^https?:\/\//i.test(finalWebsite)) {
+      finalWebsite = "https://" + finalWebsite;
+    }
+
+    const websitePattern = /^(https?:\/\/)?([\w-]+\.)+[a-zA-Z]{2,}(\/.*)?$/;
+    if (finalWebsite && !websitePattern.test(finalWebsite)) {
+      setError("Please enter a valid website URL (e.g. https://example.com)");
+      return;
+    }
+
     setError("");
-    onUpdate({ email, phone, openingTime, closingTime });
+    onUpdate({ email, phone, website: finalWebsite, openingTime, closingTime });
     onNext();
   };
 
@@ -78,6 +93,17 @@ function ContactHoursStep({ data, onUpdate, onNext, onBack }) {
             inputClass="focus:outline-none"
           />
         </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Website</label>
+        <input
+          type="url"
+          placeholder="https://yourbusiness.com"
+          className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+          value={website}
+          onChange={(e) => setWebsite(e.target.value)}
+        />
       </div>
 
       <div>

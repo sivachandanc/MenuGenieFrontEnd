@@ -3,6 +3,9 @@ function BusinessInfoStep({ data, onUpdate, onNext }) {
   const [name, setName] = useState(data.business_name || "");
   const [type, setType] = useState(data.business_type || "");
   const [location, setLocation] = useState(data.location || "");
+  const [businsessDescription, setBusinsessDescription] = useState(
+    data.businsess_description || ""
+  );
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -13,7 +16,9 @@ function BusinessInfoStep({ data, onUpdate, onNext }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-gray-700">Business Name</label>
+        <label className="block text-sm font-medium text-gray-700">
+          Business Name
+        </label>
         <input
           type="text"
           className="mt-1 block w-full border border-gray-300 rounded-md p-2"
@@ -24,7 +29,9 @@ function BusinessInfoStep({ data, onUpdate, onNext }) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">Business Type</label>
+        <label className="block text-sm font-medium text-gray-700">
+          Business Type
+        </label>
         <select
           className="mt-1 block w-full border border-gray-300 rounded-md p-2"
           value={type}
@@ -40,7 +47,9 @@ function BusinessInfoStep({ data, onUpdate, onNext }) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">Location (City, State)</label>
+        <label className="block text-sm font-medium text-gray-700">
+          Location (City, State)
+        </label>
         <input
           type="text"
           className="mt-1 block w-full border border-gray-300 rounded-md p-2"
@@ -48,6 +57,19 @@ function BusinessInfoStep({ data, onUpdate, onNext }) {
           onChange={(e) => setLocation(e.target.value)}
           required
         />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Business Description
+        </label>
+        <textarea
+          className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+          rows={4} // or whatever height you prefer
+          value={businsessDescription}
+          onChange={(e) => setBusinsessDescription(e.target.value)}
+          required
+        />  
       </div>
 
       <div className="text-right">
