@@ -1,6 +1,6 @@
 import Sidebar from "./UserSideBar.jsx";
 import UserTopNav from "./UserTopNav.jsx";
-import BusinessList from "./BusinessList.jsx"
+import { Outlet } from "react-router-dom"; 
 
 export default function UserDashboardLayout() {
   return (
@@ -14,7 +14,7 @@ export default function UserDashboardLayout() {
 
         {/* Main Dashboard Content */}
         <main className="flex-1 p-6 overflow-auto">
-            <BusinessList/>
+        <Outlet />
         </main>
       </div>
     </div>

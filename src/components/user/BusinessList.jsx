@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { supabaseClient } from "../../supabase-utils/SupaBaseClient";
 import SkeletonCard from "../util-components/SkeletonCard";
+import { useNavigate } from "react-router-dom";
+
 
 
 function BusinessList() {
   const [businesses, setBusinesses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchBusinesses = async () => {
       setLoading(true);
@@ -35,7 +38,7 @@ function BusinessList() {
           <p className="text-gray-600 mb-4">
             You have no businesses onboarded with <span className="font-semibold text-[var(--button)]">MenuGenie</span>.
           </p>
-          <button className="px-5 py-2 rounded-full bg-[var(--button)] text-black font-semibold hover:bg-[var(--button-hover)] transition">
+          <button onClick={() => navigate("/dashboard/onboarding")} className="px-5 py-2 rounded-full bg-[var(--button)] text-black font-semibold hover:bg-[var(--button-hover)] transition">
             Add Business
           </button>
         </div>
