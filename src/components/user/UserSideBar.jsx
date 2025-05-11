@@ -23,7 +23,7 @@ function Sidebar() {
     <div
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => setExpanded(false)}
-      className={`transition-all duration-300 bg-white border-r h-full ${
+      className={`transition-all duration-300 bg-white  h-full ${
         expanded ? "w-48" : "w-16"
       }`}
     >
