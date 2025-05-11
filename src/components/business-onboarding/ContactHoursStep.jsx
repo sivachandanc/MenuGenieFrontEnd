@@ -1,18 +1,26 @@
 import { useState } from "react";
+import ErrorMessage from "../util-components/ErrorMessage";
 
 function ContactHoursStep({ data, onUpdate, onNext, onBack }) {
   const [email, setEmail] = useState(data.email || "");
   const [phone, setPhone] = useState(data.phone || "");
   const [hours, setHours] = useState(data.hours || "");
+  const [error, setError] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+    setError("");
     onUpdate({ email, phone, hours });
     onNext();
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4" noValidate>
       <div>
         <label className="block text-sm font-medium text-gray-700">Email</label>
         <input
@@ -20,7 +28,6 @@ function ContactHoursStep({ data, onUpdate, onNext, onBack }) {
           className="mt-1 block w-full border border-gray-300 rounded-md p-2"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          required
         />
       </div>
 
@@ -45,6 +52,7 @@ function ContactHoursStep({ data, onUpdate, onNext, onBack }) {
           onChange={(e) => setHours(e.target.value)}
         />
       </div>
+      {error && <ErrorMessage errorMessage={error} />}
 
       <div className="flex justify-between">
         <button
