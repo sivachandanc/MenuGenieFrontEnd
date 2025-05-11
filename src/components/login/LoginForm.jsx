@@ -1,34 +1,33 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import ErrorMessage from "../util-components/ErrorMessage";
+import { useAuth } from "../../context/AuthContext"; // 👈 context
 
-function LoginForm({supabaseClient}) {
+function LoginForm() {
+  const { signIn } = useAuth(); // 👈 get signIn from context
+
   const [userEmail, setUserEmail] = useState("");
   const [userPassword, setUserPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [loginProcessing, setLoginProcessing] = useState(false)
-
+  const [loginProcessing, setLoginProcessing] = useState(false);
 
   const login = async () => {
-    let { data, error } = await supabaseClient.auth.signInWithPassword({
-        email: userEmail,
-        password: userPassword
-      })
-    if (error){
-        console.error("Signup error:", error.message);
-        setLoginProcessing(false)
-        setErrorMessage(`Signup failed: ${error.message}`);
-        return;
+    try {
+      await signIn(userEmail, userPassword);
+      setLoginProcessing(false);
+      setErrorMessage("");
+    } catch (err) {
+      console.error("Login error:", err.message);
+      setLoginProcessing(false);
+      setErrorMessage(`Login failed: ${err.message}`);
     }
-    setLoginProcessing(false)
-    console.log("Signin successfull:", data); //TODO: Remove this later
-  }
+  };
 
   const handleLogin = (event) => {
     event.preventDefault();
-    setLoginProcessing(true)
-    login()
-  }
+    setLoginProcessing(true);
+    login();
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-[var(--background)] px-4">
@@ -60,49 +59,45 @@ function LoginForm({supabaseClient}) {
             />
           </div>
 
-          {/*Error Message*/}
-          {errorMessage && (
-              <ErrorMessage errorMessage={errorMessage}/>
-            )}
+          {errorMessage && <ErrorMessage errorMessage={errorMessage} />}
 
           <button
             type="submit"
             className="w-full py-2 rounded-full text-black font-inter bg-[var(--button)] hover:bg-[var(--button-hover)] transition-colors duration-300"
-          disabled={loginProcessing}          >
+            disabled={loginProcessing}
+          >
             <div className="flex justify-center items-center space-x-2">
-                  {loginProcessing && (
-                    <svg
-                      className="animate-spin h-5 w-5 text-black"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                      ></path>
-                    </svg>
-                  )}
-                  <span>
-                    {loginProcessing ? "Processing..." : "Login"}
-                  </span>
-                </div>
+              {loginProcessing && (
+                <svg
+                  className="animate-spin h-5 w-5 text-black"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                  ></path>
+                </svg>
+              )}
+              <span>{loginProcessing ? "Processing..." : "Login"}</span>
+            </div>
           </button>
 
           <div className="text-center">
             <p className="text-sm text-gray-600">
               Don't have an account?{" "}
               <Link
-                to="/login"
+                to="/signup"
                 className="text-[var(--button)] hover:underline transition-colors duration-300"
               >
                 Register

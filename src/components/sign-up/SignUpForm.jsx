@@ -2,9 +2,11 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import RegistrationDonePopUp from "./RegistrationDonePopUp";
 import ErrorMessage from "../util-components/ErrorMessage";
+import { useAuth } from "../../context/AuthContext";
 
-function SignUpForm({supabaseClient}) {
-  // Various states
+function SignUpForm() {
+  const { signUp } = useAuth();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -14,31 +16,21 @@ function SignUpForm({supabaseClient}) {
   const [registrationProcessing, setRegistrationProcessing] = useState(false);
   const [showPopUp, setShowPopUp] = useState(false);
 
-  // Creating a sinup memchanism
-  const signUp = async () => {
-    let { data, error } = await supabaseClient.auth.signUp({
-      email: email,
-      password: password,
-    });
-    if (error) {
-      console.error("Signup error:", error.message);
-      setError(`Signup failed: ${error.message}`);
-      setRegistrationProcessing(false);
-      return;
-    }
-
-    console.log("Signup successful:", data);
-    setDisableSubmitButton(true);
-    setError("");
-    setRegistrationProcessing(false);
-    setShowPopUp(true);
+  const handleTermsAcceptedCheckBoxChange = (event) => {
+    setDisableSubmitButton(!event.target.checked);
   };
 
-  const handleTermsAcceptedCheckBoxChange = (event) => {
-    if (event.target.checked) {
-      setDisableSubmitButton(false);
-    } else {
+  const handleSignUp = async () => {
+    try {
+      await signUp(email, password);
       setDisableSubmitButton(true);
+      setError("");
+      setRegistrationProcessing(false);
+      setShowPopUp(true);
+    } catch (err) {
+      console.error("Signup error:", err.message);
+      setError(`Signup failed: ${err.message}`);
+      setRegistrationProcessing(false);
     }
   };
 
@@ -46,38 +38,21 @@ function SignUpForm({supabaseClient}) {
     event.preventDefault();
     setRegistrationProcessing(true);
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!name) {
-      setRegistrationProcessing(false);
-      setError("Name is required");
-      return;
-    }
-    if (!email) {
-      setRegistrationProcessing(false);
-      setError("Email is required");
-      return;
-    }
-    if (!emailPattern.test(email)) {
-      setRegistrationProcessing(false);
-      setError("Please enter a valid email address");
-      return;
-    }
-    if (!password) {
-      setRegistrationProcessing(false);
-      setError("Password is required");
-      return;
-    }
-    if (password.length < 6) {
-      setRegistrationProcessing(false);
-      setError("Length of password should be greater than 6");
-      return;
-    }
-    if (password !== confirmedPassword) {
-      setRegistrationProcessing(false);
-      setError("Passwords do not match!");
-      return;
-    }
+
+    if (!name) return stop("Name is required");
+    if (!email) return stop("Email is required");
+    if (!emailPattern.test(email)) return stop("Please enter a valid email address");
+    if (!password) return stop("Password is required");
+    if (password.length < 6) return stop("Length of password should be greater than 6");
+    if (password !== confirmedPassword) return stop("Passwords do not match!");
+
     setError("");
-    signUp();
+    handleSignUp();
+  };
+
+  const stop = (msg) => {
+    setError(msg);
+    setRegistrationProcessing(false);
   };
 
   return (
@@ -132,10 +107,7 @@ function SignUpForm({supabaseClient}) {
               />
             </div>
 
-            {/* ERROR MESSAGE BLOCK */}
-            {error && (
-              <ErrorMessage errorMessage={error}/>
-            )}
+            {error && <ErrorMessage errorMessage={error} />}
 
             <div className="flex items-center space-x-2">
               <input
