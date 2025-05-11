@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 
 const navItems = [
-  { icon: <Utensils />, label: "My Restaraunts" },
+  { icon: <Utensils />, label: "My Businesses" },
 //   { icon: <Database />, label: "Database" },
 //   { icon: <Users />, label: "Users" },
 //   { icon: <BarChart />, label: "Analytics" },
