@@ -32,9 +32,24 @@ function OnBoardingWizard() {
 
   const StepComponent = [
     <BusinessInfoStep data={formData} onNext={next} onUpdate={updateData} />,
-    <ContactHoursStep data={formData} onNext={next} onBack={back} onUpdate={updateData} />,
-    <EnhancementsStep data={formData} onNext={next} onBack={back} onUpdate={updateData} />,
-    <BotCustomizationStep data={formData} onNext={next} onBack={back} onUpdate={updateData} />,
+    <ContactHoursStep
+      data={formData}
+      onNext={next}
+      onBack={back}
+      onUpdate={updateData}
+    />,
+    <EnhancementsStep
+      data={formData}
+      onNext={next}
+      onBack={back}
+      onUpdate={updateData}
+    />,
+    <BotCustomizationStep
+      data={formData}
+      onNext={next}
+      onBack={back}
+      onUpdate={updateData}
+    />,
     <ReviewSubmitStep
       data={formData}
       onBack={back}
@@ -45,18 +60,31 @@ function OnBoardingWizard() {
 
   return (
     <div className="flex-1 overflow-y-auto bg-[var(--background)] py-10 px-4">
-      <div className="max-w-2xl mx-auto p-6 bg-white rounded-xl shadow">
-        <div className="mb-4">
+      <div className="max-w-2xl mx-auto p-6 bg-white rounded-xl shadow space-y-6">
+        {/* Progress Pills */}
+        <div className="flex items-center justify-center gap-2 mb-6">
+          {steps.map((_, index) => (
+            <div
+              key={index}
+              className={`h-1.5 flex-1 rounded-full transition-all duration-300
+        ${index <= step ? "bg-[var(--button)]" : "bg-gray-300"}`}
+            />
+          ))}
+        </div>
+
+        {/* Step Title */}
+        <div>
           <div className="text-sm text-gray-600">
             Step {step + 1} of {steps.length}
           </div>
           <h2 className="text-2xl font-bold">{steps[step]}</h2>
         </div>
+
+        {/* Step Component */}
         {StepComponent}
       </div>
     </div>
   );
-  
 }
 
 export default OnBoardingWizard;
