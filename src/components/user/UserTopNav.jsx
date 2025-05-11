@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import menugenie from "../../assets/menu_genie_logo.png";
+import { Link } from "react-router-dom";
 
 function UserTopNav() {
   const { signOut } = useAuth();
@@ -44,7 +45,11 @@ function UserTopNav() {
     >
       <div className="flex flex-row items-center gap-x-3">
         <MenuGenieLogo />
-        <h1 className="text-xl font-bold text-gray-800 font-tagees">MenuGenie</h1>
+        <Link to="/dashboard" className="no-underline">
+          <h1 className="text-xl font-bold text-gray-800 font-tagees">
+            MenuGenie
+          </h1>
+        </Link>
       </div>
 
       {/* Avatar */}
