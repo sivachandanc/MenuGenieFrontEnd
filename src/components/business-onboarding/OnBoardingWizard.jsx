@@ -38,22 +38,25 @@ function OnBoardingWizard() {
     <ReviewSubmitStep
       data={formData}
       onBack={back}
-      onEdit={goToStep} // 👈 Pass step setter
-      onFinish={handleFinish} // 👈 Pass final submit handler
+      onEdit={goToStep}
+      onFinish={handleFinish}
     />,
   ][step];
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white rounded-xl shadow">
-      <div className="mb-4">
-        <div className="text-sm text-gray-600">
-          Step {step + 1} of {steps.length}
+    <div className="flex-1 overflow-y-auto bg-[var(--background)] py-10 px-4">
+      <div className="max-w-2xl mx-auto p-6 bg-white rounded-xl shadow">
+        <div className="mb-4">
+          <div className="text-sm text-gray-600">
+            Step {step + 1} of {steps.length}
+          </div>
+          <h2 className="text-2xl font-bold">{steps[step]}</h2>
         </div>
-        <h2 className="text-2xl font-bold">{steps[step]}</h2>
+        {StepComponent}
       </div>
-      {StepComponent}
     </div>
   );
+  
 }
 
 export default OnBoardingWizard;

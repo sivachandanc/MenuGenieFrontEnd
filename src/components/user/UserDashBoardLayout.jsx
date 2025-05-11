@@ -4,7 +4,7 @@ import { Outlet } from "react-router-dom";
 
 export default function UserDashboardLayout() {
   return (
-    <div className="flex flex-col h-screen bg-[#f5f7fa] text-[#1a1a1a]">
+    <div className="flex flex-col h-screen bg-[var(--background)] text-[#1a1a1a]">
       {/* Top Navbar */}
       <UserTopNav />
 

@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import menugenie from "../../assets/menu_genie_logo.png";
 import { Link } from "react-router-dom";
+import MenuGenieLogo from "../util-components/MenuGenieLogo";
 
 function UserTopNav() {
   const { signOut } = useAuth();
@@ -25,22 +25,12 @@ function UserTopNav() {
     await signOut(); // Supabase logout
     navigate("/"); // Redirect to login
   };
-
-  const MenuGenieLogo = () => {
-    return (
-      <div className="group h-14 w-14 rounded-full overflow-hidden">
-        <img
-          src={menugenie}
-          alt="MenuGenie Logo"
-          className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
-        />
-      </div>
-    );
-  };
+  
+  
 
   return (
     <div
-      className="h-14 w-full bg-white shadow flex items-center justify-between px-4 relative"
+      className="h-14 w-full bg-[var(--background)] shadow flex items-center justify-between px-4 relative"
       ref={dropdownRef}
     >
       <div className="flex flex-row items-center gap-x-3">
