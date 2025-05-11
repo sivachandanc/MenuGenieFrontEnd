@@ -19,23 +19,36 @@ function OnBoardingWizard() {
 
   const next = () => setStep((prev) => Math.min(prev + 1, steps.length - 1));
   const back = () => setStep((prev) => Math.max(prev - 1, 0));
+  const goToStep = (index) => setStep(index);
 
   const updateData = (newData) => {
     setFormData((prev) => ({ ...prev, ...newData }));
   };
 
+  const handleFinish = () => {
+    console.log("Final submission:", formData);
+    // TODO: Save to Supabase and redirect
+  };
+
   const StepComponent = [
-    <BusinessInfoStep data={formData} onNext={next} onUpdate={updateData} />, 
-    <ContactHoursStep data={formData} onNext={next} onBack={back} onUpdate={updateData} />, 
-    <EnhancementsStep data={formData} onNext={next} onBack={back} onUpdate={updateData} />, 
-    <BotCustomizationStep data={formData} onNext={next} onBack={back} onUpdate={updateData} />, 
-    <ReviewSubmitStep data={formData} onBack={back} />
+    <BusinessInfoStep data={formData} onNext={next} onUpdate={updateData} />,
+    <ContactHoursStep data={formData} onNext={next} onBack={back} onUpdate={updateData} />,
+    <EnhancementsStep data={formData} onNext={next} onBack={back} onUpdate={updateData} />,
+    <BotCustomizationStep data={formData} onNext={next} onBack={back} onUpdate={updateData} />,
+    <ReviewSubmitStep
+      data={formData}
+      onBack={back}
+      onEdit={goToStep} // 👈 Pass step setter
+      onFinish={handleFinish} // 👈 Pass final submit handler
+    />,
   ][step];
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-xl shadow">
       <div className="mb-4">
-        <div className="text-sm text-gray-600">Step {step + 1} of {steps.length}</div>
+        <div className="text-sm text-gray-600">
+          Step {step + 1} of {steps.length}
+        </div>
         <h2 className="text-2xl font-bold">{steps[step]}</h2>
       </div>
       {StepComponent}
