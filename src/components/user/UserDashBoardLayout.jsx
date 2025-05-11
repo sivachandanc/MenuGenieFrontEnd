@@ -1,7 +1,8 @@
-import Sidebar from "./UserSideBar";
-import UserTopNav from "./UserTopNav";
+import Sidebar from "./UserSideBar.jsx";
+import UserTopNav from "./UserTopNav.jsx";
+import UserDashBoard from "./UserDashBoard.jsx"
 
-export default function UserDashboardLayout({ children }) {
+export default function UserDashboardLayout() {
   return (
     <div className="flex flex-col h-screen bg-[#f5f7fa] text-[#1a1a1a]">
       {/* Top Navbar */}
@@ -13,9 +14,7 @@ export default function UserDashboardLayout({ children }) {
 
         {/* Main Dashboard Content */}
         <main className="flex-1 p-6 overflow-auto">
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            {children}
-          </div>
+            <UserDashBoard/>
         </main>
       </div>
     </div>
