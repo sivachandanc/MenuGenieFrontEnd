@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { supabaseClient } from "../../supabase-utils/SupaBaseClient";
 import SkeletonCard from "../util-components/SkeletonCard";
 
+
 function BusinessList() {
   const [businesses, setBusinesses] = useState([]);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const fetchBusinesses = async () => {
       setLoading(true);
