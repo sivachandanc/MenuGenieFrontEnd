@@ -6,6 +6,8 @@ import SignUpForm from "./components/sign-up/SignUpForm.jsx";
 import LoginForm from "./components/login/LoginForm.jsx";
 import ChatWindow from "./components/user-chat/ChatWindow.jsx";
 import UserDashBoardLayout from "./components/user/UserDashBoardLayout.jsx";
+import BusinessList from "./components/user/BusinessList.jsx";
+import OnBoardingWizard from "./components/business-onboarding/OnBoardingWizard.jsx";
 
 import PublicRoute from "./routes/PublicRoute";
 import PrivateRoute from "./routes/PrivateRoute";
@@ -55,7 +57,10 @@ function App() {
                 <UserDashBoardLayout />
               </PrivateRoute>
             }
-          />
+          >
+            <Route index element={<BusinessList />} />
+            <Route path="onboarding" element={<OnBoardingWizard />} />
+          </Route>
 
           {/* Chat route can be public or private depending on use case */}
           <Route

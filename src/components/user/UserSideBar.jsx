@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 
 const navItems = [
-  { icon: <Utensils />, label: "My Restaraunts" },
+  { icon: <Utensils />, label: "My Businesses" },
 //   { icon: <Database />, label: "Database" },
 //   { icon: <Users />, label: "Users" },
 //   { icon: <BarChart />, label: "Analytics" },
@@ -23,7 +23,7 @@ function Sidebar() {
     <div
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => setExpanded(false)}
-      className={`transition-all duration-300 bg-white  h-full ${
+      className={`transition-all duration-200 bg-[var(--background)] shadow border-r border-gray-200 h-full ${
         expanded ? "w-48" : "w-16"
       }`}
     >

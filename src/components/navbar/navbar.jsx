@@ -6,21 +6,9 @@ import {
   Button,
 } from "@heroui/react";
 import { Link } from "react-router-dom";
-import menugenie from "../../assets/menu_genie_logo.png";
+import MenuGenieLogo from "../util-components/MenuGenieLogo";
 
 function NavBar() {
-  const MenuGenieLogo = () => {
-    return (
-      <div className="group h-14 w-14 rounded-full overflow-hidden">
-        <img
-          src={menugenie}
-          alt="MenuGenie Logo"
-          className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
-        />
-      </div>
-    );
-  };
-  
 
   const navBarItems = [
     { name: "About", href: "#" },
