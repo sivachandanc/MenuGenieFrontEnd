@@ -16,7 +16,6 @@ export default function UserDashboardLayout() {
         {/* Main Dashboard Content */}
         <main className="flex-1 p-6 overflow-auto bg-[var(--background)]">
         <Outlet />
-        <MiddlewareTest/>
         </main>
       </div>
     </div>

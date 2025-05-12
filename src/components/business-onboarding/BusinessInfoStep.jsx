@@ -5,8 +5,8 @@ function BusinessInfoStep({ data, onUpdate, onNext }) {
   const [name, setName] = useState(data.business_name || "");
   const [type, setType] = useState(data.business_type || "");
   const [location, setLocation] = useState(data.location || "");
-  const [businsessDescription, setBusinsessDescription] = useState(
-    data.businsess_description || ""
+  const [businessDescription, setBusinsessDescription] = useState(
+    data.business_description || ""
   );
   const [error, setError] = useState("");
 
@@ -20,7 +20,7 @@ function BusinessInfoStep({ data, onUpdate, onNext }) {
         setError("Location is required");
         return;
     }
-    if (businsessDescription.trim().length ==0){
+    if (businessDescription.trim().length ==0){
         setError("Business Descitpion is required");
         return;
     }
@@ -30,7 +30,7 @@ function BusinessInfoStep({ data, onUpdate, onNext }) {
         return;
       }
     setError("")
-    onUpdate({ business_name: name, business_type: type, location, businsess_description: businsessDescription });
+    onUpdate({ business_name: name, business_type: type, location, business_description: businessDescription });
     onNext();
   };
 
@@ -88,7 +88,7 @@ function BusinessInfoStep({ data, onUpdate, onNext }) {
           className="mt-1 block w-full border border-gray-300 rounded-md p-2"
           rows={4}
           placeholder="This helps your chatbot better represent your brand. Mention what you specialize in, your mission, or what you're proud of."
-          value={businsessDescription}
+          value={businessDescription}
           onChange={(e) => setBusinsessDescription(e.target.value)}
           required
         />

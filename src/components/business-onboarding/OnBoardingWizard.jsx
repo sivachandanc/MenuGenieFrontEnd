@@ -4,6 +4,7 @@ import ContactHoursStep from "./ContactHoursStep";
 import EnhancementsStep from "./EnhancementsStep";
 import BotCustomizationStep from "./BotCustomizationStep";
 import ReviewSubmitStep from "./ReviewSubmitStep";
+import { supabaseClient } from "../../supabase-utils/SupaBaseClient.jsx";
 
 //TODO: Need to add process to persist the data
 const steps = [
@@ -26,10 +27,45 @@ function OnBoardingWizard() {
     setFormData((prev) => ({ ...prev, ...newData }));
   };
 
-  const handleFinish = () => {
+  const handleFinish = async () => {
     console.log("Final submission:", formData);
-    // TODO: Save to Supabase and redirect
+  
+    try {
+      const token = (await supabaseClient.auth.getSession()).data?.session?.access_token;
+  
+      if (!token) {
+        alert("Authentication error. Please log in again.");
+        return;
+      }
+  
+      const payload = JSON.stringify(formData, null, 2);
+      console.log("Sending payload to backend:", payload); // 👈 log the formatted JSON
+  
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/onboard`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: payload,
+      });
+  
+      const result = await response.json();
+  
+      if (!response.ok) {
+        console.error("Backend error:", result);
+        alert("Failed to submit business data.");
+        return;
+      }
+  
+      alert("Business onboarding successful!");
+      window.location.href = "/dashboard";
+    } catch (error) {
+      console.error("Submission error:", error);
+      alert("Something went wrong. Please try again.");
+    }
   };
+  
 
   const StepComponent = [
     <BusinessInfoStep data={formData} onNext={next} onUpdate={updateData} />,
