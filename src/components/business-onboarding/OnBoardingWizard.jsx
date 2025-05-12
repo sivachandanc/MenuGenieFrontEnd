@@ -18,6 +18,7 @@ const steps = [
 function OnBoardingWizard() {
   const [step, setStep] = useState(0);
   const [formData, setFormData] = useState({});
+  const [error, setError] = useState("");
 
   const next = () => setStep((prev) => Math.min(prev + 1, steps.length - 1));
   const back = () => setStep((prev) => Math.max(prev - 1, 0));
@@ -29,42 +30,44 @@ function OnBoardingWizard() {
 
   const handleFinish = async () => {
     console.log("Final submission:", formData);
-  
+
     try {
-      const token = (await supabaseClient.auth.getSession()).data?.session?.access_token;
-  
+      const token = (await supabaseClient.auth.getSession()).data?.session
+        ?.access_token;
+
       if (!token) {
-        alert("Authentication error. Please log in again.");
+        setError("Authentication error. Please log in again.");
         return;
       }
-  
+
       const payload = JSON.stringify(formData, null, 2);
-  
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/onboard`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: payload,
-      });
-  
+
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/onboard`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: payload,
+        }
+      );
+
       const result = await response.json();
-  
+
       if (!response.ok) {
         console.error("Backend error:", result);
-        alert("Failed to submit business data.");
+        setError("Failed to submit business data.");
         return;
       }
-  
-      alert("Business onboarding successful!");
+      setError("");
       window.location.href = "/dashboard";
     } catch (error) {
+      setError("Something went wrong. Please try again.");
       console.error("Submission error:", error);
-      alert("Something went wrong. Please try again.");
     }
   };
-  
 
   const StepComponent = [
     <BusinessInfoStep data={formData} onNext={next} onUpdate={updateData} />,
@@ -91,6 +94,7 @@ function OnBoardingWizard() {
       onBack={back}
       onEdit={goToStep}
       onFinish={handleFinish}
+      error={error}
     />,
   ][step];
 

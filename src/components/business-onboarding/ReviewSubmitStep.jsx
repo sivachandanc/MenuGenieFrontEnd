@@ -1,4 +1,6 @@
-function ReviewSubmitStep({ data, onBack, onEdit, onFinish }) {
+import ErrorMessage from "../util-components/ErrorMessage";
+
+function ReviewSubmitStep({ data, onBack, onEdit, onFinish , error}) {
     const Section = ({ title, step, children }) => (
       <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
         <div className="flex justify-between items-start mb-4">
@@ -46,7 +48,7 @@ function ReviewSubmitStep({ data, onBack, onEdit, onFinish }) {
             data.ownershipTags?.length > 0 ? data.ownershipTags.join(", ") : "—"
           )}
         </Section>
-  
+          {error && <ErrorMessage errorMessage={error}/> }
         <div className="flex justify-between mt-6">
           <button
             onClick={onBack}

@@ -27,6 +27,7 @@ function Sidebar() {
           >
             <div className="text-gray-600">{item.icon}</div>
             {expanded && <span className="text-sm text-gray-800">{item.label}</span>}
+            
           </div>
         ))}
       </div>
