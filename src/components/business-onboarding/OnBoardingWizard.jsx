@@ -39,7 +39,6 @@ function OnBoardingWizard() {
       }
   
       const payload = JSON.stringify(formData, null, 2);
-      console.log("Sending payload to backend:", payload); // 👈 log the formatted JSON
   
       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/onboard`, {
         method: "POST",
