@@ -16,6 +16,8 @@ function ChatWindow({ setChatMode }) {
     const userChatURL = import.meta.env.VITE_USER_CHAT_BACKEND;
     const webSocketURL = userChatURL.concat("/", businessID);
     const socket = new WebSocket(webSocketURL);
+    console.log("Websocket URL is:")
+    console.log(webSocketURL)
     socketRef.current = socket;
 
     socket.onopen = () => console.log("Connected to WebSocket server!");
