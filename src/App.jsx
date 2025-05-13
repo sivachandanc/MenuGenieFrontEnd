@@ -17,7 +17,10 @@ import { useState } from "react";
 function App() {
   const { user } = useAuth();
   const [chatMode, setChatMode] = useState(false);
-
+  // TODO: Remove later
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  console.log("The superbase URL:",supabaseUrl)
+  //
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-[var(--background)]">
