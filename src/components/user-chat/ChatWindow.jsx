@@ -8,7 +8,6 @@ function ChatWindow({ setChatMode }) {
   const [messages, setMessages] = useState([]);
   const [botTyping, setBotTyping] = useState(false);
   const inputRef = useRef(null);
-
   const sendMessage = async () => {
     const text = inputRef.current?.value?.trim();
     if (!text || !businessID) return;
