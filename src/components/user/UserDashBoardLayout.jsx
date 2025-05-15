@@ -1,7 +1,6 @@
 import Sidebar from "./UserSideBar.jsx";
 import UserTopNav from "./UserTopNav.jsx";
 import { Outlet } from "react-router-dom"; 
-import MiddlewareTest from "../tests/MiddleWareTest.jsx";
 
 export default function UserDashboardLayout() {
   return (
