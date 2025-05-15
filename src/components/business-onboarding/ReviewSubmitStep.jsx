@@ -31,7 +31,7 @@ function ReviewSubmitStep({ data, onBack, onEdit, onFinish , error}) {
           {renderRow("Name", data.business_name)}
           {renderRow("Type", data.business_type)}
           {renderRow("Location", data.location)}
-          {renderRow("Description", data.businsess_description)}
+          {renderRow("Description", data.business_description)}
         </Section>
   
         <Section title="Contact Information" step={1}>
