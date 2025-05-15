@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import SendIcon from "../../assets/send.svg";
 
@@ -8,6 +8,20 @@ function ChatWindow({ setChatMode }) {
   const [messages, setMessages] = useState([]);
   const [botTyping, setBotTyping] = useState(false);
   const inputRef = useRef(null);
+  const sessionUUIDRef = useRef(null);
+
+  // Persist UUID even across browser restarts
+  useEffect(() => {
+    const existingUUID = localStorage.getItem("sessionUUID");
+    if (existingUUID) {
+      sessionUUIDRef.current = existingUUID;
+    } else {
+      const newUUID = crypto.randomUUID();
+      sessionUUIDRef.current = newUUID;
+      localStorage.setItem("sessionUUID", newUUID);
+    }
+  }, []);
+
   const sendMessage = async () => {
     const text = inputRef.current?.value?.trim();
     if (!text || !businessID) return;
@@ -20,7 +34,10 @@ function ChatWindow({ setChatMode }) {
     try {
       const res = await fetch(`${import.meta.env.VITE_USER_CHAT_BACKEND}/chat/${businessID}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "X-Session-ID": sessionUUIDRef.current,
+        },
         body: JSON.stringify({ text }),
       });
 
