@@ -10,13 +10,44 @@ function BusinessList() {
   useEffect(() => {
     const fetchBusinesses = async () => {
       setLoading(true);
-      const { data, error } = await supabaseClient.from("business").select("*");
+
+      // Fetch businesses from Supabase table
+      const { data: businessData, error } = await supabaseClient
+        .from("business")
+        .select("*");
 
       if (error) {
         console.error("Error fetching businesses:", error.message);
-      } else {
-        setBusinesses(data);
+        setLoading(false);
+        return;
       }
+
+      // Resolve logo URL for each business
+      const withLogos = await Promise.all(
+        businessData.map(async (biz) => {
+          const path = `business/${biz.user_id}/${biz.business_id}/bot.ico`;
+          const {
+            data: { publicUrl },
+          } = supabaseClient.storage.from("business").getPublicUrl(path);
+
+          // Check if file is accessible
+          const res = await fetch(publicUrl, { method: "HEAD" });
+
+          // If not found, use default
+          const finalUrl = res.ok
+            ? publicUrl
+            : supabaseClient.storage
+                .from("business")
+                .getPublicUrl("menu_genie_logo_default.ico").data.publicUrl;
+
+          return {
+            ...biz,
+            logoUrl: finalUrl,
+          };
+        })
+      );
+
+      setBusinesses(withLogos);
       setLoading(false);
     };
 
@@ -54,7 +85,14 @@ function BusinessList() {
               key={biz.business_id}
               className="bg-white rounded-xl border border-gray-200 shadow-md p-4 transition hover:shadow-lg cursor-pointer"
             >
-              <p className="font-semibold text-lg">{biz.name}</p>
+              <div className="flex justify-between items-center">
+                <p className="font-semibold text-lg">{biz.name}</p>
+                <img
+                  src={biz.logoUrl}
+                  alt="Business Logo"
+                  className="w-8 h-8 object-contain border border-blue-500 rounded-full"
+                />
+              </div>
             </li>
           ))}
         </ul>
