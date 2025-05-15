@@ -29,7 +29,7 @@ function OnBoardingWizard() {
   };
 
   const handleFinish = async () => {
-    console.log("Final submission:", formData);
+    console.log("Final submission:", formData); //TODO: Remove this
 
     try {
       const token = (await supabaseClient.auth.getSession()).data?.session
