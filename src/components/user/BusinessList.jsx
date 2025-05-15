@@ -7,11 +7,11 @@ function BusinessList() {
   const [businesses, setBusinesses] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
   useEffect(() => {
     const fetchBusinesses = async () => {
       setLoading(true);
 
-      // Fetch businesses from Supabase table
       const { data: businessData, error } = await supabaseClient
         .from("business")
         .select("*");
@@ -22,32 +22,38 @@ function BusinessList() {
         return;
       }
 
-      // Resolve logo URL for each business
-      const withLogos = await Promise.all(
+      const withLogosAndMenu = await Promise.all(
         businessData.map(async (biz) => {
-          const path = `business/${biz.user_id}/${biz.business_id}/bot.ico`;
+          const logoPath = `business/${biz.user_id}/${biz.business_id}/bot.ico`;
           const {
             data: { publicUrl },
-          } = supabaseClient.storage.from("business").getPublicUrl(path);
+          } = supabaseClient.storage.from("business").getPublicUrl(logoPath);
 
-          // Check if file is accessible
           const res = await fetch(publicUrl, { method: "HEAD" });
 
-          // If not found, use default
           const finalUrl = res.ok
             ? publicUrl
             : supabaseClient.storage
                 .from("business")
                 .getPublicUrl("menu_genie_logo_default.ico").data.publicUrl;
 
+          const { data: menuItems} = await supabaseClient
+            .from("menu_context")
+            .select("item_id")
+            .eq("business_id", biz.business_id)
+            .limit(1);
+
+          const hasMenu = menuItems && menuItems.length > 0;
+
           return {
             ...biz,
             logoUrl: finalUrl,
+            hasMenu,
           };
         })
       );
 
-      setBusinesses(withLogos);
+      setBusinesses(withLogosAndMenu);
       setLoading(false);
     };
 
@@ -86,7 +92,20 @@ function BusinessList() {
               className="bg-white rounded-xl border border-gray-200 shadow-md p-4 transition hover:shadow-lg cursor-pointer"
             >
               <div className="flex justify-between items-center">
-                <p className="font-semibold text-lg">{biz.name}</p>
+                {/* Business name and menu warning */}
+                <div className="flex items-center gap-2">
+                  <p className="font-semibold text-lg">{biz.name}</p>
+                  {!biz.hasMenu && (
+                    <div className="group relative">
+                      <span className="text-yellow-500 text-lg">⚠️</span>
+                      <div className="absolute left-1/2 transform -translate-x-1/2 top-full mt-1 bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded shadow opacity-0 group-hover:opacity-100 transition-opacity z-10 whitespace-nowrap">
+                        No Menu Added
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Business logo */}
                 <img
                   src={biz.logoUrl}
                   alt="Business Logo"
