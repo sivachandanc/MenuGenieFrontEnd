@@ -37,14 +37,15 @@ function BusinessList() {
                 .from("business")
                 .getPublicUrl("menu_genie_logo_default.ico").data.publicUrl;
 
-          const { data: menuItems} = await supabaseClient
+          const { data: menuItems } = await supabaseClient
             .from("menu_context")
-            .select("item_id")
+            .select("business_id")
             .eq("business_id", biz.business_id)
+            .eq("type","menu_type")
             .limit(1);
 
           const hasMenu = menuItems && menuItems.length > 0;
-
+          console.log("Has Menu:",hasMenu)
           return {
             ...biz,
             logoUrl: finalUrl,
@@ -89,6 +90,7 @@ function BusinessList() {
           {businesses.map((biz) => (
             <li
               key={biz.business_id}
+              onClick={() => navigate(`/dashboard/business/${biz.business_id}`)}
               className="bg-white rounded-xl border border-gray-200 shadow-md p-4 transition hover:shadow-lg cursor-pointer"
             >
               <div className="flex justify-between items-center">
@@ -112,6 +114,13 @@ function BusinessList() {
                   className="w-8 h-8 object-contain border border-blue-500 rounded-full"
                 />
               </div>
+
+              {/* Extra caution message */}
+              {!biz.hasMenu && (
+                <div className="mt-4 bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm px-3 py-2 rounded-md flex items-center gap-2">
+                  ⚠️ <span>There is no menu added.</span>
+                </div>
+              )}
             </li>
           ))}
         </ul>
