@@ -41,11 +41,11 @@ function BusinessList() {
             .from("menu_context")
             .select("business_id")
             .eq("business_id", biz.business_id)
-            .eq("type","menu_type")
+            .eq("type", "menu_type")
             .limit(1);
 
           const hasMenu = menuItems && menuItems.length > 0;
-          console.log("Has Menu:",hasMenu)
+          console.log("Has Menu:", hasMenu);
           return {
             ...biz,
             logoUrl: finalUrl,
@@ -90,11 +90,15 @@ function BusinessList() {
           {businesses.map((biz) => (
             <li
               key={biz.business_id}
-              onClick={() => navigate(`/dashboard/business/${biz.business_id}`)}
-              className="bg-white rounded-xl border border-gray-200 shadow-md p-4 transition hover:shadow-lg cursor-pointer"
+              className="bg-white rounded-xl border border-gray-200 shadow-md p-4 transition hover:shadow-lg"
             >
-              <div className="flex justify-between items-center">
-                {/* Business name and menu warning */}
+              {/* Clickable card title */}
+              <div
+                onClick={() =>
+                  navigate(`/dashboard/business/${biz.business_id}`)
+                }
+                className="flex justify-between items-center cursor-pointer"
+              >
                 <div className="flex items-center gap-2">
                   <p className="font-semibold text-lg">{biz.name}</p>
                   {!biz.hasMenu && (
@@ -107,7 +111,6 @@ function BusinessList() {
                   )}
                 </div>
 
-                {/* Business logo */}
                 <img
                   src={biz.logoUrl}
                   alt="Business Logo"
@@ -115,10 +118,22 @@ function BusinessList() {
                 />
               </div>
 
-              {/* Extra caution message */}
+              {/* Extra caution + Add Menu */}
               {!biz.hasMenu && (
-                <div className="mt-4 bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm px-3 py-2 rounded-md flex items-center gap-2">
-                  ⚠️ <span>There is no menu added.</span>
+                <div className="mt-4 bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm px-3 py-2 rounded-md flex justify-between items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    ⚠️ <span>This business has no menu added.</span>
+                  </div>
+                  <button
+                    onClick={() =>
+                      navigate(
+                        `/dashboard/business/${biz.business_id}/menu/add`
+                      )
+                    }
+                    className="text-xs font-medium bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded transition"
+                  >
+                    + Add Menu
+                  </button>
                 </div>
               )}
             </li>

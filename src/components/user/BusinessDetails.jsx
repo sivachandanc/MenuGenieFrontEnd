@@ -52,7 +52,7 @@ function BusinessDetails() {
         .from("menu_context")
         .select("item_id")
         .eq("business_id", businessID)
-        .eq("type","menu_type")
+        .eq("type", "menu_type")
         .limit(1);
 
       setHasMenu(menuItems && menuItems.length > 0);
@@ -103,9 +103,19 @@ function BusinessDetails() {
 
       {/* ❗ No Menu Caution */}
       {!hasMenu && (
-        <div className="flex items-center gap-2 bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm px-4 py-2 rounded-md">
-          <AlertTriangle size={16} className="text-yellow-500" />
-          <span>This business does not have a menu added yet.</span>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm px-4 py-3 rounded-md">
+          <div className="flex items-center gap-2">
+            <AlertTriangle size={16} className="text-yellow-500" />
+            <span>This business does not have a menu added yet.</span>
+          </div>
+          <button
+            onClick={() =>
+              (window.location.href = `/dashboard/business/${businessID}/menu/add`)
+            }
+            className="text-sm font-medium bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1.5 rounded transition"
+          >
+            + Add Menu
+          </button>
         </div>
       )}
 
