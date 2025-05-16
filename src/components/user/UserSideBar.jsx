@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Utensils } from "lucide-react";
+import {Plus} from "lucide-react";
 
 const navItems = [
   { icon: <Utensils />, label: "My Businesses", path: "/dashboard" },
+  { icon: <Plus />, label: "Add Business", path: "/dashboard/onboarding" }
 ];
 
 function Sidebar() {

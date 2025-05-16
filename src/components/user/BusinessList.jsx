@@ -2,25 +2,71 @@ import { useEffect, useState } from "react";
 import { supabaseClient } from "../../supabase-utils/SupaBaseClient";
 import SkeletonCard from "../util-components/SkeletonCard";
 import { useNavigate } from "react-router-dom";
-
-
+import { AlertTriangle } from "lucide-react";
 
 function BusinessList() {
   const [businesses, setBusinesses] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
   useEffect(() => {
     const fetchBusinesses = async () => {
       setLoading(true);
-      const { data, error } = await supabaseClient
+
+      const { data: businessData, error } = await supabaseClient
         .from("business")
         .select("*");
 
       if (error) {
         console.error("Error fetching businesses:", error.message);
-      } else {
-        setBusinesses(data);
+        setLoading(false);
+        return;
       }
+
+      const withLogosAndMenu = await Promise.all(
+        businessData.map(async (biz) => {
+          // ✅ Get logo
+          const logoPath = `business/${biz.user_id}/${biz.business_id}/bot.ico`;
+          const {
+            data: { publicUrl },
+          } = supabaseClient.storage.from("business").getPublicUrl(logoPath);
+          const res = await fetch(publicUrl, { method: "HEAD" });
+
+          const finalUrl = res.ok
+            ? publicUrl
+            : supabaseClient.storage
+                .from("business")
+                .getPublicUrl("menu_genie_logo_default.ico").data.publicUrl;
+
+          // ✅ Check menu existence
+          let hasMenu = false;
+          const businessType = biz.business_type;
+          const menuTable = `menu_item_${businessType}`;
+
+          try {
+            const { data: menuItems, error: menuError } = await supabaseClient
+              .from(menuTable)
+              .select("item_id")
+              .eq("business_id", biz.business_id)
+              .limit(1);
+            console.log("Menu Data is:",biz.business_id)
+
+            if (!menuError && menuItems?.length > 0) {
+              hasMenu = true;
+            }
+          } catch (err) {
+            console.warn(`Could not check table "${menuTable}" for ${biz.name}`, err.message);
+          }
+
+          return {
+            ...biz,
+            logoUrl: finalUrl,
+            hasMenu,
+          };
+        })
+      );
+
+      setBusinesses(withLogosAndMenu);
       setLoading(false);
     };
 
@@ -32,22 +78,67 @@ function BusinessList() {
       <h2 className="text-xl font-bold mb-4">Your Businesses</h2>
 
       {loading ? (
-        <p><SkeletonCard/></p>
+        <p><SkeletonCard /></p>
       ) : businesses.length === 0 ? (
         <div className="text-center border border-dashed border-gray-300 p-6 rounded-lg bg-white shadow-sm">
           <p className="text-gray-600 mb-4">
-            You have no businesses onboarded with <span className="font-semibold text-[var(--button)]">MenuGenie</span>.
+            You have no businesses onboarded with{" "}
+            <span className="font-semibold text-[var(--button)]">MenuGenie</span>.
           </p>
-          <button onClick={() => navigate("/dashboard/onboarding")} className="px-5 py-2 rounded-full bg-[var(--button)] text-black font-semibold hover:bg-[var(--button-hover)] transition">
+          <button
+            onClick={() => navigate("/dashboard/onboarding")}
+            className="px-5 py-2 rounded-full bg-[var(--button)] text-black font-semibold hover:bg-[var(--button-hover)] transition"
+          >
             Add Business
           </button>
         </div>
       ) : (
-        <ul className="space-y-2">
+        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {businesses.map((biz) => (
-            <li key={biz.business_id} className="border rounded p-3 bg-white shadow-sm">
-              <p className="font-semibold">{biz.name}</p>
-              <p className="text-sm text-gray-500">{biz.description}</p>
+            <li
+              key={biz.business_id}
+              className="bg-white rounded-xl border border-gray-200 shadow-md p-4 transition hover:shadow-lg hover:ring-1 hover:ring-blue-100"
+            >
+              <div
+                onClick={() => navigate(`/dashboard/business/${biz.business_id}`)}
+                className="flex justify-between items-center cursor-pointer"
+              >
+                <div className="flex items-center gap-2">
+                  <p className="font-semibold text-lg">{biz.name}</p>
+                  {!biz.hasMenu && (
+                    <div className="group relative">
+                      <AlertTriangle className="text-yellow-500 w-4 h-4" />
+                      <div className="absolute left-1/2 transform -translate-x-1/2 top-full mt-1 bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded shadow opacity-0 group-hover:opacity-100 transition-opacity z-10 whitespace-nowrap">
+                        No Menu Added
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <img
+                  src={biz.logoUrl}
+                  alt="Business Logo"
+                  className="w-8 h-8 object-contain border border-blue-500 rounded-full bg-white"
+                />
+              </div>
+
+              {!biz.hasMenu && (
+                <div className="mt-4 bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm px-3 py-2 rounded-md flex justify-between items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 text-yellow-500" />
+                    <span>This business has no menu added.</span>
+                  </div>
+                  <button
+                    onClick={() =>
+                      navigate(`/dashboard/business/${biz.business_id}/menu`)
+                    }
+                    className="text-xs font-semibold bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1.5 rounded-md transition"
+                    title="Click to add a menu"
+                  >
+                    + Add Menu
+                  </button>
+                </div>
+              )}
             </li>
           ))}
         </ul>
