@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { supabaseClient } from "../../supabase-utils/SupaBaseClient";
 import { Plus, AlertTriangle } from "lucide-react";
 import AddMenuItemCafeForm from "./AddMenuItems/AddMenuItemCafe.jsx";
+import ImageUploader from "../util-components/ImageUploader.jsx";
 
 function ListBusinessMenu() {
   const { businessID } = useParams();
@@ -97,19 +98,29 @@ function ListBusinessMenu() {
             </div>
           ) : (
             <ul className="space-y-2 p-4 rounded-lg shadow bg-[var(--button)]">
-  {menuItems.map((item) => (
-    <li
-      key={item.item_id}
-      className="border-b border-gray-100 pb-2"
-    >
-      <p className="font-medium text-gray-900">{item.name}</p>
-      <p className="text-sm text-gray-600 italic">{item.category}</p>
-    </li>
-  ))}
-</ul>
-
+              {menuItems.map((item) => (
+                <li
+                  key={item.item_id}
+                  className="border-b border-gray-100 pb-2"
+                >
+                  <p className="font-medium text-gray-900">{item.name}</p>
+                  <p className="text-sm text-gray-600 italic">
+                    {item.category}
+                  </p>
+                </li>
+              ))}
+            </ul>
           )}
         </div>
+        {!showForm && (
+          <div className="w-1/3">
+            <ImageUploader
+              imageUploaderTitle={
+                "📷 Skip manual entry - Upload your menu image and let AI handle the rest!"
+              }
+            />
+          </div>
+        )}
 
         {/* Right panel shows form only if showForm is true */}
         <div className="flex-1">{showForm && renderAddForm()}</div>
