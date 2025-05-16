@@ -25,11 +25,11 @@ function BusinessList() {
 
       const withLogosAndMenu = await Promise.all(
         businessData.map(async (biz) => {
+          // ✅ Get logo
           const logoPath = `business/${biz.user_id}/${biz.business_id}/bot.ico`;
           const {
             data: { publicUrl },
           } = supabaseClient.storage.from("business").getPublicUrl(logoPath);
-
           const res = await fetch(publicUrl, { method: "HEAD" });
 
           const finalUrl = res.ok
@@ -38,14 +38,25 @@ function BusinessList() {
                 .from("business")
                 .getPublicUrl("menu_genie_logo_default.ico").data.publicUrl;
 
-          const { data: menuItems } = await supabaseClient
-            .from("menu_context")
-            .select("business_id")
-            .eq("business_id", biz.business_id)
-            .eq("type", "menu_type")
-            .limit(1);
+          // ✅ Check menu existence
+          let hasMenu = false;
+          const businessType = biz.business_type;
+          const menuTable = `menu_item_${businessType}`;
 
-          const hasMenu = menuItems && menuItems.length > 0;
+          try {
+            const { data: menuItems, error: menuError } = await supabaseClient
+              .from(menuTable)
+              .select("item_id")
+              .eq("business_id", biz.business_id)
+              .limit(1);
+            console.log("Menu Data is:",biz.business_id)
+
+            if (!menuError && menuItems?.length > 0) {
+              hasMenu = true;
+            }
+          } catch (err) {
+            console.warn(`Could not check table "${menuTable}" for ${biz.name}`, err.message);
+          }
 
           return {
             ...biz,
@@ -67,9 +78,7 @@ function BusinessList() {
       <h2 className="text-xl font-bold mb-4">Your Businesses</h2>
 
       {loading ? (
-        <p>
-          <SkeletonCard />
-        </p>
+        <p><SkeletonCard /></p>
       ) : businesses.length === 0 ? (
         <div className="text-center border border-dashed border-gray-300 p-6 rounded-lg bg-white shadow-sm">
           <p className="text-gray-600 mb-4">
@@ -90,7 +99,6 @@ function BusinessList() {
               key={biz.business_id}
               className="bg-white rounded-xl border border-gray-200 shadow-md p-4 transition hover:shadow-lg hover:ring-1 hover:ring-blue-100"
             >
-              {/* Clickable card title */}
               <div
                 onClick={() => navigate(`/dashboard/business/${biz.business_id}`)}
                 className="flex justify-between items-center cursor-pointer"
@@ -114,7 +122,6 @@ function BusinessList() {
                 />
               </div>
 
-              {/* Combined warning + button */}
               {!biz.hasMenu && (
                 <div className="mt-4 bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm px-3 py-2 rounded-md flex justify-between items-center gap-4">
                   <div className="flex items-center gap-2">

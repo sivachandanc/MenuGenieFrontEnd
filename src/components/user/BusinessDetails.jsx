@@ -22,6 +22,7 @@ function BusinessDetails() {
 
   useEffect(() => {
     const fetchBusiness = async () => {
+      // Step 1: Fetch business details
       const { data, error } = await supabaseClient
         .from("business")
         .select("*")
@@ -47,15 +48,21 @@ function BusinessDetails() {
 
       setBusiness({ ...data, logoUrl: finalUrl });
 
-      // Check for menu existence
-      const { data: menuItems } = await supabaseClient
-        .from("menu_context")
-        .select("item_id")
-        .eq("business_id", businessID)
-        .eq("type", "menu_type")
-        .limit(1);
+      // Step 2: Dynamically check corresponding menu table
+      const menuTable = `menu_item_${data.business_type?.toLowerCase().replace(/\s+/g, "_")}`;
+      try {
+        const { data: menuItems } = await supabaseClient
+          .from(menuTable)
+          .select("item_id")
+          .eq("business_id", businessID)
+          .limit(1);
 
-      setHasMenu(menuItems && menuItems.length > 0);
+        setHasMenu(menuItems && menuItems.length > 0);
+      } catch (err) {
+        console.warn(`Failed to query menu table "${menuTable}":`, err.message);
+        setHasMenu(false);
+      }
+
       setLoading(false);
     };
 
@@ -86,19 +93,28 @@ function BusinessDetails() {
 
   return (
     <div className="max-w-4xl mx-auto p-8 bg-white rounded-2xl shadow space-y-8">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">{business.name}</h1>
-          <p className="text-sm text-gray-500 capitalize">
-            {business.business_type}
-          </p>
+      {/* Header with View Menu button */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex items-center justify-between w-full sm:w-auto">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">{business.name}</h1>
+            <p className="text-sm text-gray-500 capitalize">{business.business_type}</p>
+          </div>
+          <img
+            src={business.logoUrl}
+            alt="Business Logo"
+            className="w-14 h-14 object-contain border border-blue-500 rounded-full p-1 ml-4"
+          />
         </div>
-        <img
-          src={business.logoUrl}
-          alt="Business Logo"
-          className="w-14 h-14 object-contain border border-blue-500 rounded-full p-1"
-        />
+
+        <button
+          onClick={() =>
+            (window.location.href = `/dashboard/business/${businessID}/menu`)
+          }
+          className="text-sm font-medium bg-[var(--button)] hover:bg-[var(--button-hover)] text-black px-4 py-2 rounded-md shadow"
+        >
+          📋 View Menu
+        </button>
       </div>
 
       {/* ❗ No Menu Caution */}
@@ -121,26 +137,16 @@ function BusinessDetails() {
 
       {/* Description */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-700 mb-1">
-          Description
-        </h2>
+        <h2 className="text-lg font-semibold text-gray-700 mb-1">Description</h2>
         <p className="text-gray-600 leading-relaxed">{business.description}</p>
       </div>
 
-      {/* Details */}
+      {/* Business Details */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-6 text-sm">
-        <Info
-          label="Location"
-          value={business.location}
-          icon={<MapPin size={16} />}
-        />
+        <Info label="Location" value={business.location} icon={<MapPin size={16} />} />
         <Info label="Email" value={business.email} icon={<Mail size={16} />} />
         <Info label="Phone" value={business.phone} icon={<Phone size={16} />} />
-        <Info
-          label="Website"
-          value={business.website}
-          icon={<Globe size={16} />}
-        />
+        <Info label="Website" value={business.website} icon={<Globe size={16} />} />
         <Info
           label="Opening Time"
           value={business.opening_time?.slice(0, 5)}
@@ -151,11 +157,7 @@ function BusinessDetails() {
           value={business.closing_time?.slice(0, 5)}
           icon={<Clock size={16} />}
         />
-        <Info
-          label="Top Items"
-          value={business.top_items}
-          icon={<Star size={16} />}
-        />
+        <Info label="Top Items" value={business.top_items} icon={<Star size={16} />} />
         <Info
           label="Ownership Tags"
           value={business.ownership_tags?.join(", ")}
@@ -166,11 +168,7 @@ function BusinessDetails() {
           value={business.bot_personality}
           icon={<Smile size={16} />}
         />
-        <Info
-          label="Bot Name"
-          value={business.bot_name}
-          icon={<Bot size={16} />}
-        />
+        <Info label="Bot Name" value={business.bot_name} icon={<Bot size={16} />} />
       </div>
     </div>
   );
