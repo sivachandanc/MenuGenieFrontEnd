@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { supabaseClient } from "../../supabase-utils/SupaBaseClient";
 import { Plus, AlertTriangle, CheckCircle } from "lucide-react";
 import AddMenuItemCafeForm from "./AddMenuItems/AddMenuItemCafe.jsx";
-import ImageUploader from "../util-components/ImageUploader.jsx";
+import ImageUploader from "./AddMenuItems/ImageUploader.jsx";
 
 function ListBusinessMenu() {
   const { businessID } = useParams();
