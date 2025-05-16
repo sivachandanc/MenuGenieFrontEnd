@@ -110,7 +110,7 @@ function BusinessDetails() {
           </div>
           <button
             onClick={() =>
-              (window.location.href = `/dashboard/business/${businessID}/menu/add`)
+              (window.location.href = `/dashboard/business/${businessID}/menu`)
             }
             className="text-sm font-medium bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1.5 rounded transition"
           >

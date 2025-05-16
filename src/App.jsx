@@ -9,6 +9,7 @@ import UserDashBoardLayout from "./components/user/UserDashBoardLayout.jsx";
 import BusinessList from "./components/user/BusinessList.jsx";
 import OnBoardingWizard from "./components/business-onboarding/OnBoardingWizard.jsx";
 import BusinessDetails from "./components/user/BusinessDetails.jsx";
+import ListBusinessMenu from "./components/user/ListBusinessMenu.jsx";
 
 import PublicRoute from "./routes/PublicRoute";
 import PrivateRoute from "./routes/PrivateRoute";
@@ -61,6 +62,7 @@ function App() {
             <Route index element={<BusinessList />} />
             <Route path="onboarding" element={<OnBoardingWizard />} />
             <Route path="business/:businessID" element={<BusinessDetails />} />
+            <Route path="business/:businessID/menu" element={<ListBusinessMenu />} />
           </Route>
 
           {/* Chat route can be public or private depending on use case */}

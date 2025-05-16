@@ -14,7 +14,7 @@
   --button-hover: oklch(0.9 0.1 140); */
   --button: oklch(0.8807 0.1244 219.13);
   --button-hover: oklch(0.9307 0.1244 219.13);
-  --background: oklch(0.9646 0.007 257.33);
+  --background: oklch(0.97 0.015 75);
   --card: oklch(0.3704 0.1799 275.26);
   --accent: oklch(0.8807 0.1244 219.13);
   --text-main: oklch(0.23 0.01 257);
