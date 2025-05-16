@@ -104,7 +104,7 @@ function AddMenuItemCafeForm({ businessID, onClose, onItemAdded }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-gray-50 border rounded-lg p-6 shadow space-y-4"
+      className="bg-white border rounded-lg p-6 shadow space-y-4"
     >
       <div className="flex justify-between items-center">
         <h2 className="text-lg font-semibold text-gray-800">Add New Menu Item</h2>
