@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { supabaseClient } from "../../supabase-utils/SupaBaseClient";
-import { Plus, AlertTriangle } from "lucide-react";
+import { Plus, AlertTriangle, CheckCircle } from "lucide-react";
 import AddMenuItemCafeForm from "./AddMenuItems/AddMenuItemCafe.jsx";
 import ImageUploader from "../util-components/ImageUploader.jsx";
 
@@ -12,6 +12,22 @@ function ListBusinessMenu() {
   const [businessName, setBusinessName] = useState("");
   const [businessType, setBusinessType] = useState("");
   const [showForm, setShowForm] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  const fetchMenuItems = async () => {
+    setLoading(true);
+    const menuTable = `menu_item_${businessType}`;
+    const { data: menuData, error: menuError } = await supabaseClient
+      .from(menuTable)
+      .select("*")
+      .eq("business_id", businessID);
+    if (menuError) {
+      console.error("Error fetching menu items:", menuError.message);
+    } else {
+      setMenuItems(menuData || []);
+    }
+    setLoading(false);
+  };
 
   useEffect(() => {
     const fetchBusinessAndMenu = async () => {
@@ -30,24 +46,14 @@ function ListBusinessMenu() {
 
       setBusinessName(businessData?.name || "");
       setBusinessType(businessData?.business_type || "");
-
-      const menuTable = `menu_item_${businessData.business_type}`;
-      const { data: menuData, error: menuError } = await supabaseClient
-        .from(menuTable)
-        .select("*")
-        .eq("business_id", businessID);
-
-      if (menuError) {
-        console.error("Error fetching menu items:", menuError.message);
-      } else {
-        setMenuItems(menuData || []);
-      }
-
-      setLoading(false);
     };
 
     fetchBusinessAndMenu();
   }, [businessID]);
+
+  useEffect(() => {
+    if (businessType) fetchMenuItems();
+  }, [businessType]);
 
   const renderAddForm = () => {
     if (businessType === "cafe") {
@@ -57,6 +63,9 @@ function ListBusinessMenu() {
           onClose={() => setShowForm(false)}
           onItemAdded={() => {
             setShowForm(false);
+            setShowSuccess(true);
+            fetchMenuItems();
+            setTimeout(() => setShowSuccess(false), 2000);
           }}
         />
       );
@@ -80,6 +89,12 @@ function ListBusinessMenu() {
               <Plus size={14} /> Add
             </button>
           </div>
+
+          {showSuccess && (
+            <div className="flex items-center gap-2 text-green-600 text-sm mb-3 bg-green-50 border border-green-200 px-3 py-2 rounded-md animate-pulse">
+              <CheckCircle className="w-4 h-4" /> Menu item added successfully!
+            </div>
+          )}
 
           {loading ? (
             <ul className="space-y-3 animate-pulse">
@@ -112,6 +127,7 @@ function ListBusinessMenu() {
             </ul>
           )}
         </div>
+
         {!showForm && (
           <div className="w-1/3">
             <ImageUploader

@@ -12,18 +12,22 @@ const cafeCategories = [
 ];
 
 const tagOptions = ["vegan", "gluten-free", "caffeinated", "popular", "seasonal"];
-const sizeOptions = ["Small", "Medium", "Large"];
 const dairyOptions = ["Oat Milk", "Almond Milk", "2% Milk", "Whole Milk", "Non-Dairy"];
+const formOptions = ["Hot", "Cold", "Frozen"];
 
 function AddMenuItemCafeForm({ businessID, onClose, onItemAdded }) {
   const [form, setForm] = useState({
     name: "",
     category: "Coffee",
-    price: "",
-    size_options: [...sizeOptions],
-    dairy_options: [...dairyOptions],
-    tags: [],
     description: "",
+    size_price_pairs: [
+      { size: "Small", price: "" },
+      { size: "Medium", price: "" },
+      { size: "Large", price: "" }
+    ],
+    dairy_options: [],
+    tags: [],
+    form_options: [],
     available: true,
   });
 
@@ -40,43 +44,53 @@ function AddMenuItemCafeForm({ businessID, onClose, onItemAdded }) {
     });
   };
 
+  const handleSizeChange = (index, key, value) => {
+    const updated = [...form.size_price_pairs];
+    updated[index][key] = value;
+    setForm({ ...form, size_price_pairs: updated });
+  };
+
+  const addSizePrice = () => {
+    setForm((prev) => ({
+      ...prev,
+      size_price_pairs: [...prev.size_price_pairs, { size: "", price: "" }],
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    // Get the current user's ID
     const {
       data: { session },
       error: sessionError,
     } = await supabaseClient.auth.getSession();
-  
+
     if (sessionError || !session?.user?.id) {
       console.error("User not authenticated");
       return;
     }
-  
+
     const userId = session.user.id;
-  
-    // Prepare the payload matching menu_item_cafe table
+
     const payload = {
       user_id: userId,
       business_id: businessID,
       name: form.name,
       category: form.category,
-      price: parseFloat(form.price),
-      size_options: form.size_options,
+      description: form.description,
+      size_options: form.size_price_pairs,
       dairy_options: form.dairy_options,
       tags: form.tags,
-      description: form.description,
+      form_options: form.form_options,
       available: form.available,
     };
-  
+
     const { error } = await supabaseClient.from("menu_item_cafe").insert([payload]);
     if (error) return console.error("Failed to add item:", error.message);
-  
+
     if (onItemAdded) onItemAdded();
     if (onClose) onClose();
   };
-  
+
   const labelStyle =
     "text-sm font-semibold text-white bg-[var(--label)] px-3 py-1 rounded mb-2 inline-block";
 
@@ -102,10 +116,7 @@ function AddMenuItemCafeForm({ businessID, onClose, onItemAdded }) {
     ));
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="bg-white border rounded-lg p-6 shadow space-y-4"
-    >
+    <form onSubmit={handleSubmit} className="bg-white border rounded-lg p-6 shadow space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-lg font-semibold text-gray-800">Add New Menu Item</h2>
         <button type="button" onClick={onClose} className="text-gray-500 hover:text-gray-800">
@@ -138,17 +149,6 @@ function AddMenuItemCafeForm({ businessID, onClose, onItemAdded }) {
             ))}
           </select>
         </div>
-
-        <div>
-          <label className={labelStyle}>Price ($)</label>
-          <input
-            type="number"
-            step="0.01"
-            className={inputStyle(form.price)}
-            value={form.price}
-            onChange={(e) => handleChange("price", e.target.value)}
-          />
-        </div>
       </div>
 
       <div>
@@ -163,9 +163,41 @@ function AddMenuItemCafeForm({ businessID, onClose, onItemAdded }) {
       </div>
 
       <div>
-        <label className={labelStyle}>Size Options</label>
+        <label className={labelStyle}>Size & Price</label>
+        <div className="space-y-2">
+          {form.size_price_pairs.map((pair, index) => (
+            <div className="flex gap-2" key={index}>
+              <input
+                type="text"
+                placeholder="Size (e.g. Small)"
+                className="w-1/2 px-3 py-2 border rounded"
+                value={pair.size}
+                onChange={(e) => handleSizeChange(index, "size", e.target.value)}
+              />
+              <input
+                type="number"
+                placeholder="$"
+                step="0.01"
+                className="w-1/2 px-3 py-2 border rounded"
+                value={pair.price}
+                onChange={(e) => handleSizeChange(index, "price", e.target.value)}
+              />
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={addSizePrice}
+            className="text-blue-600 hover:underline text-sm"
+          >
+            + Add Size Option
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <label className={labelStyle}>Form Options (Hot, Cold, Frozen)</label>
         <div className="flex flex-wrap gap-2">
-          {renderOptionButtons(sizeOptions, "size_options")}
+          {renderOptionButtons(formOptions, "form_options")}
         </div>
       </div>
 
