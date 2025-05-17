@@ -1,10 +1,14 @@
 import { useState, useRef } from "react";
-import { XCircle, CheckCircle, AlertTriangle } from "lucide-react";
+import { XCircle, CheckCircle, AlertTriangle, Loader2 } from "lucide-react";
 import { ExtractCafeItemsFromBlob } from "./ExtractCafeItemsFromBlob";
 import { supabaseClient } from "../../../supabase-utils/SupaBaseClient";
 
 function ImageUploader({ imageUploaderTitle, businessID, onItemAdded }) {
   const [uploads, setUploads] = useState([]);
+  const [generating, setGenerating] = useState(false);
+  const [extractionDone, setExtractionDone] = useState(false);
+  const [itemsAddedCount, setItemsAddedCount] = useState(null);
+  const [dbStatus, setDbStatus] = useState("");
   const fileInputRef = useRef(null);
   const MAX_SIZE_MB = 5;
 
@@ -34,16 +38,26 @@ function ImageUploader({ imageUploaderTitle, businessID, onItemAdded }) {
   };
 
   const generateMenuByAI = async () => {
-    const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
+    setGenerating(true);
+    setExtractionDone(false);
+    setItemsAddedCount(null);
+    setDbStatus("");
+
+    const {
+      data: sessionData,
+      error: sessionError,
+    } = await supabaseClient.auth.getSession();
     if (sessionError || !sessionData?.session?.user?.id) {
       console.error("User not authenticated");
       return;
     }
     const userId = sessionData.session.user.id;
+    let totalItemsAdded = 0;
 
     for (const upload of uploads) {
       const fileBlob = upload.file;
       const result = await ExtractCafeItemsFromBlob(fileBlob);
+      setExtractionDone(true);
 
       for (const call of result) {
         const args = call.arguments;
@@ -60,18 +74,21 @@ function ImageUploader({ imageUploaderTitle, businessID, onItemAdded }) {
           form_options: args.form_options,
           available: true,
         };
-        console.log(payload)
 
         const { error } = await supabaseClient.from("menu_item_cafe").insert([payload]);
         if (error) {
           console.error("Insert failed:", error.message);
+          setDbStatus("❌ Some inserts failed");
         } else {
-          console.log("Inserted menu item:", args.name);
+          totalItemsAdded++;
         }
       }
-
-      if (onItemAdded) onItemAdded(); // Trigger list refresh
     }
+
+    setItemsAddedCount(totalItemsAdded);
+    setDbStatus("✅ Items successfully added to DB");
+    setGenerating(false);
+    if (onItemAdded) onItemAdded();
   };
 
   return (
@@ -127,7 +144,6 @@ function ImageUploader({ imageUploaderTitle, businessID, onItemAdded }) {
                   )}
                 </div>
               </div>
-
               <div className="flex items-center gap-2">
                 {file.completed && !file.error && (
                   <CheckCircle className="text-green-500 w-5 h-5" />
@@ -141,15 +157,44 @@ function ImageUploader({ imageUploaderTitle, businessID, onItemAdded }) {
         </div>
       )}
 
+      {/* Status and Add Button */}
       {uploads.length > 0 && (
-        <div className="mt-4 flex justify-end">
-          <button
-            type="button"
-            className="bg-[var(--button)] hover:bg-[var(--button-hover)] text-white font-semibold px-4 py-2 rounded shadow"
-            onClick={generateMenuByAI}
-          >
-            Add Menu
-          </button>
+        <div className="mt-4 space-y-3">
+          {!generating && (
+            <div className="flex justify-end">
+              <button
+                type="button"
+                className="bg-[var(--button)] hover:bg-[var(--button-hover)] text-white font-semibold px-4 py-2 rounded shadow"
+                onClick={generateMenuByAI}
+              >
+                Add Menu
+              </button>
+            </div>
+          )}
+
+          {generating && (
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <Loader2 className="w-4 h-4 animate-spin text-blue-500" /> Extracting menu items using AI...
+            </div>
+          )}
+
+          {extractionDone && (
+            <div className="text-sm text-green-600 font-medium">
+              ✅ Menu items extracted from image.
+            </div>
+          )}
+
+          {itemsAddedCount !== null && (
+            <div className="text-sm text-blue-600 font-medium">
+              {itemsAddedCount} item(s) added to menu.
+            </div>
+          )}
+
+          {dbStatus && (
+            <div className="text-sm text-gray-700 font-medium">
+              {dbStatus}
+            </div>
+          )}
         </div>
       )}
     </div>
