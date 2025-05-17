@@ -1,11 +1,11 @@
 import { useState, useRef } from "react";
 import { XCircle, CheckCircle, AlertTriangle } from "lucide-react";
 import { ExtractCafeItemsFromBlob } from "./ExtractCafeItemsFromBlob";
+import { supabaseClient } from "../../../supabase-utils/SupaBaseClient";
 
-function ImageUploader({ imageUploaderTitle }) {
+function ImageUploader({ imageUploaderTitle, businessID, onItemAdded }) {
   const [uploads, setUploads] = useState([]);
   const fileInputRef = useRef(null);
-
   const MAX_SIZE_MB = 5;
 
   const handleImageChange = (e) => {
@@ -16,7 +16,7 @@ function ImageUploader({ imageUploaderTitle }) {
       const isTooLarge = file.size > MAX_SIZE_MB * 1024 * 1024;
       return {
         name: file.name,
-        file, // store original file for future use
+        file,
         url: URL.createObjectURL(file),
         size: (file.size / (1024 * 1024)).toFixed(2),
         progress: isTooLarge ? 0 : Math.floor(Math.random() * 40) + 60,
@@ -28,16 +28,50 @@ function ImageUploader({ imageUploaderTitle }) {
     setUploads((prev) => [...prev, ...updatedUploads]);
     e.target.value = "";
   };
-  const generateMenuByAI = async () => {
-    for (const upload of uploads) {
-      const fileBlob = upload.file; // this is already a Blob/File
-      const result = await ExtractCafeItemsFromBlob(fileBlob);
-      console.log("Result for", upload.name, result);
-    }
-  }
 
   const removeFile = (name) => {
     setUploads((prev) => prev.filter((file) => file.name !== name));
+  };
+
+  const generateMenuByAI = async () => {
+    const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
+    if (sessionError || !sessionData?.session?.user?.id) {
+      console.error("User not authenticated");
+      return;
+    }
+    const userId = sessionData.session.user.id;
+
+    for (const upload of uploads) {
+      const fileBlob = upload.file;
+      const result = await ExtractCafeItemsFromBlob(fileBlob);
+
+      for (const call of result) {
+        const args = call.arguments;
+
+        const payload = {
+          user_id: userId,
+          business_id: businessID,
+          name: args.name,
+          category: args.category,
+          description: args.description,
+          size_options: args.size_options,
+          dairy_options: args.dairy_options,
+          tags: args.tags,
+          form_options: args.form_options,
+          available: true,
+        };
+        console.log(payload)
+
+        const { error } = await supabaseClient.from("menu_item_cafe").insert([payload]);
+        if (error) {
+          console.error("Insert failed:", error.message);
+        } else {
+          console.log("Inserted menu item:", args.name);
+        }
+      }
+
+      if (onItemAdded) onItemAdded(); // Trigger list refresh
+    }
   };
 
   return (
@@ -107,7 +141,6 @@ function ImageUploader({ imageUploaderTitle }) {
         </div>
       )}
 
-      {/* Step 1: Add Menu Button */}
       {uploads.length > 0 && (
         <div className="mt-4 flex justify-end">
           <button
