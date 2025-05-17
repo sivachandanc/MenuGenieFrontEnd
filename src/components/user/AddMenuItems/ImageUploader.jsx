@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { XCircle, CheckCircle, AlertTriangle } from "lucide-react";
+import { ExtractCafeItemsFromBlob } from "./ExtractCafeItemsFromBlob";
 
 function ImageUploader({ imageUploaderTitle }) {
   const [uploads, setUploads] = useState([]);
@@ -27,6 +28,13 @@ function ImageUploader({ imageUploaderTitle }) {
     setUploads((prev) => [...prev, ...updatedUploads]);
     e.target.value = "";
   };
+  const generateMenuByAI = async () => {
+    for (const upload of uploads) {
+      const fileBlob = upload.file; // this is already a Blob/File
+      const result = await ExtractCafeItemsFromBlob(fileBlob);
+      console.log("Result for", upload.name, result);
+    }
+  }
 
   const removeFile = (name) => {
     setUploads((prev) => prev.filter((file) => file.name !== name));
@@ -105,9 +113,7 @@ function ImageUploader({ imageUploaderTitle }) {
           <button
             type="button"
             className="bg-[var(--button)] hover:bg-[var(--button-hover)] text-white font-semibold px-4 py-2 rounded shadow"
-            onClick={() => {
-              console.log("Add Menu clicked!");
-            }}
+            onClick={generateMenuByAI}
           >
             Add Menu
           </button>
