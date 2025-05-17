@@ -77,8 +77,9 @@ function ListBusinessMenu() {
     <div className="max-w-6xl mx-auto p-4">
       <div className="flex gap-6">
         {/* Sidebar */}
-        <div className="w-2/3 h-[600px] overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-sm p-4 flex flex-col">
-          <div className="flex justify-between items-center mb-4">
+        <div className="w-2/3 h-[600px] bg-white border border-gray-200 rounded-lg shadow-sm flex flex-col overflow-hidden">
+          {/* Sticky Header */}
+          <div className="p-4 sticky top-0 z-10 bg-white border-b border-gray-100 flex justify-between items-center">
             <h2 className="text-lg font-semibold">
               Menu Items of {businessName}
             </h2>
@@ -90,48 +91,51 @@ function ListBusinessMenu() {
             </button>
           </div>
 
-          {showSuccess && (
-            <div className="flex items-center gap-2 text-green-600 text-sm mb-3 bg-green-50 border border-green-200 px-3 py-2 rounded-md animate-pulse">
-              <CheckCircle className="w-4 h-4" /> Menu item added successfully!
-            </div>
-          )}
-
-          {loading ? (
-            <ul className="space-y-3 animate-pulse">
-              {Array(5)
-                .fill(0)
-                .map((_, idx) => (
-                  <li key={idx} className="h-4 w-full bg-gray-200 rounded" />
-                ))}
-            </ul>
-          ) : menuItems.length === 0 ? (
-            <div className="text-sm text-yellow-700 bg-yellow-50 border border-yellow-200 px-3 py-2 rounded-md">
-              <div className="flex items-center gap-2 mb-1">
-                <AlertTriangle className="w-4 h-4 text-yellow-500" />
-                <span>No menu items found.</span>
+          {/* Scrollable content */}
+          <div className="p-4 overflow-y-auto flex-1">
+            {showSuccess && (
+              <div className="flex items-center gap-2 text-green-600 text-sm mb-3 bg-green-50 border border-green-200 px-3 py-2 rounded-md animate-pulse">
+                <CheckCircle className="w-4 h-4" /> Menu item added successfully!
               </div>
-            </div>
-          ) : (
-            <ul className="space-y-2 p-4 rounded-lg shadow bg-[var(--button)]">
-              {menuItems.map((item) => (
-                <li
-                  key={item.item_id}
-                  className="border-b border-gray-100 pb-2"
-                >
-                  <p className="font-medium text-gray-900">{item.name}</p>
-                  <p className="text-sm text-gray-600 italic">
-                    {item.category}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          )}
+            )}
+
+            {loading ? (
+              <ul className="space-y-3 animate-pulse">
+                {Array(5)
+                  .fill(0)
+                  .map((_, idx) => (
+                    <li key={idx} className="h-4 w-full bg-gray-200 rounded" />
+                  ))}
+              </ul>
+            ) : menuItems.length === 0 ? (
+              <div className="text-sm text-yellow-700 bg-yellow-50 border border-yellow-200 px-3 py-2 rounded-md">
+                <div className="flex items-center gap-2 mb-1">
+                  <AlertTriangle className="w-4 h-4 text-yellow-500" />
+                  <span>No menu items found.</span>
+                </div>
+              </div>
+            ) : (
+              <ul className="space-y-2 p-4 rounded-lg shadow ">
+                {menuItems.map((item) => (
+                  <li
+                    key={item.item_id}
+                    className="border-b border-gray-100 p-2 bg-[var(--button)] rounded-2xl"
+                  >
+                    <p className="font-medium text-gray-900">{item.name}</p>
+                    <p className="text-sm text-gray-600 italic">
+                      {item.category}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
 
         {!showForm && (
           <div className="w-1/3">
             <ImageUploader
-            businessID={businessID}
+              businessID={businessID}
               imageUploaderTitle={
                 "📷 Skip manual entry - Upload your menu image and let AI handle the rest!"
               }
