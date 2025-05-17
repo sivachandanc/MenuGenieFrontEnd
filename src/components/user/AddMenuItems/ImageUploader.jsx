@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { XCircle, CheckCircle, AlertTriangle } from "lucide-react";
 
-function ImageUploader({ onUpload, imageUploaderTitle }) {
+function ImageUploader({ imageUploaderTitle }) {
   const [uploads, setUploads] = useState([]);
   const fileInputRef = useRef(null);
 
@@ -24,7 +24,6 @@ function ImageUploader({ onUpload, imageUploaderTitle }) {
     });
 
     setUploads((prev) => [...prev, ...updatedUploads]);
-    if (onUpload) onUpload(files.filter((f) => f.size <= MAX_SIZE_MB * 1024 * 1024));
 
     e.target.value = "";
   };
@@ -34,7 +33,7 @@ function ImageUploader({ onUpload, imageUploaderTitle }) {
   };
 
   return (
-    <div className="w-full max-w-lg p-6 bg-white border border-gray-200 rounded-xl shadow-md">
+    <div className="w-full h-full max-w-lg p-6 bg-white border border-gray-200 rounded-xl shadow-md">
       <h3 className="text-xl font-semibold text-gray-800 mb-2">
         {imageUploaderTitle || "Upload Menu Image"}
       </h3>
