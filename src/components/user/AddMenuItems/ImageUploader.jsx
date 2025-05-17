@@ -10,11 +10,12 @@ function ImageUploader({ imageUploaderTitle }) {
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
-    console.log(files)// Remove this
+
     const updatedUploads = files.map((file) => {
       const isTooLarge = file.size > MAX_SIZE_MB * 1024 * 1024;
       return {
         name: file.name,
+        file, // store original file for future use
         url: URL.createObjectURL(file),
         size: (file.size / (1024 * 1024)).toFixed(2),
         progress: isTooLarge ? 0 : Math.floor(Math.random() * 40) + 60,
@@ -24,7 +25,6 @@ function ImageUploader({ imageUploaderTitle }) {
     });
 
     setUploads((prev) => [...prev, ...updatedUploads]);
-
     e.target.value = "";
   };
 
@@ -61,7 +61,7 @@ function ImageUploader({ imageUploaderTitle }) {
         <div className="space-y-3">
           {uploads.map((file) => (
             <div
-              key={file.name + file.url} // use both name and URL to prevent key collisions
+              key={file.name + file.url}
               className={`flex items-center justify-between border p-3 rounded-md ${
                 file.error ? "border-red-400 bg-red-50" : "border-gray-200 bg-gray-50"
               }`}
@@ -96,6 +96,21 @@ function ImageUploader({ imageUploaderTitle }) {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Step 1: Add Menu Button */}
+      {uploads.length > 0 && (
+        <div className="mt-4 flex justify-end">
+          <button
+            type="button"
+            className="bg-[var(--button)] hover:bg-[var(--button-hover)] text-white font-semibold px-4 py-2 rounded shadow"
+            onClick={() => {
+              console.log("Add Menu clicked!");
+            }}
+          >
+            Add Menu
+          </button>
         </div>
       )}
     </div>
