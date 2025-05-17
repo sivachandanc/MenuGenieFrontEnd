@@ -169,6 +169,7 @@ function ListBusinessMenu() {
             <ImageUploader
               businessID={businessID}
               onItemAdded={fetchMenuItems}
+              businessType={businessType}
               imageUploaderTitle={
                 "📷 Skip manual entry - Upload your menu image and let AI handle the rest!"
               }

@@ -1,9 +1,8 @@
 import { useState, useRef } from "react";
 import { XCircle, CheckCircle, AlertTriangle, Loader2 } from "lucide-react";
-import { ExtractCafeItemsFromBlob } from "./ExtractCafeItemsFromBlob";
 import { supabaseClient } from "../../../supabase-utils/SupaBaseClient";
 
-function ImageUploader({ imageUploaderTitle, businessID, onItemAdded }) {
+function ImageUploader({ imageUploaderTitle, businessID, onItemAdded, businessType }) {
   const [uploads, setUploads] = useState([]);
   const [generating, setGenerating] = useState(false);
   const [extractionDone, setExtractionDone] = useState(false);
@@ -43,10 +42,8 @@ function ImageUploader({ imageUploaderTitle, businessID, onItemAdded }) {
     setItemsAddedCount(null);
     setDbStatus("");
 
-    const {
-      data: sessionData,
-      error: sessionError,
-    } = await supabaseClient.auth.getSession();
+    const { data: sessionData, error: sessionError } =
+      await supabaseClient.auth.getSession();
     if (sessionError || !sessionData?.session?.user?.id) {
       console.error("User not authenticated");
       return;
@@ -55,8 +52,37 @@ function ImageUploader({ imageUploaderTitle, businessID, onItemAdded }) {
     let totalItemsAdded = 0;
 
     for (const upload of uploads) {
-      const fileBlob = upload.file;
-      const result = await ExtractCafeItemsFromBlob(fileBlob);
+      const fileToBase64 = (file) => {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const base64 = reader.result.split(",")[1]; // Strip `data:image/...;base64,`
+            resolve(base64);
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      };
+    
+      const base64 = await fileToBase64(upload.file);
+      const edgeFunction = `gemini-${businessType}-menu-generation`
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/${edgeFunction}`,
+        {
+          method: "POST",
+          mode: "cors",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${(await supabaseClient.auth.getSession()).data?.session?.access_token}`,
+          },
+          body: JSON.stringify({
+            base64,
+            mimeType: upload.file.type,
+          }),
+        }
+      );
+    
+      const result = await response.json();
       setExtractionDone(true);
 
       for (const call of result) {
@@ -75,7 +101,9 @@ function ImageUploader({ imageUploaderTitle, businessID, onItemAdded }) {
           available: true,
         };
 
-        const { error } = await supabaseClient.from("menu_item_cafe").insert([payload]);
+        const { error } = await supabaseClient
+          .from("menu_item_cafe")
+          .insert([payload]);
         if (error) {
           console.error("Insert failed:", error.message);
           setDbStatus("❌ Some inserts failed");
@@ -122,13 +150,21 @@ function ImageUploader({ imageUploaderTitle, businessID, onItemAdded }) {
             <div
               key={file.name + file.url}
               className={`flex items-center justify-between border p-3 rounded-md ${
-                file.error ? "border-red-400 bg-red-50" : "border-gray-200 bg-gray-50"
+                file.error
+                  ? "border-red-400 bg-red-50"
+                  : "border-gray-200 bg-gray-50"
               }`}
             >
               <div className="flex items-center gap-3">
-                <img src={file.url} alt={file.name} className="w-10 h-10 object-cover rounded" />
+                <img
+                  src={file.url}
+                  alt={file.name}
+                  className="w-10 h-10 object-cover rounded"
+                />
                 <div>
-                  <p className="text-sm font-medium text-gray-800">{file.name}</p>
+                  <p className="text-sm font-medium text-gray-800">
+                    {file.name}
+                  </p>
                   {file.error ? (
                     <p className="text-xs text-red-600 flex items-center gap-1">
                       <AlertTriangle className="w-4 h-4" />
@@ -138,7 +174,9 @@ function ImageUploader({ imageUploaderTitle, businessID, onItemAdded }) {
                     <div className="w-full bg-gray-200 rounded h-1.5 mt-1">
                       <div
                         className="bg-green-500 h-1.5 rounded"
-                        style={{ width: `${file.completed ? 100 : file.progress}%` }}
+                        style={{
+                          width: `${file.completed ? 100 : file.progress}%`,
+                        }}
                       ></div>
                     </div>
                   )}
@@ -174,7 +212,8 @@ function ImageUploader({ imageUploaderTitle, businessID, onItemAdded }) {
 
           {generating && (
             <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Loader2 className="w-4 h-4 animate-spin text-blue-500" /> Extracting menu items using AI...
+              <Loader2 className="w-4 h-4 animate-spin text-blue-500" />{" "}
+              Extracting menu items using AI...
             </div>
           )}
 
@@ -191,9 +230,7 @@ function ImageUploader({ imageUploaderTitle, businessID, onItemAdded }) {
           )}
 
           {dbStatus && (
-            <div className="text-sm text-green-600 font-medium">
-              {dbStatus}
-            </div>
+            <div className="text-sm text-green-600 font-medium">{dbStatus}</div>
           )}
         </div>
       )}
