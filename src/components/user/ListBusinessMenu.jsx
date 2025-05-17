@@ -32,7 +32,6 @@ function ListBusinessMenu() {
   useEffect(() => {
     const fetchBusinessAndMenu = async () => {
       setLoading(true);
-
       const { data: businessData, error: businessError } = await supabaseClient
         .from("business")
         .select("name, business_type")
@@ -92,7 +91,7 @@ function ListBusinessMenu() {
           </div>
 
           {/* Scrollable content */}
-          <div className="p-4 overflow-y-auto flex-1">
+          <div className="p-4 overflow-y-auto flex-1 relative">
             {showSuccess && (
               <div className="flex items-center gap-2 text-green-600 text-sm mb-3 bg-green-50 border border-green-200 px-3 py-2 rounded-md animate-pulse">
                 <CheckCircle className="w-4 h-4" /> Menu item added successfully!
@@ -115,16 +114,42 @@ function ListBusinessMenu() {
                 </div>
               </div>
             ) : (
-              <ul className="space-y-2 p-4 rounded-lg shadow ">
+              <ul className="relative space-y-3 p-1 overflow-visible">
                 {menuItems.map((item) => (
                   <li
                     key={item.item_id}
-                    className="border-b border-gray-100 p-2 bg-[var(--button)] rounded-2xl"
+                    className="relative border border-gray-100 p-4 bg-[var(--background)] rounded-2xl shadow-sm transition duration-200 hover:shadow-lg hover:scale-[1.01] cursor-pointer"
                   >
-                    <p className="font-medium text-gray-900">{item.name}</p>
-                    <p className="text-sm text-gray-600 italic">
+                    <p className="text-lg font-semibold text-gray-900">
+                      {item.name}
+                    </p>
+                    <p className="text-sm text-gray-600 italic mb-1">
                       {item.category}
                     </p>
+
+                    {Array.isArray(item.size_options) && (
+                      <p className="text-sm text-gray-700">
+                        {item.size_options
+                          .map(
+                            (s) =>
+                              `${s.size || "?"} ($${parseFloat(s.price).toFixed(2)})`
+                          )
+                          .join(" · ")}
+                      </p>
+                    )}
+
+                    {item.tags?.length > 0 && (
+                      <div className="mt-1 flex flex-wrap gap-1">
+                        {item.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </li>
                 ))}
               </ul>
