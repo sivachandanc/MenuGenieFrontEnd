@@ -25,7 +25,7 @@ function Sidebar() {
           <div
             key={i}
             onClick={() => navigate(item.path)}
-            className="flex items-center space-x-2 px-4 py-2 w-full hover:bg-gray-100 cursor-pointer"
+            className="flex items-center space-x-2 px-4 py-2 w-full hover:bg-[var(--button-hover)] cursor-pointer border-1 rounded-full"
           >
             <div className="text-gray-600">{item.icon}</div>
             {expanded && <span className="text-sm text-gray-800">{item.label}</span>}
