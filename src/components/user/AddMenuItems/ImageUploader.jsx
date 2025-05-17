@@ -191,7 +191,7 @@ function ImageUploader({ imageUploaderTitle, businessID, onItemAdded }) {
           )}
 
           {dbStatus && (
-            <div className="text-sm text-gray-700 font-medium">
+            <div className="text-sm text-green-600 font-medium">
               {dbStatus}
             </div>
           )}
