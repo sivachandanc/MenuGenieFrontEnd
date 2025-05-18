@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabaseClient } from "../../supabase-utils/SupaBaseClient";
-import { DeleteBusiness } from "../../supabase-utils/DeleteBusiness"; // adjust path if needed
+import { DeleteBusiness } from "../../supabase-utils/DeleteBusiness";
 import {
   MapPin,
   Mail,
@@ -14,8 +14,9 @@ import {
   Smile,
   AlertTriangle,
   Utensils,
-  Trash2,
+  Trash2
 } from "lucide-react";
+import EditableBusinessField from "./EditableBusinessField"; // Adjust path as needed
 
 function BusinessDetails() {
   const { businessID } = useParams();
@@ -141,7 +142,6 @@ function BusinessDetails() {
 
       {/* Business Info (right column) */}
       <div className="sm:w-2/3 space-y-6 relative">
-        {/* Delete button with animation */}
         <div className="absolute top-0 right-0 group z-20">
           <button
             onClick={async () => {
@@ -177,82 +177,90 @@ function BusinessDetails() {
             </div>
           )}
         </div>
-
-        <div>
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">
-            Description
-          </h3>
-          <p className="text-gray-600">{business.description}</p>
-        </div>
+          <div>
+          <EditableBusinessField
+          label="Description"
+          value={business.description}
+          icon={<Star size={16} />}
+          type="textarea"
+          validate={(v) => (!v ? "Description cannot be empty" : "")}
+        />
+          </div>
+        
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6 text-sm">
-          <Info
+          <EditableBusinessField
             label="Location"
             value={business.location}
             icon={<MapPin size={16} />}
+            type="text"
           />
-          <Info
+          <EditableBusinessField
             label="Email"
             value={business.email}
             icon={<Mail size={16} />}
+            type="text"
+            validate={(v) =>
+              !v
+                ? "Email is required"
+                : /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)
+                ? ""
+                : "Invalid email"
+            }
           />
-          <Info
+          <EditableBusinessField
             label="Phone"
             value={business.phone}
             icon={<Phone size={16} />}
+            type="phone"
           />
-          <Info
+          <EditableBusinessField
             label="Website"
             value={business.website}
             icon={<Globe size={16} />}
+            type="text"
+            validate={(v) =>
+              !v
+                ? "Website is required"
+                : /^(https?:\/\/)?[\w.-]+\.[a-z]{2,}$/.test(v)
+                ? ""
+                : "Invalid website"
+            }
           />
-          <Info
+          <EditableBusinessField
             label="Opening Time"
             value={business.opening_time?.slice(0, 5)}
             icon={<Clock size={16} />}
+            type="time"
           />
-          <Info
+          <EditableBusinessField
             label="Closing Time"
             value={business.closing_time?.slice(0, 5)}
             icon={<Clock size={16} />}
+            type="time"
           />
-          <Info
-            label="Top Items"
-            value={business.top_items}
-            icon={<Star size={16} />}
-          />
-          <Info
+          <EditableBusinessField
             label="Ownership Tags"
-            value={business.ownership_tags?.join(", ")}
+            value={business.ownership_tags || []}
             icon={<Tags size={16} />}
+            type="tags"
           />
-          <Info
+          <EditableBusinessField
             label="Bot Personality"
             value={business.bot_personality}
             icon={<Smile size={16} />}
+            type="select"
+            options={["friendly", "professional", "funny"]}
+            validate={(v) => (!v ? "Please select a personality" : "")}
           />
-          <Info
+          <EditableBusinessField
             label="Bot Name"
             value={business.bot_name}
             icon={<Bot size={16} />}
+            type="text"
+            validate={(v) => (!v ? "Bot name cannot be empty" : "")}
           />
         </div>
-      </div>
-    </div>
-  );
-}
-
-function Info({ label, value, icon }) {
-  return (
-    <div className="flex items-start gap-2 group">
-      <div className="pt-1 text-gray-500 group-hover:text-[var(--text-main)] transition-colors duration-300">
-        {icon}
-      </div>
-      <div>
-        <p className="relative z-10 font-medium text-gray-500 group-hover:text-[var(--text-main)] transition-colors duration-300">
-          {label}
-        </p>
-        <p className="text-gray-800">{value || "—"}</p>
       </div>
     </div>
   );
