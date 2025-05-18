@@ -29,43 +29,89 @@ function OnBoardingWizard() {
   };
 
   const handleFinish = async () => {
-    console.log("Final submission:", formData); //TODO: Remove this
+    console.log("Final submission:", formData); // Optional: remove in production
 
     try {
-      const token = (await supabaseClient.auth.getSession()).data?.session
-        ?.access_token;
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabaseClient.auth.getSession();
 
-      if (!token) {
+      if (sessionError || !session?.user) {
         setError("Authentication error. Please log in again.");
         return;
       }
 
-      const payload = JSON.stringify(formData, null, 2);
+      const userId = session.user.id;
 
+      // Map formData to match Supabase column names
+      const payload = {
+        user_id: userId,
+        name: formData.business_name,
+        business_type: formData.business_type,
+        location: formData.location,
+        description: formData.business_description,
+        email: formData.email,
+        phone: formData.phone,
+        opening_time: formData.openingTime,
+        closing_time: formData.closingTime,
+        website: formData.website,
+        top_items: formData.topItems,
+        ownership_tags: formData.ownershipTags,
+        bot_name: formData.botName,
+        bot_personality: formData.tone,
+      };
+
+      const { data, error } = await supabaseClient
+        .from("business")
+        .insert(payload)
+        .select(); // optional: returns inserted row
+
+      if (error) {
+        console.error("Supabase insert error:", error);
+        setError("Failed to submit business data.");
+        return;
+      }
+
+      const body = [
+        {
+          context: `Top selling items(According to owner) is: ${data[0].top_items}`,
+        },
+        {
+          context: `Name of ${data[0].business_type} is ${data[0].name}\nDescription:\n${data[0].description}\nLocation: ${data[0].location}\nOpens at:${data[0].opening_time}\nCloses at:${data[0].closing_time}`,
+        },
+        {
+          context: `This cafe is a: ${data[0].ownership_tags.join(", ")}`,
+        },
+        {
+          context: `Contact Info for any queries:\nEmail:${data[0].email}\nPhone Number:${data[0].phone}\nWebsite:${data[0].website}`,
+        },
+      ];
+      console.log(JSON.stringify(body));
       const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/onboard`,
+        `${import.meta.env.VITE_EMBEDDING_BACKEND_URL}`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
-          body: payload,
+          body: JSON.stringify(body),
         }
       );
-
-      const result = await response.json();
+      console.log(response);
 
       if (!response.ok) {
-        console.error("Backend error:", result);
+        const errorText = await response.text(); // fallback if response isn't JSON
+        console.error("Supabase insert error:", errorText);
         setError("Failed to submit business data.");
         return;
       }
+
       setError("");
-      window.location.href = "/dashboard";
+      // window.location.href = "/dashboard";
     } catch (error) {
-      setError("Something went wrong. Please try again.");
       console.error("Submission error:", error);
+      setError("Something went wrong. Please try again.");
     }
   };
 
