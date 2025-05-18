@@ -77,8 +77,7 @@ export async function insertBusinessAndEmbed(formData) {
     throw new Error(`Embedding API failed: ${errorText}`);
   }
 
-  const embeddings = await response.json();
-
+  const { embeddings } = await response.json();
   if (!Array.isArray(embeddings) || embeddings.length !== contextBlocks.length) {
     throw new Error("Invalid embedding response from API.");
   }
