@@ -96,50 +96,49 @@ function BusinessList() {
         <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {businesses.map((biz) => (
             <li
-              key={biz.business_id}
-              className="bg-white rounded-xl border border-gray-200 shadow-md p-4 transition hover:shadow-lg hover:ring-1 hover:ring-blue-100"
-            >
-              <div
-                onClick={() => navigate(`/dashboard/business/${biz.business_id}`)}
-                className="flex justify-between items-center cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
-                  <p className="font-semibold text-lg">{biz.name}</p>
-                  {!biz.hasMenu && (
-                    <div className="group relative">
-                      <AlertTriangle className="text-yellow-500 w-4 h-4" />
-                      <div className="absolute left-1/2 transform -translate-x-1/2 top-full mt-1 bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded shadow opacity-0 group-hover:opacity-100 transition-opacity z-10 whitespace-nowrap">
-                        No Menu Added
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <img
-                  src={biz.logoUrl}
-                  alt="Business Logo"
-                  className="w-8 h-8 object-contain border border-blue-500 rounded-full bg-white"
-                />
+            key={biz.business_id}
+            onClick={() => navigate(`/dashboard/business/${biz.business_id}`)}
+            className="flex flex-col sm:flex-row bg-white rounded-3xl shadow-xl overflow-hidden transform hover:scale-[1.01] transition cursor-pointer"
+          >
+            {/* Left: Business Logo */}
+            <div className="sm:w-1/2 bg-gray-100 flex items-center justify-center p-6">
+              <img
+                src={biz.logoUrl}
+                alt={biz.name}
+                className="w-32 h-32 object-contain rounded-xl"
+              />
+            </div>
+          
+            {/* Right: Business Info */}
+            <div className="sm:w-1/2 p-6 flex flex-col justify-between gap-4">
+              <div>
+                <p className="text-sm text-[var(--button)] font-semibold mb-1">Active</p>
+                <h3 className="text-2xl font-extrabold text-gray-800 mb-2">{biz.name}</h3>
+                <p className="text-gray-600 text-sm">
+                  {biz.business_type.charAt(0).toUpperCase() + biz.business_type.slice(1)} Business
+                </p>
               </div>
-
-              {!biz.hasMenu && (
-                <div className="mt-4 bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm px-3 py-2 rounded-md flex justify-between items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <AlertTriangle className="w-4 h-4 text-yellow-500" />
-                    <span>This business has no menu added.</span>
-                  </div>
+          
+              {biz.hasMenu ? (
+                <button className="mt-2 px-5 py-2 rounded-full text-white font-semibold bg-gradient-to-r from-[var(--button)] to-[var(--button-hover)] shadow hover:shadow-lg transition w-fit">
+                  Manage Business
+                </button>
+              ) : (
+                <div className="flex flex-col gap-1">
                   <button
-                    onClick={() =>
-                      navigate(`/dashboard/business/${biz.business_id}/menu`)
-                    }
-                    className="text-xs font-semibold bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1.5 rounded-md transition"
-                    title="Click to add a menu"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/dashboard/business/${biz.business_id}/menu`);
+                    }}
+                    className="px-5 py-2 rounded-full text-white font-semibold bg-[var(--button)] hover:bg-[var(--button-hover)] shadow-md w-fit"
                   >
                     + Add Menu
                   </button>
                 </div>
               )}
-            </li>
+            </div>
+          </li>
+          
           ))}
         </ul>
       )}
