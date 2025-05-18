@@ -79,7 +79,6 @@ function BusinessDetails() {
   }, [businessID]);
 
   const confirmDelete = async () => {
-    setShowConfirm(false);
     setDeleting(true);
     try {
       await DeleteBusiness(business.business_id, business.business_type);
@@ -171,7 +170,7 @@ function BusinessDetails() {
         </div>
 
         {showConfirm && (
-          <div className="fixed inset-0 bg-opacity-30 backdrop-blur-sm  z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-opacity-30 backdrop-blur-sm z-50 flex items-center justify-center">
             <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
               <h2 className="text-lg font-semibold text-gray-800 mb-3">
                 Confirm Deletion
@@ -182,7 +181,9 @@ function BusinessDetails() {
               </p>
               <div className="flex justify-end space-x-3">
                 <button
-                  onClick={() => setShowConfirm(false)}
+                  onClick={() => {
+                    if (!deleting) setShowConfirm(false);
+                  }}
                   className="px-4 py-1 text-sm text-gray-700 hover:underline"
                 >
                   Cancel
