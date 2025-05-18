@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { supabaseClient } from "../../supabase-utils/SupaBaseClient";
+import { DeleteBusiness } from "../../supabase-utils/DeleteBusiness"; // adjust path if needed
 import {
   MapPin,
   Mail,
@@ -18,13 +19,14 @@ import {
 
 function BusinessDetails() {
   const { businessID } = useParams();
+  const navigate = useNavigate();
   const [business, setBusiness] = useState(null);
   const [loading, setLoading] = useState(true);
   const [hasMenu, setHasMenu] = useState(true);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     const fetchBusiness = async () => {
-      // Step 1: Fetch business details
       const { data, error } = await supabaseClient
         .from("business")
         .select("*")
@@ -50,7 +52,6 @@ function BusinessDetails() {
 
       setBusiness({ ...data, logoUrl: finalUrl });
 
-      // Step 2: Dynamically check corresponding menu table
       const menuTable = `menu_item_${data.business_type
         ?.toLowerCase()
         .replace(/\s+/g, "_")}`;
@@ -140,14 +141,43 @@ function BusinessDetails() {
 
       {/* Business Info (right column) */}
       <div className="sm:w-2/3 space-y-6 relative">
-        <div className="absolute top-0 right-0 group">
-          <button className="p-2 text-red-500 hover:text-red-700 transition">
-            <Trash2 size={20} />
+        {/* Delete button with animation */}
+        <div className="absolute top-0 right-0 group z-20">
+          <button
+            onClick={async () => {
+              setDeleting(true);
+              try {
+                await DeleteBusiness(
+                  business.business_id,
+                  business.business_type
+                );
+                navigate("/dashboard");
+              } catch (err) {
+                console.error("Failed to delete business:", err);
+                setDeleting(false);
+                alert("Failed to delete business. Please try again.");
+              }
+            }}
+            className={`p-2 transition rounded-full ${
+              deleting
+                ? "bg-red-100 border border-red-400 animate-spin"
+                : "text-red-500 hover:text-red-700"
+            }`}
+            title="Delete Business"
+          >
+            {deleting ? (
+              <div className="w-5 h-5 rounded-full border-2 border-red-500 border-t-transparent" />
+            ) : (
+              <Trash2 size={20} />
+            )}
           </button>
-          <div className="absolute top-full right-0 mt-1 hidden group-hover:block bg-red-500 text-white text-xs font-medium px-2 py-1 rounded shadow-lg z-10">
-            Delete Business
-          </div>
+          {!deleting && (
+            <div className="absolute top-full right-0 mt-1 hidden group-hover:block bg-red-500 text-white text-xs font-medium px-2 py-1 rounded shadow-lg z-10">
+              Delete Business
+            </div>
+          )}
         </div>
+
         <div>
           <h3 className="text-xl font-semibold text-gray-800 mb-2">
             Description
