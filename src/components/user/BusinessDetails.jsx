@@ -13,6 +13,7 @@ import {
   Smile,
   AlertTriangle,
   Utensils,
+  Trash2,
 } from "lucide-react";
 
 function BusinessDetails() {
@@ -116,7 +117,7 @@ function BusinessDetails() {
             className="mt-6 px-5 py-2 rounded-full text-white font-semibold bg-[var(--button)] hover:bg-[var(--button-hover)] transition shadow"
           >
             <div className="flex flex-row space-x-1">
-              <Utensils size={25}/>
+              <Utensils size={25} />
               <span>View Menu</span>
             </div>
           </button>
@@ -138,7 +139,15 @@ function BusinessDetails() {
       </div>
 
       {/* Business Info (right column) */}
-      <div className="sm:w-2/3 space-y-6">
+      <div className="sm:w-2/3 space-y-6 relative">
+        <div className="absolute top-0 right-0 group">
+          <button className="p-2 text-red-500 hover:text-red-700 transition">
+            <Trash2 size={20} />
+          </button>
+          <div className="absolute top-full right-0 mt-1 hidden group-hover:block bg-red-500 text-white text-xs font-medium px-2 py-1 rounded shadow-lg z-10">
+            Delete Business
+          </div>
+        </div>
         <div>
           <h3 className="text-xl font-semibold text-gray-800 mb-2">
             Description
