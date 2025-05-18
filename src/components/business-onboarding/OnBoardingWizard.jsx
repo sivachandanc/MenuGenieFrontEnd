@@ -4,7 +4,7 @@ import ContactHoursStep from "./ContactHoursStep";
 import EnhancementsStep from "./EnhancementsStep";
 import BotCustomizationStep from "./BotCustomizationStep";
 import ReviewSubmitStep from "./ReviewSubmitStep";
-import { supabaseClient } from "../../supabase-utils/SupaBaseClient.jsx";
+import { insertBusinessAndEmbed } from "../../supabase-utils/InsertBusinessAndEmbed";
 
 //TODO: Need to add process to persist the data
 const steps = [
@@ -29,43 +29,21 @@ function OnBoardingWizard() {
   };
 
   const handleFinish = async () => {
-    console.log("Final submission:", formData); //TODO: Remove this
-
+    console.log("Final submission:", formData); // Optional: remove in production
+  
     try {
-      const token = (await supabaseClient.auth.getSession()).data?.session
-        ?.access_token;
-
-      if (!token) {
-        setError("Authentication error. Please log in again.");
-        return;
-      }
-
-      const payload = JSON.stringify(formData, null, 2);
-
-      const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/onboard`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: payload,
-        }
-      );
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        console.error("Backend error:", result);
-        setError("Failed to submit business data.");
-        return;
-      }
-      setError("");
-      window.location.href = "/dashboard";
-    } catch (error) {
-      setError("Something went wrong. Please try again.");
-      console.error("Submission error:", error);
+      setError(""); // clear previous error if any
+  
+      const { business, inserted_contexts } = await insertBusinessAndEmbed(formData);
+  
+      console.log("Business inserted:", business);
+      console.log("Context embeddings stored:", inserted_contexts);
+  
+      // Success — you can redirect or show a toast here
+      // window.location.href = "/dashboard";
+    } catch (err) {
+      console.error("Submission error:", err);
+      setError(err.message || "Something went wrong. Please try again.");
     }
   };
 

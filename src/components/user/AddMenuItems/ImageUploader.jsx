@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { XCircle, CheckCircle, AlertTriangle, Loader2 } from "lucide-react";
 import { supabaseClient } from "../../../supabase-utils/SupaBaseClient";
+import { insertMenuItem } from "../../../supabase-utils/InsertMenuService";
 
 function ImageUploader({ imageUploaderTitle, businessID, onItemAdded, businessType }) {
   const [uploads, setUploads] = useState([]);
@@ -41,31 +42,30 @@ function ImageUploader({ imageUploaderTitle, businessID, onItemAdded, businessTy
     setExtractionDone(false);
     setItemsAddedCount(null);
     setDbStatus("");
-
+  
     const { data: sessionData, error: sessionError } =
       await supabaseClient.auth.getSession();
+  
     if (sessionError || !sessionData?.session?.user?.id) {
       console.error("User not authenticated");
       return;
     }
+  
     const userId = sessionData.session.user.id;
     let totalItemsAdded = 0;
-
+  
     for (const upload of uploads) {
-      const fileToBase64 = (file) => {
-        return new Promise((resolve, reject) => {
+      const fileToBase64 = (file) =>
+        new Promise((resolve, reject) => {
           const reader = new FileReader();
-          reader.onload = () => {
-            const base64 = reader.result.split(",")[1]; // Strip `data:image/...;base64,`
-            resolve(base64);
-          };
+          reader.onload = () => resolve(reader.result.split(",")[1]);
           reader.onerror = reject;
           reader.readAsDataURL(file);
         });
-      };
-    
+  
       const base64 = await fileToBase64(upload.file);
-      const edgeFunction = `gemini-${businessType}-menu-generation`
+      const edgeFunction = `gemini-${businessType}-menu-generation`;
+  
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/${edgeFunction}`,
         {
@@ -73,7 +73,9 @@ function ImageUploader({ imageUploaderTitle, businessID, onItemAdded, businessTy
           mode: "cors",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${(await supabaseClient.auth.getSession()).data?.session?.access_token}`,
+            Authorization: `Bearer ${
+              (await supabaseClient.auth.getSession()).data?.session?.access_token
+            }`,
           },
           body: JSON.stringify({
             base64,
@@ -81,38 +83,21 @@ function ImageUploader({ imageUploaderTitle, businessID, onItemAdded, businessTy
           }),
         }
       );
-    
+  
       const result = await response.json();
       setExtractionDone(true);
-
+  
       for (const call of result) {
-        const args = call.arguments;
-
-        const payload = {
-          user_id: userId,
-          business_id: businessID,
-          name: args.name,
-          category: args.category,
-          description: args.description,
-          size_options: args.size_options,
-          dairy_options: args.dairy_options,
-          tags: args.tags,
-          form_options: args.form_options,
-          available: true,
-        };
-
-        const { error } = await supabaseClient
-          .from("menu_item_cafe")
-          .insert([payload]);
-        if (error) {
-          console.error("Insert failed:", error.message);
-          setDbStatus("❌ Some inserts failed");
-        } else {
+        try {
+          await insertMenuItem(call.arguments, userId, businessID, businessType);
           totalItemsAdded++;
+        } catch (err) {
+          console.error("Insert failed:", err.message);
+          setDbStatus("❌ Some inserts failed");
         }
       }
     }
-
+  
     setItemsAddedCount(totalItemsAdded);
     setDbStatus("✅ Items successfully added to DB");
     setGenerating(false);
