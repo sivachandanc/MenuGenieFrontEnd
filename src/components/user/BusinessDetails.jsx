@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabaseClient } from "../../supabase-utils/SupaBaseClient";
 import { DeleteBusiness } from "../../supabase-utils/DeleteBusiness";
+import { UpdateBusinessDescription } from "../../supabase-utils/update-business-info/updateBusinessDescription";
 import {
   MapPin,
   Mail,
@@ -90,6 +91,16 @@ function BusinessDetails() {
     }
   };
 
+  const handleDescriptionUpdate = async (newValue) => {
+    try {
+      await UpdateBusinessDescription(businessID, newValue, business);
+      setBusiness((prev) => ({ ...prev, description: newValue }));
+    } catch (err) {
+      alert("Failed to update description with embedding. Check console.");
+      console.error(err);
+    }
+  };
+
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto p-8 bg-white rounded-2xl shadow-md space-y-8 animate-pulse">
@@ -170,7 +181,7 @@ function BusinessDetails() {
         </div>
 
         {showConfirm && (
-          <div className="fixed inset-0 bg-opacity-30 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm z-50 flex items-center justify-center">
             <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
               <h2 className="text-lg font-semibold text-gray-800 mb-3">
                 Confirm Deletion
@@ -213,6 +224,7 @@ function BusinessDetails() {
           icon={<Star size={16} />}
           type="textarea"
           validate={(v) => (!v ? "Description cannot be empty" : "")}
+          onSave={handleDescriptionUpdate}
         />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6 text-sm">

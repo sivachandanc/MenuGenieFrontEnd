@@ -9,7 +9,7 @@ import "react-clock/dist/Clock.css";
 const BOT_PERSONALITIES = ["friendly", "professional", "funny"];
 const TAG_OPTIONS = ["women-owned", "family-owned", "black-owned"];
 
-function EditableBusinessField({ label, value, icon, type, options = [], validate, placeholder }) {
+function EditableBusinessField({ label, value, icon, type, options = [], validate, placeholder, onSave }) {
   const [editing, setEditing] = useState(false);
   const [fieldValue, setFieldValue] = useState(value || "");
   const [error, setError] = useState("");
@@ -26,11 +26,12 @@ function EditableBusinessField({ label, value, icon, type, options = [], validat
     return true;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateInput()) {
-      // TODO: Call Supabase update logic here
-      console.log("Submit", label, fieldValue);
+      if (typeof onSave === "function") {
+        await onSave(fieldValue);
+      }
       setEditing(false);
     }
   };
