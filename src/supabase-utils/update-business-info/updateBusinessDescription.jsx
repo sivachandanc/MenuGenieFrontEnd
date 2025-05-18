@@ -1,10 +1,17 @@
 import { supabaseClient } from "../SupaBaseClient";
 
-export async function UpdateBusinessDescription(businessID, newDescription, businessData) {
+export async function UpdateBusinessDescription(
+  businessID,
+  newDescription,
+  businessData
+) {
   // Update description in business table
   const { error: updateDescriptionError } = await supabaseClient
     .from("business")
-    .update({ description: newDescription })
+    .update({
+      description: newDescription,
+      updated_at: new Date().toISOString(),
+    })
     .eq("business_id", businessID);
 
   if (updateDescriptionError) {
