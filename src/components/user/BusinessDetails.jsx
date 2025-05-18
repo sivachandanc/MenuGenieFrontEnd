@@ -12,6 +12,7 @@ import {
   Bot,
   Smile,
   AlertTriangle,
+  Utensils,
 } from "lucide-react";
 
 function BusinessDetails() {
@@ -49,7 +50,9 @@ function BusinessDetails() {
       setBusiness({ ...data, logoUrl: finalUrl });
 
       // Step 2: Dynamically check corresponding menu table
-      const menuTable = `menu_item_${data.business_type?.toLowerCase().replace(/\s+/g, "_")}`;
+      const menuTable = `menu_item_${data.business_type
+        ?.toLowerCase()
+        .replace(/\s+/g, "_")}`;
       try {
         const { data: menuItems } = await supabaseClient
           .from(menuTable)
@@ -92,83 +95,109 @@ function BusinessDetails() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-8 bg-white rounded-2xl shadow space-y-8">
-      {/* Header with View Menu button */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div className="flex items-center justify-between w-full sm:w-auto">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">{business.name}</h1>
-            <p className="text-sm text-gray-500 capitalize">{business.business_type}</p>
-          </div>
-          <img
-            src={business.logoUrl}
-            alt="Business Logo"
-            className="w-14 h-14 object-contain border border-blue-500 rounded-full p-1 ml-4"
-          />
-        </div>
+    <div className="max-w-5xl mx-auto p-6 sm:p-10 bg-white rounded-2xl shadow-lg flex flex-col sm:flex-row gap-10">
+      {/* Profile Card (left column) */}
+      <div className="sm:w-1/3 flex flex-col items-center text-center bg-[#fef7ec] p-6 rounded-2xl shadow-md border">
+        <img
+          src={business.logoUrl}
+          alt="Business Logo"
+          className="w-24 h-24 object-contain rounded-full border-4 border-[var(--button)] mb-4"
+        />
+        <h2 className="text-2xl font-bold text-gray-900">{business.name}</h2>
+        <p className="text-sm text-gray-600 capitalize">
+          {business.business_type}
+        </p>
 
-        <button
-          onClick={() =>
-            (window.location.href = `/dashboard/business/${businessID}/menu`)
-          }
-          className="text-sm font-medium bg-[var(--button)] hover:bg-[var(--button-hover)] text-black px-4 py-2 rounded-md shadow"
-        >
-          📋 View Menu
-        </button>
-      </div>
-
-      {/* ❗ No Menu Caution */}
-      {!hasMenu && (
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm px-4 py-3 rounded-md">
-          <div className="flex items-center gap-2">
-            <AlertTriangle size={16} className="text-yellow-500" />
-            <span>This business does not have a menu added yet.</span>
-          </div>
+        {hasMenu ? (
           <button
             onClick={() =>
               (window.location.href = `/dashboard/business/${businessID}/menu`)
             }
-            className="text-sm font-medium bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1.5 rounded transition"
+            className="mt-6 px-5 py-2 rounded-full text-white font-semibold bg-[var(--button)] hover:bg-[var(--button-hover)] transition shadow"
           >
-            + Add Menu
+            <div className="flex flex-row space-x-1">
+              <Utensils size={25}/>
+              <span>View Menu</span>
+            </div>
           </button>
-        </div>
-      )}
-
-      {/* Description */}
-      <div>
-        <h2 className="text-lg font-semibold text-gray-700 mb-1">Description</h2>
-        <p className="text-gray-600 leading-relaxed">{business.description}</p>
+        ) : (
+          <div className="mt-6 flex flex-col items-center gap-2">
+            <p className="text-sm text-yellow-700 flex items-center gap-1">
+              <AlertTriangle size={16} /> No Menu Added
+            </p>
+            <button
+              onClick={() =>
+                (window.location.href = `/dashboard/business/${businessID}/menu`)
+              }
+              className="text-sm font-medium bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md transition shadow"
+            >
+              + Add Menu
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* Business Details */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-6 text-sm">
-        <Info label="Location" value={business.location} icon={<MapPin size={16} />} />
-        <Info label="Email" value={business.email} icon={<Mail size={16} />} />
-        <Info label="Phone" value={business.phone} icon={<Phone size={16} />} />
-        <Info label="Website" value={business.website} icon={<Globe size={16} />} />
-        <Info
-          label="Opening Time"
-          value={business.opening_time?.slice(0, 5)}
-          icon={<Clock size={16} />}
-        />
-        <Info
-          label="Closing Time"
-          value={business.closing_time?.slice(0, 5)}
-          icon={<Clock size={16} />}
-        />
-        <Info label="Top Items" value={business.top_items} icon={<Star size={16} />} />
-        <Info
-          label="Ownership Tags"
-          value={business.ownership_tags?.join(", ")}
-          icon={<Tags size={16} />}
-        />
-        <Info
-          label="Bot Personality"
-          value={business.bot_personality}
-          icon={<Smile size={16} />}
-        />
-        <Info label="Bot Name" value={business.bot_name} icon={<Bot size={16} />} />
+      {/* Business Info (right column) */}
+      <div className="sm:w-2/3 space-y-6">
+        <div>
+          <h3 className="text-xl font-semibold text-gray-800 mb-2">
+            Description
+          </h3>
+          <p className="text-gray-600">{business.description}</p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6 text-sm">
+          <Info
+            label="Location"
+            value={business.location}
+            icon={<MapPin size={16} />}
+          />
+          <Info
+            label="Email"
+            value={business.email}
+            icon={<Mail size={16} />}
+          />
+          <Info
+            label="Phone"
+            value={business.phone}
+            icon={<Phone size={16} />}
+          />
+          <Info
+            label="Website"
+            value={business.website}
+            icon={<Globe size={16} />}
+          />
+          <Info
+            label="Opening Time"
+            value={business.opening_time?.slice(0, 5)}
+            icon={<Clock size={16} />}
+          />
+          <Info
+            label="Closing Time"
+            value={business.closing_time?.slice(0, 5)}
+            icon={<Clock size={16} />}
+          />
+          <Info
+            label="Top Items"
+            value={business.top_items}
+            icon={<Star size={16} />}
+          />
+          <Info
+            label="Ownership Tags"
+            value={business.ownership_tags?.join(", ")}
+            icon={<Tags size={16} />}
+          />
+          <Info
+            label="Bot Personality"
+            value={business.bot_personality}
+            icon={<Smile size={16} />}
+          />
+          <Info
+            label="Bot Name"
+            value={business.bot_name}
+            icon={<Bot size={16} />}
+          />
+        </div>
       </div>
     </div>
   );
