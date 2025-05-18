@@ -43,7 +43,23 @@ export async function insertBusinessAndEmbed(formData) {
 
   const business = businessInsertData[0];
 
-  // 4. Build embedding contexts
+  // 4. insert info for chat window
+  const businessChatInfo = {
+    business_id: business.business_id,
+    name: business.name,
+    bot_name: business.bot_name
+  }
+  console.log(businessChatInfo)
+  const {error: insertBusinessChatInfo} = await supabaseClient
+    .from("business_chat_info")
+    .insert(businessChatInfo)
+    .select();
+
+  if (insertBusinessChatInfo){
+    throw new Error("Failed to insert business chat info.");
+  }
+
+  // 5. Build embedding contexts
   const contextBlocks = [
     {
       context: `Top selling items (According to owner): ${business.top_items}`,

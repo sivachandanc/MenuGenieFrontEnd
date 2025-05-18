@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import SendIcon from "../../assets/send.svg";
+import ReactMarkdown from 'react-markdown';
 
 function ChatWindow({ setChatMode }) {
   setChatMode(true);
@@ -61,8 +62,7 @@ function ChatWindow({ setChatMode }) {
                 ? "bg-blue-500 text-white self-end ml-auto"
                 : "bg-gray-300 text-black self-start mr-auto"
             }`}
-          >
-            {msg.text}
+          ><ReactMarkdown>{msg.text}</ReactMarkdown>
           </div>
         ))}
 

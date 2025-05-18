@@ -40,7 +40,7 @@ function OnBoardingWizard() {
       console.log("Context embeddings stored:", inserted_contexts);
   
       // Success — you can redirect or show a toast here
-      // window.location.href = "/dashboard";
+      window.location.href = "/dashboard";
     } catch (err) {
       console.error("Submission error:", err);
       setError(err.message || "Something went wrong. Please try again.");
