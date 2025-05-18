@@ -181,7 +181,7 @@ function BusinessDetails() {
         </div>
 
         {showConfirm && (
-          <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-opacity-30 backdrop-blur-sm z-50 flex items-center justify-center">
             <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
               <h2 className="text-lg font-semibold text-gray-800 mb-3">
                 Confirm Deletion
