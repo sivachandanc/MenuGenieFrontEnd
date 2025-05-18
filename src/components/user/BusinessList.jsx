@@ -26,7 +26,7 @@ function BusinessList() {
       const withLogosAndMenu = await Promise.all(
         businessData.map(async (biz) => {
           // ✅ Get logo
-          const logoPath = `business/${biz.user_id}/${biz.business_id}/bot.png`;
+          const logoPath = `${biz.user_id}/${biz.business_id}/bot.png`;
           const {
             data: { publicUrl },
           } = supabaseClient.storage.from("business").getPublicUrl(logoPath);

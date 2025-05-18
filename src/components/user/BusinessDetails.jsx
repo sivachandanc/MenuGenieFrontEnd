@@ -1,5 +1,3 @@
-// BusinessDetails.jsx
-
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabaseClient } from "../../supabase-utils/SupaBaseClient";
@@ -43,7 +41,7 @@ function BusinessDetails() {
         return;
       }
 
-      const logoPath = `business/${data.user_id}/${data.business_id}/bot.png`;
+      const logoPath = `${data.user_id}/${data.business_id}/bot.png`;
       const {
         data: { publicUrl },
       } = supabaseClient.storage.from("business").getPublicUrl(logoPath);
@@ -101,6 +99,68 @@ function BusinessDetails() {
     }
   };
 
+  const handleLogoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !business) return;
+
+    const image = new Image();
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      image.onload = async () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = image.width;
+        canvas.height = image.height;
+
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(image, 0, 0);
+
+        canvas.toBlob(
+          async (blob) => {
+            if (!blob) {
+              alert("Failed to convert image to PNG");
+              return;
+            }
+
+            const filePath = `${business.user_id}/${business.business_id}/bot.png`;
+
+            const { error: uploadError } = await supabaseClient.storage
+              .from("business")
+              .upload(filePath, blob, {
+                contentType: "image/png",
+                upsert: true,
+              });
+
+            if (uploadError) {
+              console.error("Logo upload failed:", uploadError.message);
+              alert("Failed to upload logo");
+              return;
+            }
+
+            const { data: urlData } = supabaseClient.storage
+              .from("business")
+              .getPublicUrl(filePath);
+
+            setBusiness((prev) => ({
+              ...prev,
+              logoUrl: urlData.publicUrl,
+            }));
+          },
+          "image/png",
+          1.0
+        );
+      };
+
+      image.onerror = () => {
+        alert("Failed to load image. Please try another file.");
+      };
+
+      image.src = reader.result;
+    };
+
+    reader.readAsDataURL(file);
+  };
+
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto p-8 bg-white rounded-2xl shadow-md space-y-8 animate-pulse">
@@ -127,11 +187,23 @@ function BusinessDetails() {
     <div className="max-w-5xl mx-auto p-6 sm:p-10 bg-white rounded-2xl shadow-lg flex flex-col sm:flex-row gap-10">
       {/* Profile Card */}
       <div className="sm:w-1/3 flex flex-col items-center text-center bg-[#fef7ec] p-6 rounded-2xl shadow-md border">
-        <img
-          src={business.logoUrl}
-          alt="Business Logo"
-          className="w-24 h-24 object-contain rounded-full border-4 border-[var(--button)] mb-4"
-        />
+        <div className="relative mb-4">
+          <img
+            src={business.logoUrl}
+            alt="Business Logo"
+            className="w-24 h-24 object-contain rounded-full border-4 border-[var(--button)]"
+          />
+          <label className="absolute bottom-0 right-0 bg-[var(--button)] text-white text-xs px-2 py-1 rounded cursor-pointer hover:bg-[var(--button-hover)]">
+            Change
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleLogoUpload}
+              className="hidden"
+            />
+          </label>
+        </div>
+
         <h2 className="text-2xl font-bold text-gray-900">{business.name}</h2>
         <p className="text-sm text-gray-600 capitalize">
           {business.business_type}
@@ -172,7 +244,7 @@ function BusinessDetails() {
           <div className="group relative z-10">
             <button
               onClick={() => setShowConfirm(true)}
-              className={`p-2 transition rounded-full text-red-500 hover:text-red-700`}
+              className="p-2 transition rounded-full text-red-500 hover:text-red-700"
               title="Delete Business"
             >
               <Trash2 size={20} />
@@ -187,14 +259,11 @@ function BusinessDetails() {
                 Confirm Deletion
               </h2>
               <p className="text-sm text-gray-600 mb-4">
-                Are you sure you want to delete <strong>{business.name}</strong>
-                ?
+                Are you sure you want to delete <strong>{business.name}</strong>?
               </p>
               <div className="flex justify-end space-x-3">
                 <button
-                  onClick={() => {
-                    if (!deleting) setShowConfirm(false);
-                  }}
+                  onClick={() => !deleting && setShowConfirm(false)}
                   className="px-4 py-1 text-sm text-gray-700 hover:underline"
                 >
                   Cancel
