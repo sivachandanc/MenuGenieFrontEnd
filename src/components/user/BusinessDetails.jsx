@@ -1,3 +1,5 @@
+// BusinessDetails.jsx
+
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabaseClient } from "../../supabase-utils/SupaBaseClient";
@@ -14,9 +16,9 @@ import {
   Smile,
   AlertTriangle,
   Utensils,
-  Trash2
+  Trash2,
 } from "lucide-react";
-import EditableBusinessField from "./EditableBusinessField"; // Adjust path as needed
+import EditableBusinessField from "./EditableBusinessField";
 
 function BusinessDetails() {
   const { businessID } = useParams();
@@ -25,6 +27,7 @@ function BusinessDetails() {
   const [loading, setLoading] = useState(true);
   const [hasMenu, setHasMenu] = useState(true);
   const [deleting, setDeleting] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   useEffect(() => {
     const fetchBusiness = async () => {
@@ -75,6 +78,19 @@ function BusinessDetails() {
     fetchBusiness();
   }, [businessID]);
 
+  const confirmDelete = async () => {
+    setShowConfirm(false);
+    setDeleting(true);
+    try {
+      await DeleteBusiness(business.business_id, business.business_type);
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("Failed to delete business:", err);
+      setDeleting(false);
+      alert("Failed to delete business. Please try again.");
+    }
+  };
+
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto p-8 bg-white rounded-2xl shadow-md space-y-8 animate-pulse">
@@ -99,7 +115,7 @@ function BusinessDetails() {
 
   return (
     <div className="max-w-5xl mx-auto p-6 sm:p-10 bg-white rounded-2xl shadow-lg flex flex-col sm:flex-row gap-10">
-      {/* Profile Card (left column) */}
+      {/* Profile Card */}
       <div className="sm:w-1/3 flex flex-col items-center text-center bg-[#fef7ec] p-6 rounded-2xl shadow-md border">
         <img
           src={business.logoUrl}
@@ -140,53 +156,63 @@ function BusinessDetails() {
         )}
       </div>
 
-      {/* Business Info (right column) */}
-      <div className="sm:w-2/3 space-y-6 relative">
-        <div className="absolute top-0 right-0 group z-20">
-          <button
-            onClick={async () => {
-              setDeleting(true);
-              try {
-                await DeleteBusiness(
-                  business.business_id,
-                  business.business_type
-                );
-                navigate("/dashboard");
-              } catch (err) {
-                console.error("Failed to delete business:", err);
-                setDeleting(false);
-                alert("Failed to delete business. Please try again.");
-              }
-            }}
-            className={`p-2 transition rounded-full ${
-              deleting
-                ? "bg-red-100 border border-red-400 animate-spin"
-                : "text-red-500 hover:text-red-700"
-            }`}
-            title="Delete Business"
-          >
-            {deleting ? (
-              <div className="w-5 h-5 rounded-full border-2 border-red-500 border-t-transparent" />
-            ) : (
+      {/* Business Info */}
+      <div className="sm:w-2/3 space-y-6">
+        <div className="flex justify-end">
+          <div className="group relative z-10">
+            <button
+              onClick={() => setShowConfirm(true)}
+              className={`p-2 transition rounded-full text-red-500 hover:text-red-700`}
+              title="Delete Business"
+            >
               <Trash2 size={20} />
-            )}
-          </button>
-          {!deleting && (
-            <div className="absolute top-full right-0 mt-1 hidden group-hover:block bg-red-500 text-white text-xs font-medium px-2 py-1 rounded shadow-lg z-10">
-              Delete Business
-            </div>
-          )}
+            </button>
+          </div>
         </div>
-          <div>
-          <EditableBusinessField
+
+        {showConfirm && (
+          <div className="fixed inset-0 bg-opacity-30 backdrop-blur-sm  z-50 flex items-center justify-center">
+            <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
+              <h2 className="text-lg font-semibold text-gray-800 mb-3">
+                Confirm Deletion
+              </h2>
+              <p className="text-sm text-gray-600 mb-4">
+                Are you sure you want to delete <strong>{business.name}</strong>
+                ?
+              </p>
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => setShowConfirm(false)}
+                  className="px-4 py-1 text-sm text-gray-700 hover:underline"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  disabled={deleting}
+                  className={`px-4 py-1 text-sm text-white rounded flex items-center justify-center gap-2 transition ${
+                    deleting
+                      ? "bg-red-400 cursor-not-allowed"
+                      : "bg-red-600 hover:bg-red-700"
+                  }`}
+                >
+                  {deleting && (
+                    <div className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                  )}
+                  {deleting ? "Deleting..." : "Delete"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <EditableBusinessField
           label="Description"
           value={business.description}
           icon={<Star size={16} />}
           type="textarea"
           validate={(v) => (!v ? "Description cannot be empty" : "")}
         />
-          </div>
-        
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6 text-sm">
           <EditableBusinessField
