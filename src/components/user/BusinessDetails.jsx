@@ -35,7 +35,7 @@ function BusinessDetails() {
         return;
       }
 
-      const logoPath = `business/${data.user_id}/${data.business_id}/bot.ico`;
+      const logoPath = `business/${data.user_id}/${data.business_id}/bot.png`;
       const {
         data: { publicUrl },
       } = supabaseClient.storage.from("business").getPublicUrl(logoPath);
@@ -45,7 +45,7 @@ function BusinessDetails() {
         ? publicUrl
         : supabaseClient.storage
             .from("business")
-            .getPublicUrl("menu_genie_logo_default.ico").data.publicUrl;
+            .getPublicUrl("menu_genie_logo_default.png").data.publicUrl;
 
       setBusiness({ ...data, logoUrl: finalUrl });
 
