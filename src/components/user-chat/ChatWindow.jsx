@@ -10,6 +10,7 @@ function ChatWindow({ setChatMode }) {
   const [messages, setMessages] = useState([]);
   const [botTyping, setBotTyping] = useState(false);
   const inputRef = useRef(null);
+  const messagesEndRef = useRef(null);
   const sessionUUIDRef = useRef(null);
 
   const [businessInfo, setBusinessInfo] = useState({
@@ -66,11 +67,15 @@ function ChatWindow({ setChatMode }) {
     fetchBusinessInfo();
   }, [businessID]);
 
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, botTyping]);
+
   const sendMessage = async () => {
     const text = inputRef.current?.value?.trim();
     if (!text || !businessID) return;
 
-    const userMessage = { text, sender: "user" };
+    const userMessage = { text, sender: "user", time: new Date() };
     setMessages((prev) => [...prev, userMessage]);
     inputRef.current.value = "";
     setBotTyping(true);
@@ -88,8 +93,11 @@ function ChatWindow({ setChatMode }) {
         }
       );
 
-      const botMessage = await res.json();
-      setMessages((prev) => [...prev, botMessage]);
+      const botReply = await res.json();
+      setMessages((prev) => [
+        ...prev,
+        { ...botReply, sender: "bot", time: new Date() },
+      ]);
     } catch (err) {
       console.error("Failed to get bot response:", err);
     } finally {
@@ -98,8 +106,8 @@ function ChatWindow({ setChatMode }) {
   };
 
   return (
-    <div className="fixed inset-0 flex flex-col bg-[#f0f0f0]">
-      {/* WhatsApp-style Top Banner */}
+    <div className="fixed inset-0 flex flex-col bg-[#f0f0f0] max-w-xl mx-auto">
+      {/* Top Banner */}
       <div className="bg-[#075E54] text-white px-4 py-3 flex items-center shadow-md sticky top-0 z-10 gap-3">
         {businessInfo.logoUrl && (
           <img
@@ -108,23 +116,51 @@ function ChatWindow({ setChatMode }) {
             className="w-8 h-8 rounded-full border border-white object-cover"
           />
         )}
-        <div className="text-lg font-semibold">
-          {businessInfo.bot_name} from {businessInfo.name}
+        <div className="flex flex-col">
+          <span className="text-base font-semibold">
+            {businessInfo.bot_name} from {businessInfo.name}
+          </span>
+          {botTyping && (
+            <span className="text-xs text-green-200 animate-pulse">
+              typing...
+            </span>
+          )}
         </div>
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2">
+      <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+        {messages.length === 0 && !botTyping && (
+          <div className="text-center text-gray-500 mt-8">
+            Start a conversation with{" "}
+            <span className="font-medium">{businessInfo.bot_name}</span>
+          </div>
+        )}
+
         {messages.map((msg, index) => (
           <div
             key={index}
-            className={`max-w-[70%] px-4 py-2 rounded-2xl shadow text-sm break-words ${
-              msg.sender === "user"
-                ? "ml-auto bg-[#DCF8C6] rounded-br-none"
-                : "mr-auto bg-white rounded-bl-none"
+            className={`flex items-end gap-2 ${
+              msg.sender === "user" ? "justify-end" : "justify-start"
             }`}
           >
-            <ReactMarkdown>{msg.text}</ReactMarkdown>
+            {msg.sender !== "user" && businessInfo.logoUrl && (
+              <img
+                src={businessInfo.logoUrl}
+                className="w-6 h-6 rounded-full object-cover"
+                alt="bot"
+              />
+            )}
+            <div
+              className={`relative max-w-[70%] px-4 py-2 rounded-2xl shadow text-sm break-words transition-all duration-300 ${
+                msg.sender === "user"
+                  ? "bg-[#DCF8C6] rounded-br-none"
+                  : "bg-white rounded-bl-none"
+              }`}
+              title={msg.time ? new Date(msg.time).toLocaleTimeString() : ""}
+            >
+              <ReactMarkdown>{msg.text}</ReactMarkdown>
+            </div>
           </div>
         ))}
 
@@ -135,19 +171,25 @@ function ChatWindow({ setChatMode }) {
             <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:0.4s]" />
           </div>
         )}
+
+        <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Field at Bottom */}
-      <div className="bg-white p-3 flex items-center gap-2 border-t">
+      {/* Input Area */}
+      <div className="bg-white px-3 py-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] flex items-center gap-2 border-t">
         <input
           ref={inputRef}
           type="text"
           className="flex-1 px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#075E54] bg-gray-50"
           placeholder="Type a message..."
+          onKeyDown={(e) => e.key === "Enter" && sendMessage()}
         />
         <button
           onClick={sendMessage}
-          className="bg-[#075E54] text-white p-2 rounded-full hover:bg-[#064d45]"
+          disabled={botTyping}
+          className={`bg-[#075E54] text-white p-2 rounded-full hover:bg-[#064d45] transition ${
+            botTyping ? "opacity-50 cursor-not-allowed" : ""
+          }`}
         >
           <img src={SendIcon} alt="Send" className="w-5 h-5" />
         </button>
