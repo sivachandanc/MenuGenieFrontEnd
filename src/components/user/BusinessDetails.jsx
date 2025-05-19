@@ -5,6 +5,7 @@ import { DeleteBusiness } from "../../supabase-utils/DeleteBusiness";
 import { UpdateBusinessDescription } from "../../supabase-utils/update-business-info/updateBusinessDescription";
 import { UpdateBusinessLocation } from "../../supabase-utils/update-business-info/UpdateBusinessLocation";
 import { UpdateBusinessEmail } from "../../supabase-utils/update-business-info/UpdateBusinessEmail";
+import { UpdateBusinessWebSite } from "../../supabase-utils/update-business-info/UpdateBusinessWebSite";
 import {
   MapPin,
   Mail,
@@ -115,6 +116,16 @@ function BusinessDetails() {
     try {
       await UpdateBusinessEmail(businessID, newValue, business);
       setBusiness((prev) => ({ ...prev, email: newValue }));
+    } catch (err) {
+      alert("Failed to update Email with embedding. Check console.");
+      console.error(err);
+    }
+  };
+
+  const handleWebSiteUpdate = async (newValue) => {
+    try {
+      await UpdateBusinessWebSite(businessID, newValue, business);
+      setBusiness((prev) => ({ ...prev, website: newValue }));
     } catch (err) {
       alert("Failed to update Email with embedding. Check console.");
       console.error(err);
@@ -358,6 +369,7 @@ function BusinessDetails() {
                 ? ""
                 : "Invalid website"
             }
+            onSave={handleWebSiteUpdate}
           />
           <EditableBusinessField
             label="Opening Time"
