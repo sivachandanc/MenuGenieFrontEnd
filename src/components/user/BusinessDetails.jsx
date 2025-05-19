@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabaseClient } from "../../supabase-utils/SupaBaseClient";
 import { DeleteBusiness } from "../../supabase-utils/DeleteBusiness";
-import CustomSpinner from "../util-components/Spinner";
 import { UpdateBusinessDescription } from "../../supabase-utils/update-business-info/updateBusinessDescription";
+import { UpdateBusinessLocation } from "../../supabase-utils/update-business-info/UpdateBusinessLocation";
 import {
   MapPin,
   Mail,
@@ -94,6 +94,16 @@ function BusinessDetails() {
     try {
       await UpdateBusinessDescription(businessID, newValue, business);
       setBusiness((prev) => ({ ...prev, description: newValue }));
+    } catch (err) {
+      alert("Failed to update description with embedding. Check console.");
+      console.error(err);
+    }
+  };
+
+  const handleLocationUpdate = async (newValue) => {
+    try {
+      await UpdateBusinessLocation(businessID, newValue, business);
+      setBusiness((prev) => ({ ...prev, location: newValue }));
     } catch (err) {
       alert("Failed to update description with embedding. Check console.");
       console.error(err);
@@ -303,6 +313,7 @@ function BusinessDetails() {
             value={business.location}
             icon={<MapPin size={16} />}
             type="text"
+            onSave={handleLocationUpdate}
           />
           <EditableBusinessField
             label="Email"
