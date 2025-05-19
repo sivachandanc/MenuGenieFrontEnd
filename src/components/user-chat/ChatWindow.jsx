@@ -12,7 +12,11 @@ function ChatWindow({ setChatMode }) {
   const inputRef = useRef(null);
   const sessionUUIDRef = useRef(null);
 
-  const [businessInfo, setBusinessInfo] = useState({ name: "", bot_name: "" });
+  const [businessInfo, setBusinessInfo] = useState({
+    name: "",
+    bot_name: "",
+    logoUrl: "",
+  });
 
   useEffect(() => {
     const existingUUID = localStorage.getItem("sessionUUID");
@@ -28,14 +32,32 @@ function ChatWindow({ setChatMode }) {
   useEffect(() => {
     const fetchBusinessInfo = async () => {
       if (!businessID) return;
+
       const { data, error } = await supabaseClient
         .from("business_chat_info")
-        .select("name, bot_name")
+        .select("name, bot_name, user_id")
         .eq("business_id", businessID)
         .single();
 
       if (!error && data) {
-        setBusinessInfo({ name: data.name, bot_name: data.bot_name });
+        const filePath = `business_logo/${businessID}.png`;
+
+        const {
+          data: { publicUrl },
+        } = supabaseClient.storage.from("business").getPublicUrl(filePath);
+
+        const res = await fetch(publicUrl, { method: "HEAD" });
+        const finalUrl = res.ok
+          ? publicUrl
+          : supabaseClient.storage
+              .from("business")
+              .getPublicUrl("menu_genie_logo_default.png").data.publicUrl;
+
+        setBusinessInfo({
+          name: data.name,
+          bot_name: data.bot_name,
+          logoUrl: finalUrl,
+        });
       } else {
         console.error("Failed to fetch business info:", error);
       }
@@ -54,14 +76,17 @@ function ChatWindow({ setChatMode }) {
     setBotTyping(true);
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_USER_CHAT_BACKEND}/chat/${businessID}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Session-ID": sessionUUIDRef.current,
-        },
-        body: JSON.stringify({ text }),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_USER_CHAT_BACKEND}/chat/${businessID}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Session-ID": sessionUUIDRef.current,
+          },
+          body: JSON.stringify({ text }),
+        }
+      );
 
       const botMessage = await res.json();
       setMessages((prev) => [...prev, botMessage]);
@@ -75,7 +100,14 @@ function ChatWindow({ setChatMode }) {
   return (
     <div className="fixed inset-0 flex flex-col bg-[#f0f0f0]">
       {/* WhatsApp-style Top Banner */}
-      <div className="bg-[#075E54] text-white px-4 py-3 flex items-center shadow-md sticky top-0 z-10">
+      <div className="bg-[#075E54] text-white px-4 py-3 flex items-center shadow-md sticky top-0 z-10 gap-3">
+        {businessInfo.logoUrl && (
+          <img
+            src={businessInfo.logoUrl}
+            alt="Business Logo"
+            className="w-8 h-8 rounded-full border border-white object-cover"
+          />
+        )}
         <div className="text-lg font-semibold">
           {businessInfo.bot_name} from {businessInfo.name}
         </div>
