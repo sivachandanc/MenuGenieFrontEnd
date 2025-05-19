@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabaseClient } from "../../supabase-utils/SupaBaseClient";
 import { DeleteBusiness } from "../../supabase-utils/DeleteBusiness";
+import CustomSpinner from "../util-components/Spinner";
 import { UpdateBusinessDescription } from "../../supabase-utils/update-business-info/updateBusinessDescription";
 import {
   MapPin,
@@ -286,7 +287,6 @@ function BusinessDetails() {
             </div>
           </div>
         )}
-
         <EditableBusinessField
           label="Description"
           value={business.description}
@@ -295,6 +295,7 @@ function BusinessDetails() {
           validate={(v) => (!v ? "Description cannot be empty" : "")}
           onSave={handleDescriptionUpdate}
         />
+        
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6 text-sm">
           <EditableBusinessField
