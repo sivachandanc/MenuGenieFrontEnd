@@ -6,6 +6,7 @@ import { UpdateBusinessDescription } from "../../supabase-utils/update-business-
 import { UpdateBusinessLocation } from "../../supabase-utils/update-business-info/UpdateBusinessLocation";
 import { UpdateBusinessEmail } from "../../supabase-utils/update-business-info/UpdateBusinessEmail";
 import { UpdateBusinessWebSite } from "../../supabase-utils/update-business-info/UpdateBusinessWebSite";
+import { UpdateBusinessPhoneNumber } from "../../supabase-utils/update-business-info/UpdateBusinessPhoneNumber";
 import {
   MapPin,
   Mail,
@@ -127,7 +128,17 @@ function BusinessDetails() {
       await UpdateBusinessWebSite(businessID, newValue, business);
       setBusiness((prev) => ({ ...prev, website: newValue }));
     } catch (err) {
-      alert("Failed to update Email with embedding. Check console.");
+      alert("Failed to update Website with embedding. Check console.");
+      console.error(err);
+    }
+  };
+
+  const handlePhoneNumberUpdate = async (newValue) => {
+    try {
+      await UpdateBusinessPhoneNumber(businessID, newValue, business);
+      setBusiness((prev) => ({ ...prev, phone: newValue }));
+    } catch (err) {
+      alert("Failed to update Phone with embedding. Check console.");
       console.error(err);
     }
   };
@@ -356,6 +367,7 @@ function BusinessDetails() {
             value={business.phone}
             icon={<Phone size={16} />}
             type="phone"
+            onSave={handlePhoneNumberUpdate}
           />
           <EditableBusinessField
             label="Website"
