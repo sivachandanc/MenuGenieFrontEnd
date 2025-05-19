@@ -7,6 +7,8 @@ import { UpdateBusinessLocation } from "../../supabase-utils/update-business-inf
 import { UpdateBusinessEmail } from "../../supabase-utils/update-business-info/UpdateBusinessEmail";
 import { UpdateBusinessWebSite } from "../../supabase-utils/update-business-info/UpdateBusinessWebSite";
 import { UpdateBusinessPhoneNumber } from "../../supabase-utils/update-business-info/UpdateBusinessPhoneNumber";
+import { UpdateBusinessOpeningTime } from "../../supabase-utils/update-business-info/UpdateBusinessOpeningTime";
+import { UpdateBusinessClosingTime } from "../../supabase-utils/update-business-info/UpdateBusinessClosingTime";
 import {
   MapPin,
   Mail,
@@ -139,6 +141,26 @@ function BusinessDetails() {
       setBusiness((prev) => ({ ...prev, phone: newValue }));
     } catch (err) {
       alert("Failed to update Phone with embedding. Check console.");
+      console.error(err);
+    }
+  };
+
+  const handleOpeningTimeUpdate = async (newValue) => {
+    try {
+      await UpdateBusinessOpeningTime(businessID, newValue, business);
+      setBusiness((prev) => ({ ...prev, opening_time: newValue }));
+    } catch (err) {
+      alert("Failed to update Opening Time with embedding. Check console.");
+      console.error(err);
+    }
+  };
+
+  const handleClosingTimeUpdate = async (newValue) => {
+    try {
+      await UpdateBusinessClosingTime(businessID, newValue, business);
+      setBusiness((prev) => ({ ...prev, closing_time: newValue }));
+    } catch (err) {
+      alert("Failed to update Closing Time with embedding. Check console.");
       console.error(err);
     }
   };
@@ -388,12 +410,14 @@ function BusinessDetails() {
             value={business.opening_time?.slice(0, 5)}
             icon={<Clock size={16} />}
             type="time"
+            onSave={handleOpeningTimeUpdate}
           />
           <EditableBusinessField
             label="Closing Time"
             value={business.closing_time?.slice(0, 5)}
             icon={<Clock size={16} />}
             type="time"
+            onSave={handleClosingTimeUpdate}
           />
           <EditableBusinessField
             label="Ownership Tags"
