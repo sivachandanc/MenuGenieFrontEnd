@@ -4,6 +4,7 @@ import { supabaseClient } from "../../supabase-utils/SupaBaseClient";
 import { DeleteBusiness } from "../../supabase-utils/DeleteBusiness";
 import { UpdateBusinessDescription } from "../../supabase-utils/update-business-info/updateBusinessDescription";
 import { UpdateBusinessLocation } from "../../supabase-utils/update-business-info/UpdateBusinessLocation";
+import { UpdateBusinessEmail } from "../../supabase-utils/update-business-info/UpdateBusinessEmail";
 import {
   MapPin,
   Mail,
@@ -105,7 +106,17 @@ function BusinessDetails() {
       await UpdateBusinessLocation(businessID, newValue, business);
       setBusiness((prev) => ({ ...prev, location: newValue }));
     } catch (err) {
-      alert("Failed to update description with embedding. Check console.");
+      alert("Failed to update Location with embedding. Check console.");
+      console.error(err);
+    }
+  };
+
+  const handleEmailUpdate = async (newValue) => {
+    try {
+      await UpdateBusinessEmail(businessID, newValue, business);
+      setBusiness((prev) => ({ ...prev, email: newValue }));
+    } catch (err) {
+      alert("Failed to update Email with embedding. Check console.");
       console.error(err);
     }
   };
@@ -327,6 +338,7 @@ function BusinessDetails() {
                 ? ""
                 : "Invalid email"
             }
+            onSave={handleEmailUpdate}
           />
           <EditableBusinessField
             label="Phone"
