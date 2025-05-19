@@ -42,7 +42,7 @@ function BusinessDetails() {
         return;
       }
 
-      const logoPath = `${data.user_id}/${data.business_id}/bot.png`;
+      const logoPath = `business_logo/${businessID}.png`;
       const {
         data: { publicUrl },
       } = supabaseClient.storage.from("business").getPublicUrl(logoPath);
@@ -123,7 +123,7 @@ function BusinessDetails() {
               return;
             }
 
-            const filePath = `${business.user_id}/${business.business_id}/bot.png`;
+            const filePath = `business_logo/${business.business_id}.png`;
 
             const { error: uploadError } = await supabaseClient.storage
               .from("business")
