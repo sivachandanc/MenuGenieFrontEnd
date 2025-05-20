@@ -6,6 +6,7 @@ import {
   CheckCircle,
   Bot,
   Utensils,
+  CircleArrowLeft,
   Pencil,
   Trash,
 } from "lucide-react";
@@ -82,40 +83,44 @@ function ListBusinessMenu() {
   return (
     <div className="w-full mx-auto p-4">
       <div className="flex flex-col  gap-4">
-        {/* Tabs */}
-        {/* <div className="flex flex-row"></div> */}
-        <div className="flex flex-wrap justify-center bg-[var(--tabs-color)] p-1 rounded-md w-1/3">
-          {[
-            { id: "menu", label: "Menu", icon: <Utensils size={14} /> },
-            { id: "add", label: "Add Item", icon: <Plus size={14} /> },
-            { id: "ai", label: "Use AI", icon: <Bot size={14} /> },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setSelectedTab(tab.id)}
-              className={`flex items-center justify-center gap-1 px-4 py-2 rounded-md text-sm font-semibold transition min-w-[100px] text-center ${
-                selectedTab === tab.id
-                  ? "bg-[var(--button)] text-white"
-                  : "text-gray-800 hover:bg-gray-200"
-              }`}
-            >
-              {tab.icon}
-              {tab.label}
-            </button>
-          ))}
-        </div>
+        
+        <div className="flex flex-row space-x-2">
 
-        {/* Navigate button */}
-        <div className="flex justify-end">
-          <button
-            onClick={() => navigate(`/dashboard/business/${businessID}`)}
-            className="px-5 py-2 rounded-full text-white font-semibold bg-[var(--button)] hover:bg-[var(--button-hover)] transition shadow"
-          >
-            <div className="flex flex-row space-x-1 items-center">
-              <Utensils size={20} />
-              <span>View Business</span>
-            </div>
-          </button>
+          {/* GO Back to Business*/}
+          <div className="flex justify-start">
+            <button
+              onClick={() => navigate(`/dashboard/business/${businessID}`)}
+              className="px-5 py-2 rounded-full text-white font-semibold bg-[var(--button)] hover:bg-[var(--button-hover)] transition shadow"
+            >
+              <div className="flex flex-row space-x-1 items-center rounded-full">
+                <CircleArrowLeft size={20} />
+              </div>
+            </button>
+          </div>
+
+          {/* Tabs */}
+          <div className="flex flex-wrap justify-center bg-[var(--tabs-color)] p-1 m-0 rounded-md w-1/3">
+            {[
+              { id: "menu", label: "Menu", icon: <Utensils size={14} /> },
+              { id: "add", label: "Add Item", icon: <Plus size={14} /> },
+              { id: "ai", label: "Use AI", icon: <Bot size={14} /> },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setSelectedTab(tab.id)}
+                className={`flex items-center justify-center gap-1 px-4 py-2 rounded-md text-sm font-semibold transition min-w-[100px] text-center ${
+                  selectedTab === tab.id
+                    ? "bg-[var(--button)] text-white"
+                    : "text-gray-800 hover:bg-gray-200"
+                }`}
+              >
+                {tab.icon}
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Navigate button */}
         </div>
 
         {/* Tab Panel */}
