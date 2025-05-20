@@ -118,7 +118,13 @@ function ListBusinessMenu() {
         </div>
 
         {/* Tab Panel */}
-        <div className="bg-white border border-gray-200 rounded-2xl shadow p-4">
+        <div
+          className={`p-4 ${
+            selectedTab !== "ai"
+              ? "bg-white border border-gray-200 rounded-2xl shadow"
+              : ""
+          }`}
+        >
           {selectedTab === "menu" && (
             <>
               <h2 className="text-lg font-semibold text-gray-800 mb-4">
