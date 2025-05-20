@@ -33,6 +33,7 @@ function BusinessDetails() {
   const [hasMenu, setHasMenu] = useState(true);
   const [deleting, setDeleting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [logoUploading, setLogoUploading] = useState(false);
 
   useEffect(() => {
     const fetchBusiness = async () => {
@@ -169,6 +170,8 @@ function BusinessDetails() {
     const file = e.target.files?.[0];
     if (!file || !business) return;
 
+    setLogoUploading(true); // Start spinner
+
     const image = new Image();
     const reader = new FileReader();
 
@@ -185,6 +188,7 @@ function BusinessDetails() {
           async (blob) => {
             if (!blob) {
               alert("Failed to convert image to PNG");
+              setLogoUploading(false);
               return;
             }
 
@@ -200,6 +204,7 @@ function BusinessDetails() {
             if (uploadError) {
               console.error("Logo upload failed:", uploadError.message);
               alert("Failed to upload logo");
+              setLogoUploading(false);
               return;
             }
 
@@ -211,6 +216,8 @@ function BusinessDetails() {
               ...prev,
               logoUrl: urlData.publicUrl,
             }));
+
+            setLogoUploading(false); // End spinner
           },
           "image/png",
           1.0
@@ -219,6 +226,7 @@ function BusinessDetails() {
 
       image.onerror = () => {
         alert("Failed to load image. Please try another file.");
+        setLogoUploading(false);
       };
 
       image.src = reader.result;
@@ -254,11 +262,17 @@ function BusinessDetails() {
       {/* Profile Card */}
       <div className="sm:w-1/3 flex flex-col items-center text-center bg-[#fef7ec] p-6 rounded-2xl shadow-md border">
         <div className="relative mb-4">
-          <img
-            src={business.logoUrl}
-            alt="Business Logo"
-            className="w-24 h-24 object-contain rounded-full border-4 border-[var(--button)]"
-          />
+          {logoUploading ? (
+            <div className="w-24 h-24 flex items-center justify-center rounded-full border-4 border-[var(--button)] bg-white">
+              <div className="w-6 h-6 border-4 border-[var(--button)] border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : (
+            <img
+              src={business.logoUrl}
+              alt="Business Logo"
+              className="w-24 h-24 object-contain rounded-full border-4 border-[var(--button)]"
+            />
+          )}
           <label className="absolute bottom-0 right-0 bg-[var(--button)] text-white text-xs px-2 py-1 rounded cursor-pointer hover:bg-[var(--button-hover)]">
             Change
             <input
@@ -325,7 +339,8 @@ function BusinessDetails() {
                 Confirm Deletion
               </h2>
               <p className="text-sm text-gray-600 mb-4">
-                Are you sure you want to delete <strong>{business.name}</strong>?
+                Are you sure you want to delete <strong>{business.name}</strong>
+                ?
               </p>
               <div className="flex justify-end space-x-3">
                 <button
@@ -360,7 +375,6 @@ function BusinessDetails() {
           validate={(v) => (!v ? "Description cannot be empty" : "")}
           onSave={handleDescriptionUpdate}
         />
-        
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6 text-sm">
           <EditableBusinessField
