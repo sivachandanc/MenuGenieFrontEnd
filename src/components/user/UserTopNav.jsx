@@ -4,13 +4,13 @@ import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
 import MenuGenieLogo from "../util-components/MenuGenieLogo";
 
-function UserTopNav() {
+function UserTopNav({ onToggleSidebar }) {
   const { signOut } = useAuth();
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef();
   const navigate = useNavigate();
 
-  // Close dropdown on click outside
+  // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -22,8 +22,8 @@ function UserTopNav() {
   }, []);
 
   const handleLogout = async () => {
-    await signOut(); // Supabase logout
-    navigate("/"); // Redirect to login
+    await signOut();
+    navigate("/");
   };
 
   return (
@@ -32,6 +32,27 @@ function UserTopNav() {
       ref={dropdownRef}
     >
       <div className="flex flex-row items-center gap-x-3">
+        {/* Hamburger toggle on mobile */}
+        <button
+          onClick={onToggleSidebar}
+          className="lg:hidden text-gray-700 focus:outline-none"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            className="w-6 h-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M3.75 5.25h16.5M3.75 12h16.5m-16.5 6.75h16.5"
+            />
+          </svg>
+        </button>
+
         <MenuGenieLogo />
         <Link to="/dashboard" className="no-underline">
           <h1 className="text-xl font-bold text-gray-800 font-tagees">
