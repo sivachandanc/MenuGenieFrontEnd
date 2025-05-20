@@ -57,7 +57,7 @@ function ChatPreview() {
   }, [displayedMessages, isTyping]);
 
   return (
-    <div className="w-[300px] h-[420px] rounded-2xl bg-white shadow-xl flex flex-col overflow-hidden">
+    <div className="w-full max-w-[300px] h-[420px] rounded-2xl bg-white shadow-xl flex flex-col overflow-hidden">
       {/* Banner/Header */}
       <div className="flex items-center gap-3 px-4 py-2 bg-[var(--button)] text-black font-semibold border-b border-gray-200">
         <MenuGenieLogo />

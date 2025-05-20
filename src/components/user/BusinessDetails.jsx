@@ -13,6 +13,7 @@ import { UpdateBusinessName } from "../../supabase-utils/update-business-info/Up
 import { UpdateBusinessTags } from "../../supabase-utils/update-business-info/UpdateBusinessTags";
 import { UpdateBotPersonality } from "../../supabase-utils/update-business-info/UpdateBotPersonality";
 import { UpdateBotName } from "../../supabase-utils/update-business-info/UpdateBotName";
+import MenuIcon from "../../assets/menu.png";
 import {
   MapPin,
   Mail,
@@ -327,7 +328,7 @@ function BusinessDetails() {
           </label>
         </div>
 
-        <div className="pt-1">
+        <div className="pt-1 mb-2">
           <EditableBusinessField
             label=""
             value={business.name}
@@ -335,7 +336,7 @@ function BusinessDetails() {
             icon={<Star size={16} />}
             validate={(v) => (!v ? "Business name cannot be empty" : "")}
             highlight={true}
-              onSave={handleBusinessNameUpdate}
+            onSave={handleBusinessNameUpdate}
           />
         </div>
 
@@ -350,10 +351,16 @@ function BusinessDetails() {
             }
             className="mt-6 px-5 py-2 rounded-full text-white font-semibold bg-[var(--button)] hover:bg-[var(--button-hover)] transition shadow"
           >
-            <div className="flex flex-row space-x-1">
-              <Utensils size={25} />
-              <span>View Menu</span>
-            </div>
+            <button>
+              <div className="flex flex-row items-center space-x-2">
+                <img
+                  src={MenuIcon}
+                  alt="menu icon"
+                  className="w-6 h-6 object-contain"
+                />
+                <span>View Menu</span>
+              </div>
+            </button>
           </button>
         ) : (
           <div className="mt-6 flex flex-col items-center gap-2">
