@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import RegistrationDonePopUp from "./RegistrationDonePopUp";
 import ErrorMessage from "../util-components/ErrorMessage";
 import { useAuth } from "../../context/AuthContext";
+import bg from "../../assets/bg-illustration.png"
 
 function SignUpForm() {
   const { signUp } = useAuth();
@@ -22,7 +23,7 @@ function SignUpForm() {
 
   const handleSignUp = async () => {
     try {
-      const data = await signUp(email, password); // just `data`, no destructuring
+      const data = await signUp(email, password);
       console.log("SIGNUP DATA:", data);
       setDisableSubmitButton(true);
       setError("");
@@ -34,7 +35,6 @@ function SignUpForm() {
       setRegistrationProcessing(false);
     }
   };
-  
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -58,56 +58,55 @@ function SignUpForm() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[var(--background)] px-4">
+    <div className="relative min-h-screen bg-[#f7f3ed] flex items-start justify-center px-4 py-12 overflow-hidden">
+      {/* Background illustration (optional if reused) */}
+      <img
+        src={bg}
+        alt="Decorative background"
+        className="absolute inset-0 w-full h-full object-cover opacity-20 pointer-events-none z-0 animate-bgFloat"
+      />
+
       {!showPopUp && (
-        <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
-          <h2 className="text-3xl font-bold text-center text-black mb-8">
+        <div className="relative z-10 bg-white p-8 rounded-3xl shadow-lg w-full max-w-md">
+          <h2 className="text-2xl font-bold text-center text-black mb-2">
             Register
           </h2>
-          <form onSubmit={handleSubmit} className="space-y-6" noValidate>
-            <div>
-              <input
-                type="text"
-                name="name"
-                onChange={(e) => setName(e.target.value)}
-                value={name}
-                className="w-full px-4 py-2 rounded-md bg--[var(--background)] focus:outline-none focus:ring-2 focus:ring-[var(--button)] outline-1 outline-black"
-                placeholder="Enter your name"
-              />
-            </div>
-
-            <div>
-              <input
-                type="email"
-                name="email"
-                onChange={(e) => setEmail(e.target.value)}
-                value={email}
-                className="w-full px-4 py-2 rounded-md bg--[var(--background)] focus:outline-none focus:ring-2 focus:ring-[var(--button)] outline-1 outline-black"
-                placeholder="Enter your email"
-              />
-            </div>
-
-            <div>
-              <input
-                type="password"
-                name="password"
-                onChange={(e) => setPassword(e.target.value)}
-                value={password}
-                className="w-full px-4 py-2 rounded-md bg--[var(--background)] focus:outline-none focus:ring-2 focus:ring-[var(--button)] outline-1 outline-black"
-                placeholder="Enter your password"
-              />
-            </div>
-
-            <div>
-              <input
-                type="password"
-                name="confirmed-password"
-                onChange={(e) => setConfirmedPassword(e.target.value)}
-                value={confirmedPassword}
-                className="w-full px-4 py-2 rounded-md bg--[var(--background)] focus:outline-none focus:ring-2 focus:ring-[var(--button)] outline-1 outline-black"
-                placeholder="Confirm your password"
-              />
-            </div>
+          <p className="text-sm text-center text-gray-600 mb-6">
+            Enter your details to create a new account
+          </p>
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+            <input
+              type="text"
+              name="name"
+              onChange={(e) => setName(e.target.value)}
+              value={name}
+              className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[var(--button)] text-sm"
+              placeholder="Enter your name"
+            />
+            <input
+              type="email"
+              name="email"
+              onChange={(e) => setEmail(e.target.value)}
+              value={email}
+              className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[var(--button)] text-sm"
+              placeholder="Enter your email"
+            />
+            <input
+              type="password"
+              name="password"
+              onChange={(e) => setPassword(e.target.value)}
+              value={password}
+              className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[var(--button)] text-sm"
+              placeholder="Enter your password"
+            />
+            <input
+              type="password"
+              name="confirmed-password"
+              onChange={(e) => setConfirmedPassword(e.target.value)}
+              value={confirmedPassword}
+              className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[var(--button)] text-sm"
+              placeholder="Confirm your password"
+            />
 
             {error && <ErrorMessage errorMessage={error} />}
 
@@ -123,56 +122,50 @@ function SignUpForm() {
               </label>
             </div>
 
-            <div>
-              <button
-                type="submit"
-                className={`w-full py-2 rounded-full text-black font-inter ${
-                  submitDisabled
-                    ? "bg-[var(--button-disabled)]"
-                    : "bg-[var(--button)] hover:bg-[var(--button-hover)] transition-colors duration-300"
-                } `}
-                disabled={submitDisabled || registrationProcessing}
-              >
-                <div className="flex justify-center items-center space-x-2">
-                  {registrationProcessing && (
-                    <svg
-                      className="animate-spin h-5 w-5 text-black"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                      ></path>
-                    </svg>
-                  )}
-                  <span>
-                    {registrationProcessing ? "Processing..." : "Register"}
-                  </span>
-                </div>
-              </button>
-            </div>
+            <button
+              type="submit"
+              className={`w-full py-3 rounded-xl text-white font-semibold ${
+                submitDisabled
+                  ? "bg-[var(--button-disabled)]"
+                  : "bg-[#fcb565] hover:bg-[#fda94e] transition-colors duration-300"
+              }`}
+              disabled={submitDisabled || registrationProcessing}
+            >
+              <div className="flex justify-center items-center space-x-2">
+                {registrationProcessing && (
+                  <svg
+                    className="animate-spin h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                    ></path>
+                  </svg>
+                )}
+                <span>{registrationProcessing ? "Processing..." : "Register"}</span>
+              </div>
+            </button>
 
-            <div className="text-center">
-              <p className="text-sm text-gray-600">
-                Already have an account?{" "}
-                <Link
-                  to="/login"
-                  className="text-[var(--button)] hover:underline transition-colors duration-300"
-                >
-                  Login now
-                </Link>
-              </p>
+            <div className="text-center mt-6 text-sm text-gray-600">
+              Already have an account? {" "}
+              <Link
+                to="/login"
+                className="text-[var(--button)] hover:underline transition-colors duration-300"
+              >
+                Login now
+              </Link>
             </div>
           </form>
         </div>
