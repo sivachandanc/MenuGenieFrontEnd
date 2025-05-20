@@ -1,7 +1,17 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import {
+  Plus,
+  AlertTriangle,
+  CheckCircle,
+  Bot,
+  Utensils,
+  Pencil,
+  Trash,
+} from "lucide-react";
+
 import { supabaseClient } from "../../supabase-utils/SupaBaseClient";
-import { Plus, AlertTriangle, CheckCircle, Bot, Utensils } from "lucide-react";
+import { DeleteMenuItem } from "../../supabase-utils/delete-menu-item/DeleteMenuItem.jsx";
 import AddMenuItemCafeForm from "./AddMenuItems/AddMenuItemCafe.jsx";
 import ImageUploader from "./AddMenuItems/ImageUploader.jsx";
 
@@ -16,6 +26,10 @@ function ListBusinessMenu() {
   const [showForm, setShowForm] = useState(false);
   const [showAIUploader, setShowAIUploader] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchMenuItems = async () => {
     setLoading(true);
@@ -49,6 +63,22 @@ function ListBusinessMenu() {
     if (businessType) fetchMenuItems();
   }, [businessType]);
 
+  const handleDeleteItem = async () => {
+    setDeleting(true);
+    try {
+      const menuTable = `menu_item_${businessType}`;
+      await DeleteMenuItem(menuTable, itemToDelete.item_id);
+      setShowDeleteConfirm(false);
+      setItemToDelete(null);
+      fetchMenuItems();
+    } catch (error) {
+      console.error("Delete failed:", error.message);
+      alert(`Failed to delete item: ${error.message}`);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   const renderAddForm = () => {
     if (businessType === "cafe") {
       return (
@@ -69,12 +99,25 @@ function ListBusinessMenu() {
 
   return (
     <div className="w-full mx-auto p-4">
-      <div className="flex flex-col lg:flex-row gap-6">
-        {/* Menu Panel */}
+      <div className="flex flex-col-reverse lg:flex-row gap-6">
+        {(showForm || showAIUploader) && (
+          <div className="lg:w-1/3 w-full">
+            {showForm && renderAddForm()}
+            {showAIUploader && (
+              <ImageUploader
+                businessID={businessID}
+                onItemAdded={fetchMenuItems}
+                businessType={businessType}
+                imageUploaderTitle="📷 Skip manual entry - Upload your menu image and let AI handle the rest!"
+              />
+            )}
+          </div>
+        )}
+
         <div
           className={`w-full ${
             showForm || showAIUploader ? "lg:w-2/3" : ""
-          } h-[600px] bg-white border border-gray-200 rounded-3xl shadow-lg flex flex-col overflow-hidden`}
+          } min-h-[400px] max-h-screen bg-white border border-gray-200 rounded-3xl shadow-lg flex flex-col overflow-hidden`}
         >
           <div className="p-4 sticky top-0 z-10 bg-white border-b border-gray-100">
             <h2 className="text-lg font-semibold text-gray-800 flex items-center flex-wrap">
@@ -86,24 +129,24 @@ function ListBusinessMenu() {
               </span>
             </h2>
 
-            <div className="mt-2 flex flex-wrap justify-between items-center gap-2">
+            <div className="mt-2 flex flex-col sm:flex-row flex-wrap justify-between items-start sm:items-center gap-2">
               <button
                 onClick={() => navigate(`/dashboard/business/${businessID}`)}
-                className="mt-2 px-5 py-2 rounded-full text-white font-semibold bg-[var(--button)] hover:bg-[var(--button-hover)] transition shadow"
+                className="px-5 py-2 rounded-full text-white font-semibold bg-[var(--button)] hover:bg-[var(--button-hover)] transition shadow"
               >
-                <div className="flex flex-row space-x-1">
-                  <Utensils size={25} />
+                <div className="flex flex-row space-x-1 items-center">
+                  <Utensils size={20} />
                   <span>View Business</span>
                 </div>
               </button>
 
-              <div className="flex gap-2 ml-auto">
+              <div className="flex flex-wrap gap-2 sm:ml-auto">
                 <button
                   onClick={() => {
                     setShowForm((prev) => !prev);
                     setShowAIUploader(false);
                   }}
-                  className={`flex mt-6 px-5 py-2 rounded-full  items-center gap-1 text-xs font-semibold shadow-sm transition ${
+                  className={`flex px-5 py-2 rounded-full items-center gap-1 text-sm font-semibold shadow-sm transition ${
                     showForm
                       ? "bg-[var(--button)] text-white hover:bg-[var(--button-hover)]"
                       : "bg-gray-100 text-gray-800 hover:bg-gray-200"
@@ -117,7 +160,7 @@ function ListBusinessMenu() {
                     setShowAIUploader((prev) => !prev);
                     setShowForm(false);
                   }}
-                  className={`flex mt-6 px-5 py-2 rounded-full items-center gap-1 text-xs font-semibold shadow-sm transition ${
+                  className={`flex px-5 py-2 rounded-full items-center gap-1 text-sm font-semibold shadow-sm transition ${
                     showAIUploader
                       ? "bg-[var(--button)] text-white hover:bg-[var(--button-hover)]"
                       : "bg-gray-100 text-gray-800 hover:bg-gray-200"
@@ -157,9 +200,25 @@ function ListBusinessMenu() {
                 {menuItems.map((item) => (
                   <li
                     key={item.item_id}
-                    className="border border-gray-100 p-4 bg-[var(--background)] rounded-2xl shadow hover:shadow-md transition-transform hover:scale-[1.01] cursor-pointer"
+                    className="relative border border-gray-100 p-4 bg-[var(--background)] rounded-2xl shadow hover:shadow-md transition-transform hover:scale-[1.01] cursor-pointer"
                   >
-                    <div className="mb-1">
+                    <div className="absolute top-3 right-3 flex gap-2 z-10">
+                      <button className="text-gray-500 hover:text-blue-600 transition">
+                        <Pencil size={16} />
+                      </button>
+                      <button
+                        className="text-gray-500 hover:text-red-600 transition"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setItemToDelete(item);
+                          setShowDeleteConfirm(true);
+                        }}
+                      >
+                        <Trash size={16} />
+                      </button>
+                    </div>
+
+                    <div className="mb-1 pr-6">
                       <span className="text-lg font-semibold text-gray-900">
                         {item.name}
                       </span>
@@ -167,6 +226,7 @@ function ListBusinessMenu() {
                         {item.category}
                       </p>
                     </div>
+
                     {Array.isArray(item.size_options) && (
                       <p className="text-sm text-gray-700">
                         {item.size_options
@@ -179,6 +239,7 @@ function ListBusinessMenu() {
                           .join(" · ")}
                       </p>
                     )}
+
                     {item.tags?.length > 0 && (
                       <div className="mt-2 flex flex-wrap gap-1">
                         {item.tags.map((tag) => (
@@ -197,22 +258,59 @@ function ListBusinessMenu() {
             )}
           </div>
         </div>
-
-        {/* Form or AI Panel */}
-        {(showForm || showAIUploader) && (
-          <div className="lg:w-1/3 w-full">
-            {showForm && renderAddForm()}
-            {showAIUploader && (
-              <ImageUploader
-                businessID={businessID}
-                onItemAdded={fetchMenuItems}
-                businessType={businessType}
-                imageUploaderTitle="📷 Skip manual entry - Upload your menu image and let AI handle the rest!"
-              />
-            )}
-          </div>
-        )}
       </div>
+
+      {showDeleteConfirm && itemToDelete && (
+        <div className="fixed inset-0 bg-opacity-30 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
+            <h2 className="text-lg font-semibold text-gray-800 mb-3">
+              Confirm Deletion
+            </h2>
+            <p className="text-sm text-gray-600 mb-4">
+              Are you sure you want to delete{" "}
+              <strong>{itemToDelete.name}</strong>?
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="px-4 py-1 text-sm text-gray-700 hover:underline"
+                disabled={deleting}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteItem}
+                disabled={deleting}
+                className="px-4 py-1 text-sm text-white bg-red-600 hover:bg-red-700 rounded flex items-center gap-2"
+              >
+                {deleting ? (
+                  <svg
+                    className="w-4 h-4 animate-spin text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 100 16 8 8 0 01-8-8z"
+                    ></path>
+                  </svg>
+                ) : (
+                  "Delete"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
