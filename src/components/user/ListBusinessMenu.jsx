@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { supabaseClient } from "../../supabase-utils/SupaBaseClient";
-import { Plus, AlertTriangle, CheckCircle, Bot } from "lucide-react";
+import { Plus, AlertTriangle, CheckCircle, Bot, Utensils } from "lucide-react";
 import AddMenuItemCafeForm from "./AddMenuItems/AddMenuItemCafe.jsx";
 import ImageUploader from "./AddMenuItems/ImageUploader.jsx";
 
 function ListBusinessMenu() {
   const { businessID } = useParams();
+  const navigate = useNavigate();
+
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [businessName, setBusinessName] = useState("");
@@ -18,36 +20,29 @@ function ListBusinessMenu() {
   const fetchMenuItems = async () => {
     setLoading(true);
     const menuTable = `menu_item_${businessType}`;
-    const { data: menuData, error: menuError } = await supabaseClient
+    const { data, error } = await supabaseClient
       .from(menuTable)
       .select("*")
       .eq("business_id", businessID);
-    if (menuError) {
-      console.error("Error fetching menu items:", menuError.message);
-    } else {
-      setMenuItems(menuData || []);
-    }
+    if (!error) setMenuItems(data || []);
     setLoading(false);
   };
 
   useEffect(() => {
-    const fetchBusinessAndMenu = async () => {
-      const { data: businessData, error: businessError } = await supabaseClient
+    const fetchBusiness = async () => {
+      const { data, error } = await supabaseClient
         .from("business")
         .select("name, business_type")
         .eq("business_id", businessID)
         .single();
 
-      if (businessError) {
-        console.error("Error fetching business info:", businessError.message);
-        return;
+      if (!error) {
+        setBusinessName(data?.name || "");
+        setBusinessType(data?.business_type || "");
       }
-
-      setBusinessName(businessData?.name || "");
-      setBusinessType(businessData?.business_type || "");
     };
 
-    fetchBusinessAndMenu();
+    fetchBusiness();
   }, [businessID]);
 
   useEffect(() => {
@@ -75,48 +70,65 @@ function ListBusinessMenu() {
   return (
     <div className="w-full mx-auto p-4">
       <div className="flex flex-col lg:flex-row gap-6">
-        {/* Menu List Panel */}
+        {/* Menu Panel */}
         <div
-          className={`${
-            showForm || showAIUploader ? "lg:w-2/3" : "w-full"
-          } w-full h-[600px] bg-white border border-gray-200 rounded-3xl shadow-lg flex flex-col overflow-hidden`}
+          className={`w-full ${
+            showForm || showAIUploader ? "lg:w-2/3" : ""
+          } h-[600px] bg-white border border-gray-200 rounded-3xl shadow-lg flex flex-col overflow-hidden`}
         >
-          {/* Header */}
-          <div className="p-4 sticky top-0 z-10 bg-white border-b border-gray-100 flex justify-between items-center">
-            <h2 className="text-lg font-semibold text-gray-800">
-              Menu Items of {businessName}
+          <div className="p-4 sticky top-0 z-10 bg-white border-b border-gray-100">
+            <h2 className="text-lg font-semibold text-gray-800 flex items-center flex-wrap">
+              <span className="pl-5">Menu Items of</span>
+              <span className="ml-2 relative inline-block before:absolute before:-inset-1 before:block before:-skew-y-3 before:bg-[var(--label)]">
+                <span className="relative text-white dark:text-gray-950">
+                  {businessName}
+                </span>
+              </span>
             </h2>
-            <div className="flex gap-2">
+
+            <div className="mt-2 flex flex-wrap justify-between items-center gap-2">
               <button
-                onClick={() => {
-                  setShowForm((prev) => !prev);
-                  setShowAIUploader(false);
-                }}
-                className={`flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-xl shadow-sm transition ${
-                  showForm
-                    ? "bg-[var(--button)] text-white hover:bg-[var(--button-hover)]"
-                    : "bg-gray-100 text-gray-800 hover:bg-gray-200"
-                }`}
+                onClick={() => navigate(`/dashboard/business/${businessID}`)}
+                className="mt-2 px-5 py-2 rounded-full text-white font-semibold bg-[var(--button)] hover:bg-[var(--button-hover)] transition shadow"
               >
-                <Plus size={14} /> Add Item
+                <div className="flex flex-row space-x-1">
+                  <Utensils size={25} />
+                  <span>View Business</span>
+                </div>
               </button>
-              <button
-                onClick={() => {
-                  setShowAIUploader((prev) => !prev);
-                  setShowForm(false);
-                }}
-                className={`flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-xl shadow-sm transition ${
-                  showAIUploader
-                    ? "bg-[var(--button)] text-white hover:bg-[var(--button-hover)]"
-                    : "bg-gray-100 text-gray-800 hover:bg-gray-200"
-                }`}
-              >
-                <Bot size={14} /> Use AI
-              </button>
+
+              <div className="flex gap-2 ml-auto">
+                <button
+                  onClick={() => {
+                    setShowForm((prev) => !prev);
+                    setShowAIUploader(false);
+                  }}
+                  className={`flex mt-6 px-5 py-2 rounded-full  items-center gap-1 text-xs font-semibold shadow-sm transition ${
+                    showForm
+                      ? "bg-[var(--button)] text-white hover:bg-[var(--button-hover)]"
+                      : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                  }`}
+                >
+                  <Plus size={14} /> Add Item
+                </button>
+
+                <button
+                  onClick={() => {
+                    setShowAIUploader((prev) => !prev);
+                    setShowForm(false);
+                  }}
+                  className={`flex mt-6 px-5 py-2 rounded-full items-center gap-1 text-xs font-semibold shadow-sm transition ${
+                    showAIUploader
+                      ? "bg-[var(--button)] text-white hover:bg-[var(--button-hover)]"
+                      : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                  }`}
+                >
+                  <Bot size={14} /> Use AI
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* Menu List */}
           <div className="p-4 overflow-y-auto flex-1 relative">
             {showSuccess && (
               <div className="flex items-center gap-2 text-green-600 text-sm mb-3 bg-green-50 border border-green-200 px-3 py-2 rounded-md animate-pulse">
@@ -155,7 +167,6 @@ function ListBusinessMenu() {
                         {item.category}
                       </p>
                     </div>
-
                     {Array.isArray(item.size_options) && (
                       <p className="text-sm text-gray-700">
                         {item.size_options
@@ -168,7 +179,6 @@ function ListBusinessMenu() {
                           .join(" · ")}
                       </p>
                     )}
-
                     {item.tags?.length > 0 && (
                       <div className="mt-2 flex flex-wrap gap-1">
                         {item.tags.map((tag) => (
@@ -188,7 +198,7 @@ function ListBusinessMenu() {
           </div>
         </div>
 
-        {/* Right Panel Logic */}
+        {/* Form or AI Panel */}
         {(showForm || showAIUploader) && (
           <div className="lg:w-1/3 w-full">
             {showForm && renderAddForm()}
@@ -197,9 +207,7 @@ function ListBusinessMenu() {
                 businessID={businessID}
                 onItemAdded={fetchMenuItems}
                 businessType={businessType}
-                imageUploaderTitle={
-                  "📷 Skip manual entry - Upload your menu image and let AI handle the rest!"
-                }
+                imageUploaderTitle="📷 Skip manual entry - Upload your menu image and let AI handle the rest!"
               />
             )}
           </div>
