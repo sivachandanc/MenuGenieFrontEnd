@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import ErrorMessage from "../util-components/ErrorMessage";
 import { useAuth } from "../../context/AuthContext";
 import bg from "../../assets/bg-illustration.png"
-import "./LoginForm.css";
 
 
 function LoginForm() {
