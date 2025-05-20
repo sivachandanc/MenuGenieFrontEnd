@@ -45,6 +45,7 @@ export async function insertBusinessAndEmbed(formData) {
 
   // 4. insert info for chat window
   const businessChatInfo = {
+    user_id: userId,
     business_id: business.business_id,
     name: business.name,
     bot_name: business.bot_name

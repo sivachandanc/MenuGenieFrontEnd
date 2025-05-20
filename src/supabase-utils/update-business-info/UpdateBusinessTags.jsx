@@ -1,15 +1,14 @@
 import { supabaseClient } from "../SupaBaseClient";
 
-export async function UpdateBusinessWebSite(
+export async function UpdateBusinessTags(
   businessID,
-  newWebSite,
-  businessData
+  newTags,
 ) {
   // Update description in business table
   const { error: updateDescriptionError } = await supabaseClient
     .from("business")
     .update({
-      website: newWebSite,
+      ownership_tags: newTags,
       updated_at: new Date().toISOString(),
     })
     .eq("business_id", businessID);
@@ -21,7 +20,7 @@ export async function UpdateBusinessWebSite(
   }
 
   // Construct new context string
-  const newContext = `Contact Info:\nEmail: ${businessData.email}\nPhone: ${businessData.phone}\nWebsite: ${newWebSite}`;
+  const newContext = `This cafe is: ${newTags.join(", ")}`;
 
   // Get new embedding from embedding service
   const embeddingResponse = await fetch(
@@ -54,7 +53,7 @@ export async function UpdateBusinessWebSite(
       updated_at: new Date().toISOString(),
     })
     .eq("business_id", businessID)
-    .eq("type", "contact");
+    .eq("type", "ownership");
 
   if (updateContextError) {
     throw new Error(

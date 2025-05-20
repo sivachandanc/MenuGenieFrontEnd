@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { supabaseClient } from "../../supabase-utils/SupaBaseClient";
 import SkeletonCard from "../util-components/SkeletonCard";
 import { useNavigate } from "react-router-dom";
-import { AlertTriangle } from "lucide-react";
 
 function BusinessList() {
   const [businesses, setBusinesses] = useState([]);

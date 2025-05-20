@@ -11,7 +11,7 @@ const business_specific_tables = {
 
 export async function DeleteBusiness(businessId, businessType) {
   try {
-    // Generic tables
+    // Step 1: Delete from shared business tables
     for (const table of tablesToPurge) {
       const { error } = await supabaseClient
         .from(table)
@@ -23,7 +23,7 @@ export async function DeleteBusiness(businessId, businessType) {
       }
     }
 
-    // Business-specific table
+    // Step 2: Delete from business-specific menu item table
     const businessTable = business_specific_tables[businessType];
     if (!businessTable) {
       throw new Error(`Unsupported business type: ${businessType}`);
@@ -38,6 +38,16 @@ export async function DeleteBusiness(businessId, businessType) {
       throw new Error(
         `Failed to delete from business-specific table "${businessTable}": ${bizError.message}`
       );
+    }
+
+    // Step 3: Delete associated image from Supabase storage
+    const { error: storageError } = await supabaseClient
+      .storage
+      .from("business")
+      .remove([`business_logo/${businessId}.png`]);
+
+    if (storageError) {
+      throw new Error(`Failed to delete business image: ${storageError.message}`);
     }
   } catch (err) {
     console.error("DeleteBusiness error:", err.message);

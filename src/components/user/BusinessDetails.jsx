@@ -9,6 +9,10 @@ import { UpdateBusinessWebSite } from "../../supabase-utils/update-business-info
 import { UpdateBusinessPhoneNumber } from "../../supabase-utils/update-business-info/UpdateBusinessPhoneNumber";
 import { UpdateBusinessOpeningTime } from "../../supabase-utils/update-business-info/UpdateBusinessOpeningTime";
 import { UpdateBusinessClosingTime } from "../../supabase-utils/update-business-info/UpdateBusinessClosingTime";
+import { UpdateBusinessName } from "../../supabase-utils/update-business-info/UpdateBusinessName";
+import { UpdateBusinessTags } from "../../supabase-utils/update-business-info/UpdateBusinessTags";
+import { UpdateBotPersonality } from "../../supabase-utils/update-business-info/UpdateBotPersonality";
+import { UpdateBotName } from "../../supabase-utils/update-business-info/UpdateBotName";
 import {
   MapPin,
   Mail,
@@ -22,6 +26,7 @@ import {
   AlertTriangle,
   Utensils,
   Trash2,
+  Pencil,
 } from "lucide-react";
 import EditableBusinessField from "./EditableBusinessField";
 
@@ -33,6 +38,7 @@ function BusinessDetails() {
   const [hasMenu, setHasMenu] = useState(true);
   const [deleting, setDeleting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [logoUploading, setLogoUploading] = useState(false);
 
   useEffect(() => {
     const fetchBusiness = async () => {
@@ -164,10 +170,50 @@ function BusinessDetails() {
       console.error(err);
     }
   };
+  const handleBusinessNameUpdate = async (newValue) => {
+    try {
+      await UpdateBusinessName(businessID, newValue, business);
+      setBusiness((prev) => ({ ...prev, name: newValue }));
+    } catch (err) {
+      alert("Failed to update Business Name with embedding. Check console.");
+      console.error(err);
+    }
+  };
+  const handleBusinessTagsUpdate = async (newValue) => {
+    try {
+      await UpdateBusinessTags(businessID, newValue);
+      setBusiness((prev) => ({ ...prev, ownership_tags: newValue }));
+    } catch (err) {
+      alert("Failed to update Business Tags with embedding. Check console.");
+      console.error(err);
+    }
+  };
+
+  const handleBotNameUpdate = async (newValue) => {
+    try {
+      await UpdateBotName(businessID, newValue);
+      setBusiness((prev) => ({ ...prev, bot_name: newValue }));
+    } catch (err) {
+      alert("Failed to update Business Tags with embedding. Check console.");
+      console.error(err);
+    }
+  };
+
+  const handleBotPersonalityUpdate = async (newValue) => {
+    try {
+      await UpdateBotPersonality(businessID, newValue);
+      setBusiness((prev) => ({ ...prev, bot_personality: newValue }));
+    } catch (err) {
+      alert("Failed to update Business Tags with embedding. Check console.");
+      console.error(err);
+    }
+  };
 
   const handleLogoUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file || !business) return;
+
+    setLogoUploading(true); // Start spinner
 
     const image = new Image();
     const reader = new FileReader();
@@ -185,6 +231,7 @@ function BusinessDetails() {
           async (blob) => {
             if (!blob) {
               alert("Failed to convert image to PNG");
+              setLogoUploading(false);
               return;
             }
 
@@ -200,6 +247,7 @@ function BusinessDetails() {
             if (uploadError) {
               console.error("Logo upload failed:", uploadError.message);
               alert("Failed to upload logo");
+              setLogoUploading(false);
               return;
             }
 
@@ -211,6 +259,8 @@ function BusinessDetails() {
               ...prev,
               logoUrl: urlData.publicUrl,
             }));
+
+            setLogoUploading(false); // End spinner
           },
           "image/png",
           1.0
@@ -219,6 +269,7 @@ function BusinessDetails() {
 
       image.onerror = () => {
         alert("Failed to load image. Please try another file.");
+        setLogoUploading(false);
       };
 
       image.src = reader.result;
@@ -254,13 +305,19 @@ function BusinessDetails() {
       {/* Profile Card */}
       <div className="sm:w-1/3 flex flex-col items-center text-center bg-[#fef7ec] p-6 rounded-2xl shadow-md border">
         <div className="relative mb-4">
-          <img
-            src={business.logoUrl}
-            alt="Business Logo"
-            className="w-24 h-24 object-contain rounded-full border-4 border-[var(--button)]"
-          />
-          <label className="absolute bottom-0 right-0 bg-[var(--button)] text-white text-xs px-2 py-1 rounded cursor-pointer hover:bg-[var(--button-hover)]">
-            Change
+          {logoUploading ? (
+            <div className="w-24 h-24 flex items-center justify-center rounded-full border-4 border-[var(--button)] bg-white">
+              <div className="w-6 h-6 border-4 border-[var(--button)] border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : (
+            <img
+              src={business.logoUrl}
+              alt="Business Logo"
+              className="w-24 h-24 object-contain rounded-full border-4 border-[var(--button)]"
+            />
+          )}
+          <label className="absolute bottom-0 right-0 bg-[var(--button)] p-1 rounded-full cursor-pointer hover:bg-[var(--button-hover)]">
+            <Pencil size={14} className="text-white" />
             <input
               type="file"
               accept="image/*"
@@ -270,7 +327,18 @@ function BusinessDetails() {
           </label>
         </div>
 
-        <h2 className="text-2xl font-bold text-gray-900">{business.name}</h2>
+        <div className="pt-1">
+          <EditableBusinessField
+            label=""
+            value={business.name}
+            type="text"
+            icon={<Star size={16} />}
+            validate={(v) => (!v ? "Business name cannot be empty" : "")}
+            highlight={true}
+              onSave={handleBusinessNameUpdate}
+          />
+        </div>
+
         <p className="text-sm text-gray-600 capitalize">
           {business.business_type}
         </p>
@@ -325,7 +393,8 @@ function BusinessDetails() {
                 Confirm Deletion
               </h2>
               <p className="text-sm text-gray-600 mb-4">
-                Are you sure you want to delete <strong>{business.name}</strong>?
+                Are you sure you want to delete <strong>{business.name}</strong>
+                ?
               </p>
               <div className="flex justify-end space-x-3">
                 <button
@@ -360,7 +429,6 @@ function BusinessDetails() {
           validate={(v) => (!v ? "Description cannot be empty" : "")}
           onSave={handleDescriptionUpdate}
         />
-        
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6 text-sm">
           <EditableBusinessField
@@ -424,6 +492,7 @@ function BusinessDetails() {
             value={business.ownership_tags || []}
             icon={<Tags size={16} />}
             type="tags"
+            onSave={handleBusinessTagsUpdate}
           />
           <EditableBusinessField
             label="Bot Personality"
@@ -432,6 +501,7 @@ function BusinessDetails() {
             type="select"
             options={["friendly", "professional", "funny"]}
             validate={(v) => (!v ? "Please select a personality" : "")}
+            onSave={handleBotPersonalityUpdate}
           />
           <EditableBusinessField
             label="Bot Name"
@@ -439,6 +509,7 @@ function BusinessDetails() {
             icon={<Bot size={16} />}
             type="text"
             validate={(v) => (!v ? "Bot name cannot be empty" : "")}
+            onSave={handleBotNameUpdate}
           />
         </div>
       </div>
