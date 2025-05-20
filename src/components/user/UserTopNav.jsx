@@ -25,12 +25,10 @@ function UserTopNav() {
     await signOut(); // Supabase logout
     navigate("/"); // Redirect to login
   };
-  
-  
 
   return (
     <div
-      className="h-14 w-full bg-[var(--background)] shadow flex items-center justify-between px-4 relative"
+      className="sticky top-0 z-50 h-14 w-full bg-[var(--background)] shadow flex items-center justify-between px-4"
       ref={dropdownRef}
     >
       <div className="flex flex-row items-center gap-x-3">

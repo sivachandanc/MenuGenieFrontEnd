@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Utensils } from "lucide-react";
-import {Plus} from "lucide-react";
+import { Plus } from "lucide-react";
 
 const navItems = [
   { icon: <Utensils />, label: "My Businesses", path: "/dashboard" },
-  { icon: <Plus />, label: "Add Business", path: "/dashboard/onboarding" }
+  { icon: <Plus />, label: "Add Business", path: "/dashboard/onboarding" },
 ];
 
 function Sidebar() {
@@ -16,7 +16,7 @@ function Sidebar() {
     <div
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => setExpanded(false)}
-      className={`transition-all duration-200 bg-[var(--background)] shadow border-r border-gray-200 h-full ${
+      className={`sticky top-14 z-40 transition-all duration-200 bg-[var(--background)] shadow border-r border-gray-200 h-[calc(100vh-3.5rem)] ${
         expanded ? "w-48" : "w-16"
       }`}
     >
@@ -28,8 +28,9 @@ function Sidebar() {
             className="flex items-center space-x-2 px-4 py-2 w-full hover:bg-[var(--button-hover)] cursor-pointer border-1 rounded-full"
           >
             <div className="text-gray-600">{item.icon}</div>
-            {expanded && <span className="text-sm text-gray-800">{item.label}</span>}
-            
+            {expanded && (
+              <span className="text-sm text-gray-800">{item.label}</span>
+            )}
           </div>
         ))}
       </div>

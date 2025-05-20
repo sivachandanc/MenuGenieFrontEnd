@@ -6,7 +6,6 @@ import BotCustomizationStep from "./BotCustomizationStep";
 import ReviewSubmitStep from "./ReviewSubmitStep";
 import { insertBusinessAndEmbed } from "../../supabase-utils/InsertBusinessAndEmbed";
 
-//TODO: Need to add process to persist the data
 const steps = [
   "Business Info",
   "Contact & Hours",
@@ -29,17 +28,13 @@ function OnBoardingWizard() {
   };
 
   const handleFinish = async () => {
-    console.log("Final submission:", formData); // Optional: remove in production
-  
+    console.log("Final submission:", formData);
+
     try {
-      setError(""); // clear previous error if any
-  
+      setError("");
       const { business, inserted_contexts } = await insertBusinessAndEmbed(formData);
-  
       console.log("Business inserted:", business);
       console.log("Context embeddings stored:", inserted_contexts);
-  
-      // Success — you can redirect or show a toast here
       window.location.href = "/dashboard";
     } catch (err) {
       console.error("Submission error:", err);
@@ -49,57 +44,37 @@ function OnBoardingWizard() {
 
   const StepComponent = [
     <BusinessInfoStep data={formData} onNext={next} onUpdate={updateData} />,
-    <ContactHoursStep
-      data={formData}
-      onNext={next}
-      onBack={back}
-      onUpdate={updateData}
-    />,
-    <EnhancementsStep
-      data={formData}
-      onNext={next}
-      onBack={back}
-      onUpdate={updateData}
-    />,
-    <BotCustomizationStep
-      data={formData}
-      onNext={next}
-      onBack={back}
-      onUpdate={updateData}
-    />,
-    <ReviewSubmitStep
-      data={formData}
-      onBack={back}
-      onEdit={goToStep}
-      onFinish={handleFinish}
-      error={error}
-    />,
+    <ContactHoursStep data={formData} onNext={next} onBack={back} onUpdate={updateData} />,
+    <EnhancementsStep data={formData} onNext={next} onBack={back} onUpdate={updateData} />,
+    <BotCustomizationStep data={formData} onNext={next} onBack={back} onUpdate={updateData} />,
+    <ReviewSubmitStep data={formData} onBack={back} onEdit={goToStep} onFinish={handleFinish} error={error} />,
   ][step];
 
   return (
-    <div className="flex-1 overflow-y-auto bg-[var(--background)] py-10 px-4">
-      <div className="max-w-2xl mx-auto p-6 bg-white rounded-xl shadow space-y-6">
+    <div className="flex-1 overflow-y-auto bg-[var(--background)] px-4 py-12 md:py-16">
+      <div className="max-w-4xl mx-auto p-6 bg-white rounded-3xl shadow-xl space-y-8">
         {/* Progress Pills */}
         <div className="flex items-center justify-center gap-2 mb-6">
           {steps.map((_, index) => (
             <div
               key={index}
-              className={`h-1.5 flex-1 rounded-full transition-all duration-300
-        ${index <= step ? "bg-[var(--button)]" : "bg-gray-300"}`}
+              className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
+                index <= step ? "bg-[var(--button)]" : "bg-gray-300"
+              }`}
             />
           ))}
         </div>
 
         {/* Step Title */}
-        <div>
-          <div className="text-sm text-gray-600">
+        <div className="text-center">
+          <div className="text-sm text-gray-500 font-medium">
             Step {step + 1} of {steps.length}
           </div>
-          <h2 className="text-2xl font-bold">{steps[step]}</h2>
+          <h2 className="text-3xl font-bold text-gray-900">{steps[step]}</h2>
         </div>
 
         {/* Step Component */}
-        {StepComponent}
+        <div className="px-2 md:px-8">{StepComponent}</div>
       </div>
     </div>
   );

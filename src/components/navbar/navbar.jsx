@@ -9,24 +9,24 @@ import { Link } from "react-router-dom";
 import MenuGenieLogo from "../util-components/MenuGenieLogo";
 
 function NavBar() {
-
   const navBarItems = [
-    { name: "About", href: "#" },
-    { name: "Features", href: "#" },
-    { name: "Pricing", href: "#" },
-    { name: "Contact", href: "#" },
+    { name: "About", href: "#about" },
+    { name: "Features", href: "#features" },
+    { name: "Pricing", href: "#pricing" },
+    { name: "Contact", href: "#contact" },
   ];
 
   return (
-    <div className="pt-2 flex">
-      <Navbar isBordered className="w-full relative justify-between">
+    <div className="pt-4 px-6 sticky top-0 z-50">
+      <Navbar isBordered className="w-full relative justify-between shadow-sm backdrop-blur-md bg-[var(--button)] text-black rounded-xl py-2 px-4 pl-0">
         <NavbarContent justify="start">
-          <NavbarBrand className="flex items-center space-x-1 ml-0 pl-2.5">
+          <NavbarBrand className="flex items-center space-x-1 ml-0">
             <MenuGenieLogo />
             <Button
               as={Link}
               to="/"
-              className="hidden sm:block text-[var(--text-main)] font-tagees text-2xl"
+              className="hidden sm:block text-[var(--text-main)] font-tagees text-2xl tracking-tight pl-0"
+              variant="light"
             >
               MenuGenie
             </Button>
@@ -34,31 +34,31 @@ function NavBar() {
         </NavbarContent>
 
         <NavbarContent
-          className="hidden sm:flex space-x-10 gap-4"
+          className="hidden sm:flex gap-6 font-inter"
           justify="center"
         >
           {navBarItems.map((item) => (
             <NavbarItem key={item.name} className="relative group">
               <a
                 href={item.href}
-                className="text-[var(--text-main)] font-inter relative"
+                className="text-[var(--text-main)] text-lg font-medium transition-colors duration-300 hover:text-black"
               >
                 {item.name}
-                <span className="absolute left-0 -bottom-1 h-0.5 w-0 bg-[var(--button)] transition-all duration-300 group-hover:w-full"></span>
+                <span className="absolute left-0 -bottom-1 h-0.5 w-0 bg-[#fff7ec]/90 transition-all duration-300 group-hover:w-full"></span>
               </a>
             </NavbarItem>
           ))}
         </NavbarContent>
 
-        <NavbarContent justify="end" className="pr-2.5">
+        <NavbarContent justify="end" className="gap-2">
           <NavbarItem className="hidden lg:flex group relative overflow-hidden">
             <Link
               to="/login"
-              className="relative z-10 px-3 py-1 font-inter text-[var(--text-main)] transition-colors duration-300"
+              className="relative z-10 px-4 py-2 text-lg font-medium text-[var(--text-main)] transition-colors duration-100 hover:text-black"
             >
               Login
             </Link>
-            <span className="absolute inset-0 bg-[var(--button)] scale-x-0 origin-left transition-transform duration-300 group-hover:scale-x-100 z-0 rounded-md"></span>
+            <span className="absolute inset-0 bg-[#fff7ec]/90 scale-x-0 origin-left transition-transform duration-300 group-hover:scale-x-100 z-0 rounded-md"></span>
           </NavbarItem>
           <NavbarItem>
             <Button
@@ -66,7 +66,7 @@ function NavBar() {
               as={Link}
               to="/signup"
               variant="flat"
-              className="text-black font-inter bg-[var(--button)] hover:bg-[var(--button-hover)] hover:shadow-lg hover:brightness-105 transition-colors duration-300 py-2 px-4 rounded-full"
+              className="text-black font-inter bg-[#fff7ec]/90 hover:bg-[var(--button-hover)] hover:shadow-lg hover:brightness-105 transition-all duration-200 py-2 px-5 rounded-full"
             >
               Sign Up
             </Button>
