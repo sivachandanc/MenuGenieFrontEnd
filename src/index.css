@@ -25,3 +25,15 @@
   --font-tagees: Tagees, sans-serif;
   --some-color: oklch(0.73 0.12 245);
 }
+--animate-bounce: bounce 1s ease-in-out infinite;
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(-50%);
+    animation-timing-function: cubic-bezier(0, 0, 1, 1);
+  }
+  50% {
+    transform: translateY(10%);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
