@@ -10,6 +10,7 @@ import { UpdateBusinessPhoneNumber } from "../../supabase-utils/update-business-
 import { UpdateBusinessOpeningTime } from "../../supabase-utils/update-business-info/UpdateBusinessOpeningTime";
 import { UpdateBusinessClosingTime } from "../../supabase-utils/update-business-info/UpdateBusinessClosingTime";
 import { UpdateBusinessName } from "../../supabase-utils/update-business-info/UpdateBusinessName";
+import { UpdateBusinessTags } from "../../supabase-utils/update-business-info/UpdateBusinessTags";
 import {
   MapPin,
   Mail,
@@ -173,6 +174,15 @@ function BusinessDetails() {
       setBusiness((prev) => ({ ...prev, name: newValue }));
     } catch (err) {
       alert("Failed to update Business Name with embedding. Check console.");
+      console.error(err);
+    }
+  };
+  const handleBusinessTagsUpdate = async (newValue) => {
+    try {
+      await UpdateBusinessTags(businessID, newValue);
+      setBusiness((prev) => ({ ...prev, ownership_tags: newValue }));
+    } catch (err) {
+      alert("Failed to update Business Tags with embedding. Check console.");
       console.error(err);
     }
   };
@@ -460,6 +470,7 @@ function BusinessDetails() {
             value={business.ownership_tags || []}
             icon={<Tags size={16} />}
             type="tags"
+            onSave={handleBusinessTagsUpdate}
           />
           <EditableBusinessField
             label="Bot Personality"
