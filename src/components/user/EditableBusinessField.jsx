@@ -10,7 +10,7 @@ import CustomSpinner from "../util-components/Spinner";
 const BOT_PERSONALITIES = ["friendly", "professional", "funny"];
 const TAG_OPTIONS = ["women-owned", "family-owned", "black-owned"];
 
-function EditableBusinessField({ label, value, icon, type, options = [], validate, placeholder, onSave }) {
+function EditableBusinessField({ label, value, icon, type, options = [], validate, placeholder, onSave , highlight}) {
   const [editing, setEditing] = useState(false);
   const [fieldValue, setFieldValue] = useState(value || "");
   const [error, setError] = useState("");
@@ -47,7 +47,10 @@ function EditableBusinessField({ label, value, icon, type, options = [], validat
           <div className="pt-1 text-gray-500">{icon}</div>
           <div>
             <p className="font-medium text-gray-500">{label}</p>
-            <p className="text-gray-800 whitespace-pre-wrap">{value || "—"}</p>
+            { highlight? (<span class="relative inline-block before:absolute before:-inset-1 before:block before:-skew-y-3 before:bg-[var(--label)]">
+    <span class="relative text-white dark:text-gray-950">{value || "—"}</span>
+  </span>):(<p className="text-gray-800 whitespace-pre-wrap">{value || "—"}</p>)}
+            
           </div>
         </div>
         <button

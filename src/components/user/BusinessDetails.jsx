@@ -22,6 +22,7 @@ import {
   AlertTriangle,
   Utensils,
   Trash2,
+  Pencil,
 } from "lucide-react";
 import EditableBusinessField from "./EditableBusinessField";
 
@@ -273,8 +274,8 @@ function BusinessDetails() {
               className="w-24 h-24 object-contain rounded-full border-4 border-[var(--button)]"
             />
           )}
-          <label className="absolute bottom-0 right-0 bg-[var(--button)] text-white text-xs px-2 py-1 rounded cursor-pointer hover:bg-[var(--button-hover)]">
-            Change
+          <label className="absolute bottom-0 right-0 bg-[var(--button)] p-1 rounded-full cursor-pointer hover:bg-[var(--button-hover)]">
+            <Pencil size={14} className="text-white" />
             <input
               type="file"
               accept="image/*"
@@ -284,7 +285,18 @@ function BusinessDetails() {
           </label>
         </div>
 
-        <h2 className="text-2xl font-bold text-gray-900">{business.name}</h2>
+        <div className="pt-1">
+          <EditableBusinessField
+            label=""
+            value={business.name}
+            type="text"
+            icon={<Star size={16} />}
+            validate={(v) => (!v ? "Business name cannot be empty" : "")}
+            highlight={true}
+            //   onSave={handleNameUpdate}
+          />
+        </div>
+
         <p className="text-sm text-gray-600 capitalize">
           {business.business_type}
         </p>
