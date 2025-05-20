@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { supabaseClient } from "../../supabase-utils/SupaBaseClient";
-import { Plus, AlertTriangle, CheckCircle } from "lucide-react";
+import { Plus, AlertTriangle, CheckCircle, Bot } from "lucide-react";
 import AddMenuItemCafeForm from "./AddMenuItems/AddMenuItemCafe.jsx";
 import ImageUploader from "./AddMenuItems/ImageUploader.jsx";
 
@@ -92,7 +92,11 @@ function ListBusinessMenu() {
                   setShowForm((prev) => !prev);
                   setShowAIUploader(false);
                 }}
-                className="flex items-center gap-1 text-xs font-semibold bg-[var(--button)] hover:bg-[var(--button-hover)] text-white px-3 py-1.5 rounded-xl shadow-sm"
+                className={`flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-xl shadow-sm transition ${
+                  showForm
+                    ? "bg-[var(--button)] text-white hover:bg-[var(--button-hover)]"
+                    : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                }`}
               >
                 <Plus size={14} /> Add Item
               </button>
@@ -101,13 +105,13 @@ function ListBusinessMenu() {
                   setShowAIUploader((prev) => !prev);
                   setShowForm(false);
                 }}
-                className={`text-xs font-semibold px-3 py-1.5 rounded-xl shadow-sm transition ${
+                className={`flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-xl shadow-sm transition ${
                   showAIUploader
                     ? "bg-[var(--button)] text-white hover:bg-[var(--button-hover)]"
                     : "bg-gray-100 text-gray-800 hover:bg-gray-200"
                 }`}
               >
-                🧠 Use AI
+                <Bot size={14} /> Use AI
               </button>
             </div>
           </div>
