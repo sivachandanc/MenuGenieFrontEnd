@@ -19,6 +19,21 @@ export async function UpdateBusinessName(
       `Failed to update "business" table: ${updateDescriptionError.message}`
     );
   }
+  
+  // Update business_info_table
+  const { error: updateNameInInfo } = await supabaseClient
+    .from("business_chat_info")
+    .update({
+      name: newName,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("business_id", businessID);
+
+  if (updateNameInInfo) {
+    throw new Error(
+      `Failed to update "business_chat_info" table: ${updateNameInInfo.message}`
+    );
+  }
 
   // Construct new context string
   const newContext = `Name of ${businessData.business_type} is ${newName}\nDescription:\n${businessData.description}\nLocation: ${businessData.location}\nOpens at: ${businessData.opening_time}\nCloses at: ${businessData.closing_time}`;

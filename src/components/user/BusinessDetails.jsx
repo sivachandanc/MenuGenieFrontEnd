@@ -11,6 +11,8 @@ import { UpdateBusinessOpeningTime } from "../../supabase-utils/update-business-
 import { UpdateBusinessClosingTime } from "../../supabase-utils/update-business-info/UpdateBusinessClosingTime";
 import { UpdateBusinessName } from "../../supabase-utils/update-business-info/UpdateBusinessName";
 import { UpdateBusinessTags } from "../../supabase-utils/update-business-info/UpdateBusinessTags";
+import { UpdateBotPersonality } from "../../supabase-utils/update-business-info/UpdateBotPersonality";
+import { UpdateBotName } from "../../supabase-utils/update-business-info/UpdateBotName";
 import {
   MapPin,
   Mail,
@@ -181,6 +183,26 @@ function BusinessDetails() {
     try {
       await UpdateBusinessTags(businessID, newValue);
       setBusiness((prev) => ({ ...prev, ownership_tags: newValue }));
+    } catch (err) {
+      alert("Failed to update Business Tags with embedding. Check console.");
+      console.error(err);
+    }
+  };
+
+  const handleBotNameUpdate = async (newValue) => {
+    try {
+      await UpdateBotName(businessID, newValue);
+      setBusiness((prev) => ({ ...prev, bot_name: newValue }));
+    } catch (err) {
+      alert("Failed to update Business Tags with embedding. Check console.");
+      console.error(err);
+    }
+  };
+
+  const handleBotPersonalityUpdate = async (newValue) => {
+    try {
+      await UpdateBotPersonality(businessID, newValue);
+      setBusiness((prev) => ({ ...prev, bot_personality: newValue }));
     } catch (err) {
       alert("Failed to update Business Tags with embedding. Check console.");
       console.error(err);
@@ -479,6 +501,7 @@ function BusinessDetails() {
             type="select"
             options={["friendly", "professional", "funny"]}
             validate={(v) => (!v ? "Please select a personality" : "")}
+            onSave={handleBotPersonalityUpdate}
           />
           <EditableBusinessField
             label="Bot Name"
@@ -486,6 +509,7 @@ function BusinessDetails() {
             icon={<Bot size={16} />}
             type="text"
             validate={(v) => (!v ? "Bot name cannot be empty" : "")}
+            onSave={handleBotNameUpdate}
           />
         </div>
       </div>
