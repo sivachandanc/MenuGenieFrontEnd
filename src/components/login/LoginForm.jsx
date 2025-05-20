@@ -30,20 +30,23 @@ function LoginForm() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[var(--background)] px-4">
-      <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
-        <h2 className="text-3xl font-bold text-center text-black mb-8">
-          Login
+    <div className="min-h-screen bg-[#f7f3ed] flex items-start justify-center px-4 py-12">
+      <div className="bg-white p-8 rounded-3xl shadow-lg w-full max-w-md">
+        <h2 className="text-2xl font-bold text-center text-black mb-2">
+          Agent Login
         </h2>
-        <form className="space-y-6" onSubmit={handleLogin}>
+        <p className="text-sm text-center text-gray-600 mb-6">
+          Hey, Enter your details to get sign in to your account
+        </p>
+        <form className="space-y-4" onSubmit={handleLogin}>
           <div>
             <input
               type="email"
               name="email"
               onChange={(e) => setUserEmail(e.target.value)}
               value={userEmail}
-              className="w-full px-4 py-2 rounded-md bg--[var(--background)] focus:outline-none focus:ring-2 focus:ring-[var(--button)] outline-1 outline-black"
-              placeholder="Enter your email"
+              className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[var(--button)] text-sm"
+              placeholder="Enter Email / Phone No"
               required
             />
           </div>
@@ -53,23 +56,27 @@ function LoginForm() {
               name="password"
               onChange={(e) => setUserPassword(e.target.value)}
               value={userPassword}
-              className="w-full px-4 py-2 rounded-md bg--[var(--background)] focus:outline-none focus:ring-2 focus:ring-[var(--button)] outline-1 outline-black"
-              placeholder="Enter your password"
+              className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[var(--button)] text-sm"
+              placeholder="Passcode"
               required
             />
           </div>
 
           {errorMessage && <ErrorMessage errorMessage={errorMessage} />}
 
+          <div className="text-right text-sm text-[var(--textSecondary)] mb-2">
+            Having trouble in sign in?
+          </div>
+
           <button
             type="submit"
-            className="w-full py-2 rounded-full text-black font-inter bg-[var(--button)] hover:bg-[var(--button-hover)] transition-colors duration-300"
+            className="w-full py-3 rounded-xl text-white font-semibold bg-[#fcb565] hover:bg-[#fda94e] transition-colors duration-300"
             disabled={loginProcessing}
           >
             <div className="flex justify-center items-center space-x-2">
               {loginProcessing && (
                 <svg
-                  className="animate-spin h-5 w-5 text-black"
+                  className="animate-spin h-5 w-5 text-white"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -89,20 +96,34 @@ function LoginForm() {
                   ></path>
                 </svg>
               )}
-              <span>{loginProcessing ? "Processing..." : "Login"}</span>
+              <span>{loginProcessing ? "Processing..." : "Sign in"}</span>
             </div>
           </button>
 
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              Don't have an account?{" "}
-              <Link
-                to="/signup"
-                className="text-[var(--button)] hover:underline transition-colors duration-300"
-              >
-                Register
-              </Link>
-            </p>
+          <div className="text-center text-gray-400 text-sm mt-4">
+            Or Sign in with
+          </div>
+
+          <div className="flex justify-center gap-4 mt-2">
+            <button className="flex-1 border border-gray-200 rounded-lg py-2 text-sm font-medium hover:shadow">
+              Google
+            </button>
+            <button className="flex-1 border border-gray-200 rounded-lg py-2 text-sm font-medium hover:shadow">
+              Apple ID
+            </button>
+            <button className="flex-1 border border-gray-200 rounded-lg py-2 text-sm font-medium hover:shadow">
+              Facebook
+            </button>
+          </div>
+
+          <div className="text-center mt-6 text-sm text-gray-600">
+            Don't have an account?{" "}
+            <Link
+              to="/signup"
+              className="text-[var(--button)] hover:underline transition-colors duration-300"
+            >
+              Request Now
+            </Link>
           </div>
         </form>
       </div>
