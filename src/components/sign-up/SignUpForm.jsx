@@ -22,7 +22,8 @@ function SignUpForm() {
 
   const handleSignUp = async () => {
     try {
-      await signUp(email, password);
+      const data = await signUp(email, password); // just `data`, no destructuring
+      console.log("SIGNUP DATA:", data);
       setDisableSubmitButton(true);
       setError("");
       setRegistrationProcessing(false);
@@ -33,6 +34,7 @@ function SignUpForm() {
       setRegistrationProcessing(false);
     }
   };
+  
 
   const handleSubmit = (event) => {
     event.preventDefault();
