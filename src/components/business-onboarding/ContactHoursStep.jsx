@@ -50,99 +50,101 @@ function ContactHoursStep({ data, onUpdate, onNext, onBack }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Email</label>
-        <input
-          type="email"
-          className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-        <div className="focus-within:ring-2 focus-within:ring-blue-600 focus-within:border-blue-600 rounded-md transition">
-          <PhoneInput
-            country={"us"}
-            value={phone}
-            onChange={setPhone}
-            inputStyle={{
-              width: "100%",
-              height: "42px",
-              border: "none",
-              fontSize: "1rem",
-              paddingLeft: "48px",
-              outline: "none",
-            }}
-            buttonStyle={{
-              border: "none",
-              borderRight: "1px solid #d1d5db",
-              background: "white",
-              borderRadius: "0.375rem 0 0 0.375rem",
-            }}
-            containerStyle={{
-              width: "100%",
-              border: "1px solid #d1d5db",
-              borderRadius: "0.375rem",
-              backgroundColor: "white",
-              display: "flex",
-              alignItems: "center",
-            }}
-            inputClass="focus:outline-none"
+    <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div className="sm:col-span-2">
+          <label className="block text-sm font-medium text-gray-700">Email</label>
+          <input
+            type="email"
+            className="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-2 text-sm"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
         </div>
-      </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Website</label>
-        <input
-          type="url"
-          placeholder="https://yourbusiness.com"
-          className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-          value={website}
-          onChange={(e) => setWebsite(e.target.value)}
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Opening Hours</label>
-        <div className="flex gap-4">
-          <div className="flex-1 focus-within:ring-2 focus-within:ring-blue-600 focus-within:border-blue-600 rounded-md transition">
-            <TimePicker
-              onChange={setOpeningTime}
-              value={openingTime}
-              className="w-full"
-              clearIcon={null}
-              disableClock
+        <div className="sm:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+          <div className="focus-within:ring-2 focus-within:ring-blue-600 focus-within:border-blue-600 rounded-lg transition">
+            <PhoneInput
+              country={"us"}
+              value={phone}
+              onChange={setPhone}
+              inputStyle={{
+                width: "100%",
+                height: "42px",
+                border: "none",
+                fontSize: "1rem",
+                paddingLeft: "48px",
+                outline: "none",
+              }}
+              buttonStyle={{
+                border: "none",
+                borderRight: "1px solid #d1d5db",
+                background: "white",
+                borderRadius: "0.5rem 0 0 0.5rem",
+              }}
+              containerStyle={{
+                width: "100%",
+                border: "1px solid #d1d5db",
+                borderRadius: "0.5rem",
+                backgroundColor: "white",
+                display: "flex",
+                alignItems: "center",
+              }}
+              inputClass="focus:outline-none"
             />
           </div>
-          <div className="flex-1 focus-within:ring-2 focus-within:ring-blue-600 focus-within:border-blue-600 rounded-md transition">
-            <TimePicker
-              onChange={setClosingTime}
-              value={closingTime}
-              className="w-full"
-              clearIcon={null}
-              disableClock
-            />
+        </div>
+
+        <div className="sm:col-span-2">
+          <label className="block text-sm font-medium text-gray-700">Website</label>
+          <input
+            type="url"
+            placeholder="https://yourbusiness.com"
+            className="mt-1 block w-full border border-gray-300 rounded-lg px-4 py-2 text-sm"
+            value={website}
+            onChange={(e) => setWebsite(e.target.value)}
+          />
+        </div>
+
+        <div className="sm:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Operating Hours</label>
+          <div className="flex gap-4">
+            <div className="flex-1 focus-within:ring-2 focus-within:ring-blue-600 focus-within:border-blue-600 rounded-lg transition">
+              <TimePicker
+                onChange={setOpeningTime}
+                value={openingTime}
+                className="w-full"
+                clearIcon={null}
+                disableClock
+              />
+            </div>
+            <div className="flex-1 focus-within:ring-2 focus-within:ring-blue-600 focus-within:border-blue-600 rounded-lg transition">
+              <TimePicker
+                onChange={setClosingTime}
+                value={closingTime}
+                className="w-full"
+                clearIcon={null}
+                disableClock
+              />
+            </div>
           </div>
         </div>
       </div>
 
       {error && <ErrorMessage errorMessage={error} />}
 
-      <div className="flex justify-between">
+      <div className="flex justify-between mt-6">
         <button
           type="button"
           onClick={onBack}
-          className="px-4 py-2 rounded bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300"
+          className="px-6 py-3 rounded-xl bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300"
         >
           Back
         </button>
         <button
           type="submit"
-          className="px-4 py-2 rounded bg-[var(--button)] text-black font-semibold hover:bg-[var(--button-hover)]"
+          className="px-6 py-3 rounded-xl bg-[var(--button)] text-black font-semibold hover:bg-[var(--button-hover)]"
         >
           Next
         </button>
