@@ -77,17 +77,14 @@ function BusinessList() {
       <h2 className="text-xl font-bold mb-4">Your Businesses</h2>
 
       {loading ? (
-        <p>
-          <SkeletonCard />
-        </p>
+        <p><SkeletonCard /></p>
       ) : businesses.length === 0 ? (
         <div className="text-center border border-dashed border-gray-300 p-6 rounded-lg bg-white shadow-sm">
           <p className="text-gray-600 mb-4">
             You have no businesses onboarded with{" "}
             <span className="font-semibold text-[var(--button)]">
               MenuGenie
-            </span>
-            .
+            </span>.
           </p>
           <button
             onClick={() => navigate("/dashboard/onboarding")}
@@ -107,11 +104,11 @@ function BusinessList() {
                 zIndex: index,
               }}
               className="sticky sm:static sm:top-auto sm:z-auto transition-all duration-300 ease-in-out 
-        flex flex-col sm:flex-row bg-white rounded-3xl shadow-xl overflow-hidden transform hover:scale-[1.01] 
-        cursor-pointer mx-2 sm:mx-0 mb-6"
+                flex flex-col bg-white rounded-3xl shadow-xl overflow-hidden transform hover:scale-[1.01] 
+                cursor-pointer mx-2 sm:mx-0 mb-6"
             >
               {/* Logo */}
-              <div className="sm:w-1/2 bg-gray-100 flex items-center justify-center p-6">
+              <div className="bg-gray-100 flex items-center justify-center p-6">
                 <img
                   src={biz.logoUrl}
                   alt={biz.name}
@@ -120,7 +117,7 @@ function BusinessList() {
               </div>
 
               {/* Info */}
-              <div className="sm:w-1/2 p-6 flex flex-col justify-between gap-4">
+              <div className="p-6 flex flex-col justify-between gap-4">
                 <div>
                   <p className="text-sm text-[var(--button)] font-semibold mb-1">
                     Active

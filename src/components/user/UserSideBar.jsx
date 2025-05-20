@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Utensils, Plus, X } from "lucide-react";
 
@@ -7,24 +6,11 @@ const navItems = [
   { icon: <Plus />, label: "Add Business", path: "/dashboard/onboarding" },
 ];
 
-function Sidebar({ onClose }) {
-  const [expanded, setExpanded] = useState(false);
+function Sidebar({ onClose, isDesktop, expanded }) {
   const navigate = useNavigate();
-  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
-
-  useEffect(() => {
-    const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   return (
-    <div
-      onMouseEnter={() => isDesktop && setExpanded(true)}
-      onMouseLeave={() => isDesktop && setExpanded(false)}
-      className={`h-full transition-all duration-200 bg-[var(--background)] shadow border-r border-gray-200 flex flex-col
-        ${isDesktop ? (expanded ? "w-48" : "w-16") : "w-full"}`}
-    >
+    <div className="h-full w-full transition-all duration-200 bg-[var(--background)] shadow border-r border-gray-200 flex flex-col">
       {/* Close button for mobile */}
       {!isDesktop && (
         <div className="flex justify-end p-3">
@@ -40,7 +26,7 @@ function Sidebar({ onClose }) {
             key={i}
             onClick={() => {
               navigate(item.path);
-              if (onClose) onClose(); // close sidebar on mobile
+              if (onClose) onClose();
             }}
             className="flex items-center space-x-2 px-4 py-2 w-full hover:bg-[var(--button-hover)] cursor-pointer border-1 rounded-full"
           >
