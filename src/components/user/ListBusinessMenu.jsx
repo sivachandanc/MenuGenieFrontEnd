@@ -29,6 +29,7 @@ function ListBusinessMenu() {
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchMenuItems = async () => {
     setLoading(true);
@@ -63,6 +64,7 @@ function ListBusinessMenu() {
   }, [businessType]);
 
   const handleDeleteItem = async () => {
+    setDeleting(true);
     try {
       const menuTable = `menu_item_${businessType}`;
       await DeleteMenuItem(menuTable, itemToDelete.item_id);
@@ -72,6 +74,8 @@ function ListBusinessMenu() {
     } catch (error) {
       console.error("Delete failed:", error.message);
       alert(`Failed to delete item: ${error.message}`);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -171,7 +175,8 @@ function ListBusinessMenu() {
           <div className="p-4 overflow-y-auto flex-1 relative">
             {showSuccess && (
               <div className="flex items-center gap-2 text-green-600 text-sm mb-3 bg-green-50 border border-green-200 px-3 py-2 rounded-md animate-pulse">
-                <CheckCircle className="w-4 h-4" /> Menu item added successfully!
+                <CheckCircle className="w-4 h-4" /> Menu item added
+                successfully!
               </div>
             )}
 
@@ -269,14 +274,38 @@ function ListBusinessMenu() {
               <button
                 onClick={() => setShowDeleteConfirm(false)}
                 className="px-4 py-1 text-sm text-gray-700 hover:underline"
+                disabled={deleting}
               >
                 Cancel
               </button>
               <button
                 onClick={handleDeleteItem}
-                className="px-4 py-1 text-sm text-white bg-red-600 hover:bg-red-700 rounded"
+                disabled={deleting}
+                className="px-4 py-1 text-sm text-white bg-red-600 hover:bg-red-700 rounded flex items-center gap-2"
               >
-                Delete
+                {deleting ? (
+                  <svg
+                    className="w-4 h-4 animate-spin text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 100 16 8 8 0 01-8-8z"
+                    ></path>
+                  </svg>
+                ) : (
+                  "Delete"
+                )}
               </button>
             </div>
           </div>
