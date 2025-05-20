@@ -2,6 +2,9 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import ErrorMessage from "../util-components/ErrorMessage";
 import { useAuth } from "../../context/AuthContext";
+import bg from "../../assets/bg-illustration.png"
+import "./LoginForm.css";
+
 
 function LoginForm() {
   const { signIn } = useAuth();
@@ -30,8 +33,14 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f3ed] flex items-start justify-center px-4 py-12">
-      <div className="bg-white p-8 rounded-3xl shadow-lg w-full max-w-md">
+    <div className="relative min-h-screen bg-[#f7f3ed] flex items-start justify-center px-4 py-12 overflow-hidden">
+      <img
+        src={bg}
+        alt="Background"
+        className="absolute inset-0 w-full h-full object-cover opacity-20 pointer-events-none z-0"
+      />
+
+      <div className="relative z-10 bg-white p-8 rounded-3xl shadow-lg w-full max-w-md">
         <h2 className="text-2xl font-bold text-center text-black mb-2">
           Agent Login
         </h2>
@@ -117,7 +126,7 @@ function LoginForm() {
           </div>
 
           <div className="text-center mt-6 text-sm text-gray-600">
-            Don't have an account?{" "}
+            Don't have an account? {" "}
             <Link
               to="/signup"
               className="text-[var(--button)] hover:underline transition-colors duration-300"
