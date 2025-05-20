@@ -48,7 +48,11 @@ export async function UpdateBusinessPhoneNumber(
   // Update context + embedding in menu_context
   const { error: updateContextError } = await supabaseClient
     .from("menu_context")
-    .update({ context: newContext, embedding: embeddings[0] })
+    .update({
+      context: newContext,
+      embedding: embeddings[0],
+      updated_at: new Date().toISOString(),
+    })
     .eq("business_id", businessID)
     .eq("type", "contact");
 

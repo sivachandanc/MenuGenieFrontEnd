@@ -9,6 +9,7 @@ import { UpdateBusinessWebSite } from "../../supabase-utils/update-business-info
 import { UpdateBusinessPhoneNumber } from "../../supabase-utils/update-business-info/UpdateBusinessPhoneNumber";
 import { UpdateBusinessOpeningTime } from "../../supabase-utils/update-business-info/UpdateBusinessOpeningTime";
 import { UpdateBusinessClosingTime } from "../../supabase-utils/update-business-info/UpdateBusinessClosingTime";
+import { UpdateBusinessName } from "../../supabase-utils/update-business-info/UpdateBusinessName";
 import {
   MapPin,
   Mail,
@@ -166,6 +167,15 @@ function BusinessDetails() {
       console.error(err);
     }
   };
+  const handleBusinessNameUpdate = async (newValue) => {
+    try {
+      await UpdateBusinessName(businessID, newValue, business);
+      setBusiness((prev) => ({ ...prev, name: newValue }));
+    } catch (err) {
+      alert("Failed to update Business Name with embedding. Check console.");
+      console.error(err);
+    }
+  };
 
   const handleLogoUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -293,7 +303,7 @@ function BusinessDetails() {
             icon={<Star size={16} />}
             validate={(v) => (!v ? "Business name cannot be empty" : "")}
             highlight={true}
-            //   onSave={handleNameUpdate}
+              onSave={handleBusinessNameUpdate}
           />
         </div>
 

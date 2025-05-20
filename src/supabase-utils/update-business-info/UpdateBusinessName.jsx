@@ -1,15 +1,15 @@
 import { supabaseClient } from "../SupaBaseClient";
 
-export async function UpdateBusinessWebSite(
+export async function UpdateBusinessName(
   businessID,
-  newWebSite,
+  newName,
   businessData
 ) {
   // Update description in business table
   const { error: updateDescriptionError } = await supabaseClient
     .from("business")
     .update({
-      website: newWebSite,
+      name: newName,
       updated_at: new Date().toISOString(),
     })
     .eq("business_id", businessID);
@@ -21,7 +21,7 @@ export async function UpdateBusinessWebSite(
   }
 
   // Construct new context string
-  const newContext = `Contact Info:\nEmail: ${businessData.email}\nPhone: ${businessData.phone}\nWebsite: ${newWebSite}`;
+  const newContext = `Name of ${businessData.business_type} is ${newName}\nDescription:\n${businessData.description}\nLocation: ${businessData.location}\nOpens at: ${businessData.opening_time}\nCloses at: ${businessData.closing_time}`;
 
   // Get new embedding from embedding service
   const embeddingResponse = await fetch(
@@ -48,13 +48,9 @@ export async function UpdateBusinessWebSite(
   // Update context + embedding in menu_context
   const { error: updateContextError } = await supabaseClient
     .from("menu_context")
-    .update({
-      context: newContext,
-      embedding: embeddings[0],
-      updated_at: new Date().toISOString(),
-    })
+    .update({context: newContext, embedding: embeddings[0] , updated_at: new Date().toISOString()})
     .eq("business_id", businessID)
-    .eq("type", "contact");
+    .eq("type", "description");
 
   if (updateContextError) {
     throw new Error(
