@@ -8,13 +8,29 @@ import "react-clock/dist/Clock.css";
 import CustomSpinner from "../util-components/Spinner";
 
 const BOT_PERSONALITIES = ["friendly", "professional", "funny"];
-const TAG_OPTIONS = ["women-owned", "family-owned", "black-owned"];
+const TAG_OPTIONS = [
+  "Veteran Owned",
+  "Female Owned",
+  "LGBTQ Owned",
+  "Black Owned",
+  "First Responder Owned",
+];
 
-function EditableBusinessField({ label, value, icon, type, options = [], validate, placeholder, onSave , highlight}) {
+function EditableBusinessField({
+  label,
+  value,
+  icon,
+  type,
+  options = [],
+  validate,
+  placeholder,
+  onSave,
+  highlight,
+}) {
   const [editing, setEditing] = useState(false);
   const [fieldValue, setFieldValue] = useState(value || "");
   const [error, setError] = useState("");
-  const [savingInProgress, setSavingInProgress] = useState(false)
+  const [savingInProgress, setSavingInProgress] = useState(false);
 
   const validateInput = () => {
     if (validate) {
@@ -29,13 +45,13 @@ function EditableBusinessField({ label, value, icon, type, options = [], validat
   };
 
   const handleSubmit = async (e) => {
-    setSavingInProgress(true)
+    setSavingInProgress(true);
     e.preventDefault();
     if (validateInput()) {
       if (typeof onSave === "function") {
         await onSave(fieldValue);
       }
-      setSavingInProgress(false)
+      setSavingInProgress(false);
       setEditing(false);
     }
   };
@@ -47,10 +63,17 @@ function EditableBusinessField({ label, value, icon, type, options = [], validat
           <div className="pt-1 text-gray-500">{icon}</div>
           <div>
             <p className="font-medium text-gray-500">{label}</p>
-            { highlight? (<span class="relative inline-block before:absolute before:-inset-1 before:block before:-skew-y-3 before:bg-[var(--label)]">
-    <span class="relative text-white dark:text-gray-950">{value || "—"}</span>
-  </span>):(<p className="text-gray-800 whitespace-pre-wrap">{value || "—"}</p>)}
-            
+            {highlight ? (
+              <span class="relative inline-block before:absolute before:-inset-1 before:block before:-skew-y-3 before:bg-[var(--label)]">
+                <span class="relative text-white dark:text-gray-950">
+                  {value || "—"}
+                </span>
+              </span>
+            ) : (
+              <p className="text-gray-800 whitespace-pre-wrap">
+                {value || "—"}
+              </p>
+            )}
           </div>
         </div>
         <button
@@ -63,8 +86,10 @@ function EditableBusinessField({ label, value, icon, type, options = [], validat
       </div>
 
       {editing && (
-        <form onSubmit={handleSubmit} className="mt-1 bg-gray-50 border border-gray-300 rounded p-2 text-sm shadow-sm">
-            
+        <form
+          onSubmit={handleSubmit}
+          className="mt-1 bg-gray-50 border border-gray-300 rounded p-2 text-sm shadow-sm"
+        >
           {type === "textarea" && (
             <textarea
               className="w-full px-2 py-1 border border-gray-300 rounded"
@@ -91,14 +116,16 @@ function EditableBusinessField({ label, value, icon, type, options = [], validat
             >
               <option value="">-- Select --</option>
               {options.map((opt) => (
-                <option key={opt} value={opt}>{opt}</option>
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
               ))}
             </select>
           )}
 
           {type === "phone" && (
             <PhoneInput
-              country={'us'}
+              country={"us"}
               value={fieldValue}
               onChange={setFieldValue}
               inputClass="w-full"
@@ -142,9 +169,17 @@ function EditableBusinessField({ label, value, icon, type, options = [], validat
           {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
 
           <div className="flex justify-end mt-2 gap-2">
-            <button type="button" onClick={() => setEditing(false)} className="text-gray-500 text-xs">Cancel</button>
-            <button type="submit" className="text-blue-600 text-xs font-medium">Save</button>
-            {savingInProgress && <CustomSpinner/>}
+            <button
+              type="button"
+              onClick={() => setEditing(false)}
+              className="text-gray-500 text-xs"
+            >
+              Cancel
+            </button>
+            <button type="submit" className="text-blue-600 text-xs font-medium">
+              Save
+            </button>
+            {savingInProgress && <CustomSpinner />}
           </div>
         </form>
       )}
