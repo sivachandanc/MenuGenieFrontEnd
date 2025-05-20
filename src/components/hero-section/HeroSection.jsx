@@ -1,14 +1,55 @@
 import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
 import ChatPreview from "./ChatPreview";
 import MenuGenieLogo from "../util-components/MenuGenieLogo";
 
+const testimonials = [
+  {
+    name: "Jet Café",
+    quote: "This chatbot turned 30% of our site visitors into paying customers!",
+    icon: "☕️"
+  },
+  {
+    name: "Urban Taco",
+    quote: "MenuGenie saved us hours each day answering the same questions.",
+    icon: "🌮"
+  },
+  {
+    name: "Brew Bros",
+    quote: "Our online orders doubled in two weeks.",
+    icon: "🍺"
+  }
+];
+
 function HeroSection() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex((prev) => (prev + 1) % testimonials.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <section className="relative min-h-[90vh] flex flex-col lg:flex-row justify-center lg:items-center items-start text-center px-4 py-16 bg-[var(--background)] overflow-hidden">
       {/* Floating Badge */}
       <div className="absolute top-6 left-6 z-30 bg-yellow-400 text-black px-3 py-1 rounded-full shadow font-semibold text-sm animate-bounce">
         New ✨ AI Chatbot
       </div>
+
+      {/* Testimonial Card */}
+      <motion.div
+        key={index}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -10 }}
+        transition={{ duration: 0.5 }}
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 w-[90%] sm:w-[400px] bg-white/90 backdrop-blur-md p-4 rounded-xl shadow-md"
+      >
+        <div className="text-sm text-gray-700 font-medium">"{testimonials[index].quote}"</div>
+        <div className="mt-2 text-xs text-gray-500">— {testimonials[index].name} {testimonials[index].icon}</div>
+      </motion.div>
 
       {/* Left Text Block */}
       <div className="w-full lg:w-[52%] text-left max-w-2xl z-10">

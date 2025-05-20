@@ -2,7 +2,7 @@ import menugenie from "../../assets/menu_genie_logo.png";
 
 function MenuGenieLogo() {
   return (
-    <div className="h-14 w-14">
+    <div className="h-14 w-14 pl-0">
       <img
         src={menugenie}
         alt="MenuGenie Logo"
