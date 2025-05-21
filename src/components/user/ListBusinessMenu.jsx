@@ -25,7 +25,6 @@ function ListBusinessMenu() {
   const [businessName, setBusinessName] = useState("");
   const [businessType, setBusinessType] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
-
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
@@ -102,14 +101,16 @@ function ListBusinessMenu() {
               <button
                 key={tab.id}
                 onClick={() => setSelectedTab(tab.id)}
-                className={`flex items-center justify-center gap-1 px-4 py-2 rounded-md text-sm font-semibold transition min-w-[100px] text-center ${
+                className={`flex items-center justify-center gap-1 px-4 py-2 rounded-md text-sm font-semibold transition min-w-[80px] text-center ${
                   selectedTab === tab.id
                     ? "bg-[var(--button)] text-white"
                     : "text-gray-800 hover:bg-gray-200"
                 }`}
               >
-                {tab.icon}
-                {tab.label}
+                <span className="flex items-center gap-1">
+                  {tab.icon}
+                  <span className="hidden sm:inline">{tab.label}</span>
+                </span>
               </button>
             ))}
           </div>
@@ -128,8 +129,7 @@ function ListBusinessMenu() {
 
               {showSuccess && (
                 <div className="flex items-center gap-2 text-green-600 text-sm mb-3 bg-green-50 border border-green-200 px-3 py-2 rounded-md animate-pulse">
-                  <CheckCircle className="w-4 h-4" /> Menu item added
-                  successfully!
+                  <CheckCircle className="w-4 h-4" /> Menu item added successfully!
                 </div>
               )}
 
