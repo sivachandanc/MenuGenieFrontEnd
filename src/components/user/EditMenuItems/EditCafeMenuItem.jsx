@@ -10,7 +10,6 @@ const cafeCategories = [
   "Smoothies",
   "Juices",
 ];
-
 const tagOptions = [
   "vegan",
   "gluten-free",
@@ -42,6 +41,7 @@ function EditMenuItemCafeForm({ item, onClose, onItemUpdated }) {
     form_options: item.form_options || [],
     available: item.available ?? true,
   });
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
@@ -52,8 +52,7 @@ function EditMenuItemCafeForm({ item, onClose, onItemUpdated }) {
   const handleMultiSelect = (field, value) => {
     setForm((prev) => {
       const current = new Set(prev[field]);
-      if (current.has(value)) current.delete(value);
-      else current.add(value);
+      current.has(value) ? current.delete(value) : current.add(value);
       return { ...prev, [field]: Array.from(current) };
     });
   };
@@ -136,7 +135,7 @@ function EditMenuItemCafeForm({ item, onClose, onItemUpdated }) {
               type="text"
               value={form.name}
               onChange={(e) => handleChange("name", e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--button)] focus:ring-[var(--button)]"
               required
             />
           </div>
@@ -149,12 +148,10 @@ function EditMenuItemCafeForm({ item, onClose, onItemUpdated }) {
             <select
               value={form.category}
               onChange={(e) => handleChange("category", e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--button)] focus:ring-[var(--button)]"
             >
               {cafeCategories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
+                <option key={category}>{category}</option>
               ))}
             </select>
           </div>
@@ -167,7 +164,7 @@ function EditMenuItemCafeForm({ item, onClose, onItemUpdated }) {
             <textarea
               value={form.description}
               onChange={(e) => handleChange("description", e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--button)] focus:ring-[var(--button)]"
               rows={3}
             />
           </div>
@@ -186,7 +183,7 @@ function EditMenuItemCafeForm({ item, onClose, onItemUpdated }) {
                     handleSizeChange(index, "size", e.target.value)
                   }
                   placeholder="Size"
-                  className="w-1/2 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="w-1/2 rounded-md border-gray-300 shadow-sm focus:border-[var(--button)] focus:ring-[var(--button)]"
                 />
                 <input
                   type="number"
@@ -195,14 +192,14 @@ function EditMenuItemCafeForm({ item, onClose, onItemUpdated }) {
                     handleSizeChange(index, "price", e.target.value)
                   }
                   placeholder="Price"
-                  className="w-1/2 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="w-1/2 rounded-md border-gray-300 shadow-sm focus:border-[var(--button)] focus:ring-[var(--button)]"
                 />
               </div>
             ))}
             <button
               type="button"
               onClick={addSizePrice}
-              className="mt-2 text-sm text-blue-600 hover:text-blue-800"
+              className="mt-2 text-sm text-[var(--button)] hover:text-[var(--button-hover)]"
             >
               + Add Size Option
             </button>
@@ -221,7 +218,7 @@ function EditMenuItemCafeForm({ item, onClose, onItemUpdated }) {
                   onClick={() => handleMultiSelect("dairy_options", option)}
                   className={`px-3 py-1 rounded-full text-sm border transition ${
                     form.dairy_options.includes(option)
-                      ? "bg-blue-100 border-blue-500 text-blue-700"
+                      ? "bg-[var(--button-hover)] border-[var(--button)] text-white"
                       : "bg-white border-gray-300 text-gray-600"
                   }`}
                 >
@@ -244,7 +241,7 @@ function EditMenuItemCafeForm({ item, onClose, onItemUpdated }) {
                   onClick={() => handleMultiSelect("tags", tag)}
                   className={`px-3 py-1 rounded-full text-sm border transition ${
                     form.tags.includes(tag)
-                      ? "bg-blue-100 border-blue-500 text-blue-700"
+                      ? "bg-[var(--button-hover)] border-[var(--button)] text-white"
                       : "bg-white border-gray-300 text-gray-600"
                   }`}
                 >
@@ -267,7 +264,7 @@ function EditMenuItemCafeForm({ item, onClose, onItemUpdated }) {
                   onClick={() => handleMultiSelect("form_options", option)}
                   className={`px-3 py-1 rounded-full text-sm border transition ${
                     form.form_options.includes(option)
-                      ? "bg-blue-100 border-blue-500 text-blue-700"
+                      ? "bg-[var(--button-hover)] border-[var(--button)] text-white"
                       : "bg-white border-gray-300 text-gray-600"
                   }`}
                 >
@@ -277,13 +274,13 @@ function EditMenuItemCafeForm({ item, onClose, onItemUpdated }) {
             </div>
           </div>
 
-          {/* Availability Toggle */}
+          {/* Availability */}
           <div className="flex items-center">
             <input
               type="checkbox"
               checked={form.available}
               onChange={(e) => handleChange("available", e.target.checked)}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              className="h-4 w-4 text-[var(--button)] focus:ring-[var(--button)] border-gray-300 rounded"
             />
             <label className="ml-2 block text-sm text-gray-900">
               Item is currently available
@@ -305,7 +302,7 @@ function EditMenuItemCafeForm({ item, onClose, onItemUpdated }) {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded disabled:opacity-50"
+              className="px-6 py-2 bg-[var(--button)] hover:bg-[var(--button-hover)] text-white font-semibold rounded disabled:opacity-50"
             >
               {isSubmitting ? "Saving..." : "Save Changes"}
             </button>
