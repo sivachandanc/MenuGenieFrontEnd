@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { supabaseClient } from "../../supabase-utils/SupaBaseClient";
 import SkeletonCard from "../util-components/SkeletonCard";
 import { useNavigate } from "react-router-dom";
+import QRCode from "react-qr-code";
 
 function BusinessList() {
   const [businesses, setBusinesses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [flippedCardId, setFlippedCardId] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -52,8 +54,8 @@ function BusinessList() {
             }
           } catch (err) {
             console.warn(
-              `Could not check table "${menuTable}" for ${biz.name}`,
-              err.message
+              `Could not check table "${menuTable}" for business "${biz.name}": ${err.message}`,
+              err
             );
           }
 
@@ -77,14 +79,17 @@ function BusinessList() {
       <h2 className="text-xl font-bold mb-4">Your Businesses</h2>
 
       {loading ? (
-        <p><SkeletonCard /></p>
+        <p>
+          <SkeletonCard />
+        </p>
       ) : businesses.length === 0 ? (
         <div className="text-center border border-dashed border-gray-300 p-6 rounded-lg bg-white shadow-sm">
           <p className="text-gray-600 mb-4">
             You have no businesses onboarded with{" "}
             <span className="font-semibold text-[var(--button)]">
               MenuGenie
-            </span>.
+            </span>
+            .
           </p>
           <button
             onClick={() => navigate("/dashboard/onboarding")}
@@ -95,63 +100,104 @@ function BusinessList() {
         </div>
       ) : (
         <ul className="relative flex flex-col sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-4">
-          {businesses.map((biz, index) => (
-            <li
-              key={biz.business_id}
-              onClick={() => navigate(`/dashboard/business/${biz.business_id}`)}
-              style={{
-                top: 0,
-                zIndex: index,
-              }}
-              className="sticky sm:static sm:top-auto sm:z-auto transition-all duration-300 ease-in-out 
-                flex flex-col bg-white rounded-3xl shadow-xl overflow-hidden transform hover:scale-[1.01] 
-                cursor-pointer mx-2 sm:mx-0 mb-6"
-            >
-              {/* Logo */}
-              <div className="bg-gray-100 flex items-center justify-center p-6">
-                <img
-                  src={biz.logoUrl}
-                  alt={biz.name}
-                  className="w-32 h-32 object-contain rounded-xl"
-                />
-              </div>
+          {businesses.map((biz) => {
+            const isFlipped = flippedCardId === biz.business_id;
 
-              {/* Info */}
-              <div className="p-6 flex flex-col justify-between gap-4">
-                <div>
-                  <p className="text-sm text-[var(--button)] font-semibold mb-1">
-                    Active
-                  </p>
-                  <h3 className="text-2xl font-extrabold text-gray-800 mb-2">
-                    {biz.name}
-                  </h3>
-                  <p className="text-gray-600 text-sm">
-                    {biz.business_type.charAt(0).toUpperCase() +
-                      biz.business_type.slice(1)}{" "}
-                    Business
-                  </p>
-                </div>
+            return (
+              <li
+                key={biz.business_id}
+                className="relative w-full h-80 mx-2 sm:mx-0 mb-6"
+                style={{ perspective: 1000 }}
+              >
+                <div
+                  className={`relative w-full h-full transition-transform duration-700 transform ${
+                    isFlipped ? "rotate-y-180" : ""
+                  }`}
+                  style={{ transformStyle: "preserve-3d" }}
+                >
+                  {/* Front Face */}
+                  <div
+                    className="absolute w-full h-full bg-white rounded-3xl shadow-xl overflow-hidden"
+                    style={{ backfaceVisibility: "hidden" }}
+                    onClick={() =>
+                      navigate(`/dashboard/business/${biz.business_id}`)
+                    }
+                  >
+                    <div className="bg-gray-100 flex items-center justify-between p-4">
+                      <img
+                        src={biz.logoUrl}
+                        alt={biz.name}
+                        className="w-24 h-24 object-contain rounded-xl"
+                      />
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setFlippedCardId(biz.business_id);
+                        }}
+                        className="text-xs px-2 py-1 bg-gray-200 rounded"
+                      >
+                        QR
+                      </button>
+                    </div>
+                    <div className="p-4 flex flex-col gap-2">
+                      <h3 className="text-xl font-bold text-gray-800">
+                        {biz.name}
+                      </h3>
+                      <p className="text-gray-600 text-sm capitalize">
+                        {biz.business_type} Business
+                      </p>
+                      {biz.hasMenu ? (
+                        <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full w-fit">
+                          Has Menu
+                        </span>
+                      ) : (
+                        <span className="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-full w-fit">
+                          No Menu Yet
+                        </span>
+                      )}
+                    </div>
+                  </div>
 
-                {biz.hasMenu ? (
-                  <button className="mt-2 px-5 py-2 rounded-full text-white font-semibold bg-gradient-to-r from-[var(--button)] to-[var(--button-hover)] shadow hover:shadow-lg transition w-fit">
-                    Manage Business
-                  </button>
-                ) : (
-                  <div className="flex flex-col gap-1">
+                  {/* Back Face */}
+                  <div
+                    className="absolute w-full h-full bg-white rounded-3xl shadow-xl flex flex-col items-center justify-center p-6"
+                    style={{
+                      backfaceVisibility: "hidden",
+                      transform: "rotateY(180deg)",
+                    }}
+                  >
+                    <QRCode
+                      value={`https://menu-genie-front-end.vercel.app/chat-with-menu/${biz.business_id}`}
+                      size={128}
+                    />
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        navigate(`/dashboard/business/${biz.business_id}/menu`);
+                        setFlippedCardId(null);
                       }}
-                      className="px-5 py-2 rounded-full text-white font-semibold bg-[var(--button)] hover:bg-[var(--button-hover)] shadow-md w-fit"
+                      className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-800 text-sm font-medium rounded-full shadow hover:bg-gray-200 transition"
                     >
-                      + Add Menu
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M15 19l-7-7 7-7"
+                        />
+                      </svg>
+                      Back to Card
                     </button>
                   </div>
-                )}
-              </div>
-            </li>
-          ))}
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>
