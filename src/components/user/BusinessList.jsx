@@ -3,7 +3,7 @@ import { supabaseClient } from "../../supabase-utils/SupaBaseClient";
 import SkeletonCard from "../util-components/SkeletonCard";
 import { useNavigate } from "react-router-dom";
 import QRCode from "react-qr-code";
-import { QrCode } from "lucide-react"; // ICON
+import { QrCode, ArrowRight } from "lucide-react";
 
 function BusinessList() {
   const [businesses, setBusinesses] = useState([]);
@@ -127,7 +127,6 @@ function BusinessList() {
                     isFlipped ? "rotate-y-180" : ""
                   }`}
               >
-
                 {!isFlipped ? (
                   <>
                     <div className="bg-gray-100 flex items-center justify-center p-6">
@@ -183,8 +182,16 @@ function BusinessList() {
                     </div>
                   </>
                 ) : (
-                  <div className="flex items-center justify-center h-full p-6 bg-white">
-                    <QRCode value={qrUrl} size={128} />
+                  <div
+                    onClick={(e) => toggleCardFlip(biz.business_id, e)}
+                    className="flex items-center justify-center h-full p-6 bg-white cursor-pointer"
+                  >
+                    <div className="flex flex-col items-center space-y-4">
+                      <QRCode value={qrUrl} size={128} />
+                      <span className="text-sm text-gray-500">
+                        Tap to return
+                      </span>
+                    </div>
                   </div>
                 )}
               </li>
