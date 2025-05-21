@@ -2,10 +2,13 @@ import { useEffect, useState } from "react";
 import { supabaseClient } from "../../supabase-utils/SupaBaseClient";
 import SkeletonCard from "../util-components/SkeletonCard";
 import { useNavigate } from "react-router-dom";
+import QRCode from "react-qr-code";
+import { QrCode, ArrowRight } from "lucide-react";
 
 function BusinessList() {
   const [businesses, setBusinesses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [flippedCardId, setFlippedCardId] = useState(null); // Track which card is flipped
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -72,19 +75,27 @@ function BusinessList() {
     fetchBusinesses();
   }, []);
 
+  const toggleCardFlip = (businessId, e) => {
+    e.stopPropagation(); // Prevent card click
+    setFlippedCardId((prev) => (prev === businessId ? null : businessId));
+  };
+
   return (
     <div>
       <h2 className="text-xl font-bold mb-4">Your Businesses</h2>
 
       {loading ? (
-        <p><SkeletonCard /></p>
+        <p>
+          <SkeletonCard />
+        </p>
       ) : businesses.length === 0 ? (
         <div className="text-center border border-dashed border-gray-300 p-6 rounded-lg bg-white shadow-sm">
           <p className="text-gray-600 mb-4">
             You have no businesses onboarded with{" "}
             <span className="font-semibold text-[var(--button)]">
               MenuGenie
-            </span>.
+            </span>
+            .
           </p>
           <button
             onClick={() => navigate("/dashboard/onboarding")}
@@ -95,63 +106,95 @@ function BusinessList() {
         </div>
       ) : (
         <ul className="relative flex flex-col sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-4">
-          {businesses.map((biz, index) => (
-            <li
-              key={biz.business_id}
-              onClick={() => navigate(`/dashboard/business/${biz.business_id}`)}
-              style={{
-                top: 0,
-                zIndex: index,
-              }}
-              className="sticky sm:static sm:top-auto sm:z-auto transition-all duration-300 ease-in-out 
-                flex flex-col bg-white rounded-3xl shadow-xl overflow-hidden transform hover:scale-[1.01] 
-                cursor-pointer mx-2 sm:mx-0 mb-6"
-            >
-              {/* Logo */}
-              <div className="bg-gray-100 flex items-center justify-center p-6">
-                <img
-                  src={biz.logoUrl}
-                  alt={biz.name}
-                  className="w-32 h-32 object-contain rounded-xl"
-                />
-              </div>
+          {businesses.map((biz, index) => {
+            const isFlipped = flippedCardId === biz.business_id;
+            const qrUrl = `https://menu-genie-front-end.vercel.app/chat-with-menu/${biz.business_id}`;
 
-              {/* Info */}
-              <div className="p-6 flex flex-col justify-between gap-4">
-                <div>
-                  <p className="text-sm text-[var(--button)] font-semibold mb-1">
-                    Active
-                  </p>
-                  <h3 className="text-2xl font-extrabold text-gray-800 mb-2">
-                    {biz.name}
-                  </h3>
-                  <p className="text-gray-600 text-sm">
-                    {biz.business_type.charAt(0).toUpperCase() +
-                      biz.business_type.slice(1)}{" "}
-                    Business
-                  </p>
-                </div>
+            return (
+              <li
+                key={biz.business_id}
+                onClick={(e) => toggleCardFlip(biz.business_id, e)
+                }
+                style={{
+                  top: 0,
+                  zIndex: index,
+                }}
+                className={`sticky sm:static sm:top-auto sm:z-auto transition-all duration-500 ease-in-out 
+                  flex flex-col bg-white rounded-3xl shadow-xl overflow-hidden transform hover:scale-[1.01] 
+                  cursor-pointer mx-2 sm:mx-0 mb-6 relative ${
+                    isFlipped ? "rotate-y-180" : ""
+                  }`}
+              >
+                {!isFlipped ? (
+                  <>
+                    <div className="bg-gray-100 flex items-center justify-center p-6">
+                      <img
+                        src={biz.logoUrl}
+                        alt={biz.name}
+                        className="w-32 h-32 object-contain rounded-xl"
+                      />
+                    </div>
 
-                {biz.hasMenu ? (
-                  <button className="mt-2 px-5 py-2 rounded-full text-white font-semibold bg-gradient-to-r from-[var(--button)] to-[var(--button-hover)] shadow hover:shadow-lg transition w-fit">
-                    Manage Business
-                  </button>
+                    <div className="p-6 flex flex-col justify-between gap-4">
+                      <div>
+                        <p className="text-sm text-[var(--button)] font-semibold mb-1">
+                          Active
+                        </p>
+                        <div className="flex justify-between items-start">
+                          <h3 className="text-2xl font-extrabold text-gray-800 mb-2">
+                            {biz.name}
+                          </h3>
+                          <button
+                            onClick={(e) => toggleCardFlip(biz.business_id, e)}
+                            className="bg-gray-200 p-2 rounded-full hover:bg-gray-300 ml-2"
+                          >
+                            <QrCode size={18} />
+                          </button>
+                        </div>
+                        <p className="text-gray-600 text-sm">
+                          {biz.business_type.charAt(0).toUpperCase() +
+                            biz.business_type.slice(1)}{" "}
+                          Business
+                        </p>
+                      </div>
+
+                      {biz.hasMenu ? (
+                        <button className="mt-2 px-5 py-2 rounded-full text-white font-semibold bg-gradient-to-r from-[var(--button)] to-[var(--button-hover)] shadow hover:shadow-lg transition w-fit">
+                          Manage Business
+                        </button>
+                      ) : (
+                        <div className="flex flex-col gap-1">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(
+                                `/dashboard/business/${biz.business_id}/menu`
+                              );
+                            }}
+                            className="px-5 py-2 rounded-full text-white font-semibold bg-[var(--button)] hover:bg-[var(--button-hover)] shadow-md w-fit"
+                          >
+                            + Add Menu
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </>
                 ) : (
-                  <div className="flex flex-col gap-1">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/dashboard/business/${biz.business_id}/menu`);
-                      }}
-                      className="px-5 py-2 rounded-full text-white font-semibold bg-[var(--button)] hover:bg-[var(--button-hover)] shadow-md w-fit"
-                    >
-                      + Add Menu
-                    </button>
+                  <div
+                    onClick={(e) => toggleCardFlip(biz.business_id, e)}
+                    className="flex items-center justify-center h-full p-6 bg-white cursor-pointer"
+                  >
+                    <div className="flex flex-col items-center space-y-4">
+                      <QRCode value={qrUrl} size={128} />
+                      <span className="text-sm text-gray-500">
+                        Tap to return
+                      </span>
+                    </div>
                   </div>
                 )}
-              </div>
-            </li>
-          ))}
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>
