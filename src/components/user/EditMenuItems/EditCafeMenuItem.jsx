@@ -108,12 +108,12 @@ function EditMenuItemCafeForm({ item, onClose, onItemUpdated }) {
     >
       <form
         onSubmit={handleSubmit}
-        className="bg-white border rounded-lg p-6 shadow-lg space-y-4 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        className="bg-white border rounded-lg p-6 pt-0 pb-0 shadow-lg space-y-4 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="sticky top-0 bg-white pb-4 border-b">
           <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold text-gray-800">
+            <h2 className="text-lg font-semibold text-gray-800 pt-6">
               Edit {form.name}
             </h2>
             <button
@@ -294,7 +294,7 @@ function EditMenuItemCafeForm({ item, onClose, onItemUpdated }) {
         </div>
 
         <div className="sticky bottom-0 bg-white pt-4 border-t mt-6">
-          <div className="flex justify-end gap-3">
+          <div className="flex justify-end gap-3 pb-4">
             <button
               type="button"
               onClick={onClose}

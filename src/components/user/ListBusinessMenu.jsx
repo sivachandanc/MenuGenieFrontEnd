@@ -82,52 +82,51 @@ function ListBusinessMenu() {
 
   return (
     <div className="w-full mx-auto p-4 h-[calc(100vh-2rem)] flex flex-col gap-4">
-      {/* Sticky Back + Tabs */}
-      <div className="sticky top-0 z-40 pt-2 pb-3">
-        <div className="flex flex-row space-x-2 items-center">
-          <button
-            onClick={() => navigate(`/dashboard/business/${businessID}`)}
-            className="px-5 py-2 rounded-full text-white font-semibold bg-[var(--button)] hover:bg-[var(--button-hover)] transition shadow"
-          >
-            <div className="flex flex-row space-x-1 items-center">
-              <CircleArrowLeft size={20} />
-            </div>
-          </button>
+      <div className="flex-1 overflow-hidden">
+        <div className="sticky top-0 z-40 pt-2 pb-3">
+          <div className="flex flex-row space-x-2 items-center">
+            <button
+              onClick={() => navigate(`/dashboard/business/${businessID}`)}
+              className="px-5 py-2 rounded-full text-white font-semibold bg-[var(--button)] hover:bg-[var(--button-hover)] transition shadow"
+            >
+              <div className="flex flex-row space-x-1 items-center">
+                <CircleArrowLeft size={20} />
+              </div>
+            </button>
 
-          <div className="flex flex-wrap justify-center bg-[var(--tabs-color)] p-1 rounded-md w-fit ml-auto mr-auto">
-            {[
-              { id: "menu", label: "Menu", icon: <Utensils size={14} /> },
-              { id: "add", label: "Add Item", icon: <Plus size={14} /> },
-              { id: "ai", label: "Use AI", icon: <Bot size={14} /> },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setSelectedTab(tab.id)}
-                className={`flex items-center justify-center gap-1 px-4 py-2 rounded-md text-sm font-semibold transition min-w-[80px] text-center ${
-                  selectedTab === tab.id
-                    ? "bg-[var(--button)] text-white"
-                    : "text-gray-800 hover:bg-gray-200"
-                }`}
-              >
-                <span className="flex items-center gap-1">
-                  {tab.icon}
-                  <span className="hidden sm:inline">{tab.label}</span>
-                </span>
-              </button>
-            ))}
+            <div className="flex flex-wrap justify-center bg-[var(--tabs-color)] p-1 rounded-md w-fit ml-auto mr-auto">
+              {[
+                { id: "menu", label: "Menu", icon: <Utensils size={14} /> },
+                { id: "add", label: "Add Item", icon: <Plus size={14} /> },
+                { id: "ai", label: "Use AI", icon: <Bot size={14} /> },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setSelectedTab(tab.id)}
+                  className={`flex items-center justify-center gap-1 px-4 py-2 rounded-md text-sm font-semibold transition min-w-[80px] text-center ${
+                    selectedTab === tab.id
+                      ? "bg-[var(--button)] text-white"
+                      : "text-gray-800 hover:bg-gray-200"
+                  }`}
+                >
+                  <span className="flex items-center gap-1">
+                    {tab.icon}
+                    <span className="hidden sm:inline">{tab.label}</span>
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* Scrollable Tab Container */}
-      <div className="flex-1 overflow-hidden">
-        <div className="h-full overflow-y-auto p-4 bg-white border border-gray-200 rounded-2xl shadow">
+        <div className="h-full overflow-y-auto p-4 pt-0 bg-white border border-gray-200 rounded-2xl shadow">
           {selectedTab === "menu" && (
             <>
-              <h2 className="text-lg font-semibold text-gray-800 mb-4">
-                Menu Items of{" "}
-                <span className="text-[var(--button)]">{businessName}</span>
-              </h2>
+              <div className="sticky top-0 bg-white z-20 pb-2">
+                <h2 className="text-lg font-semibold text-gray-800 pt-2">
+                  Menu Items of{" "}
+                  <span className="text-[var(--button)]">{businessName}</span>
+                </h2>
+              </div>
 
               {showSuccess && (
                 <div className="flex items-center gap-2 text-green-600 text-sm mb-3 bg-green-50 border border-green-200 px-3 py-2 rounded-md animate-pulse">
@@ -155,71 +154,76 @@ function ListBusinessMenu() {
                   </div>
                 </div>
               ) : (
-                <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {menuItems.map((item) => (
-                    <li
-                      key={item.item_id}
-                      className="relative border border-gray-100 p-4 bg-[var(--background)] rounded-2xl shadow hover:shadow-md transition-transform hover:scale-[1.01] cursor-pointer"
-                    >
-                      <div className="absolute top-3 right-3 flex gap-2 z-10">
-                        <button
-                          className="text-gray-500 hover:text-blue-600 transition"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setEditingItem(item);
-                          }}
-                        >
-                          <Pencil size={16} />
-                        </button>
-                        <button
-                          className="text-gray-500 hover:text-red-600 transition"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setItemToDelete(item);
-                            setShowDeleteConfirm(true);
-                          }}
-                        >
-                          <Trash size={16} />
-                        </button>
-                      </div>
-
-                      <div className="mb-1 pr-6">
-                        <span className="text-lg font-semibold text-gray-900">
-                          {item.name}
-                        </span>
-                        <p className="text-sm text-gray-600 italic">
-                          {item.category}
-                        </p>
-                      </div>
-
-                      {Array.isArray(item.size_options) && (
-                        <p className="text-sm text-gray-700">
-                          {item.size_options
-                            .map(
-                              (s) =>
-                                `${s.size || "?"} ($${parseFloat(
-                                  s.price
-                                ).toFixed(2)})`
-                            )
-                            .join(" · ")}
-                        </p>
-                      )}
-
-                      {item.tags?.length > 0 && (
-                        <div className="mt-2 flex flex-wrap gap-1">
-                          {item.tags.map((tag) => (
-                            <span
-                              key={tag}
-                              className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full"
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </li>
-                  ))}
-                </ul>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full border border-gray-200 rounded-md overflow-hidden text-sm">
+                    <thead className="bg-gray-100 text-gray-700 font-semibold">
+                      <tr>
+                        <th className="px-4 py-2 text-left">Menu Item</th>
+                        <th className="px-4 py-2 text-left">Type</th>
+                        <th className="px-4 py-2 text-center">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {menuItems.map((item) => (
+                        <tr key={item.item_id} className="hover:bg-gray-50">
+                          <td className="px-4 py-2">
+                            <div className="font-medium text-gray-900">
+                              {item.name}
+                            </div>
+                            <div className="text-xs text-gray-600 italic">
+                              {Array.isArray(item.size_options)
+                                ? item.size_options
+                                    .map(
+                                      (s) =>
+                                        `${s.size || "?"} ($${parseFloat(
+                                          s.price
+                                        ).toFixed(2)})`
+                                    )
+                                    .join(" · ")
+                                : ""}
+                            </div>
+                            {item.tags?.length > 0 && (
+                              <div className="mt-1 flex flex-wrap gap-1">
+                                {item.tags.map((tag) => (
+                                  <span
+                                    key={tag}
+                                    className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full"
+                                  >
+                                    {tag}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </td>
+                          <td className="px-4 py-2">{item.category}</td>
+                          <td className="px-4 py-2 text-center">
+                            <div className="flex justify-center gap-3">
+                              <button
+                                className="text-gray-500 hover:text-blue-600"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setEditingItem(item);
+                                }}
+                              >
+                                <Pencil size={16} />
+                              </button>
+                              <button
+                                className="text-gray-500 hover:text-red-600"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setItemToDelete(item);
+                                  setShowDeleteConfirm(true);
+                                }}
+                              >
+                                <Trash size={16} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </>
           )}
@@ -248,7 +252,6 @@ function ListBusinessMenu() {
         </div>
       </div>
 
-      {/* Edit Modal */}
       {editingItem && (
         <EditMenuItemCafeForm
           item={editingItem}
@@ -260,7 +263,6 @@ function ListBusinessMenu() {
         />
       )}
 
-      {/* Delete Confirmation Modal */}
       {showDeleteConfirm && itemToDelete && (
         <div className="fixed inset-0 bg-opacity-30 backdrop-blur-sm z-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
