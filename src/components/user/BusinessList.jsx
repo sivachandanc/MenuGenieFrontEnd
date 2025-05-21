@@ -3,11 +3,12 @@ import { supabaseClient } from "../../supabase-utils/SupaBaseClient";
 import SkeletonCard from "../util-components/SkeletonCard";
 import { useNavigate } from "react-router-dom";
 import QRCode from "react-qr-code";
+import { QrCode } from "lucide-react"; // ICON
 
 function BusinessList() {
   const [businesses, setBusinesses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [flippedCardId, setFlippedCardId] = useState(null);
+  const [flippedCardId, setFlippedCardId] = useState(null); // Track which card is flipped
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -54,8 +55,8 @@ function BusinessList() {
             }
           } catch (err) {
             console.warn(
-              `Could not check table "${menuTable}" for business "${biz.name}": ${err.message}`,
-              err
+              `Could not check table "${menuTable}" for ${biz.name}`,
+              err.message
             );
           }
 
@@ -73,6 +74,11 @@ function BusinessList() {
 
     fetchBusinesses();
   }, []);
+
+  const toggleCardFlip = (businessId, e) => {
+    e.stopPropagation(); // Prevent card click
+    setFlippedCardId((prev) => (prev === businessId ? null : businessId));
+  };
 
   return (
     <div>
@@ -100,101 +106,87 @@ function BusinessList() {
         </div>
       ) : (
         <ul className="relative flex flex-col sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-4">
-          {businesses.map((biz) => {
+          {businesses.map((biz, index) => {
             const isFlipped = flippedCardId === biz.business_id;
+            const qrUrl = `https://menu-genie-front-end.vercel.app/chat-with-menu/${biz.business_id}`;
 
             return (
               <li
                 key={biz.business_id}
-                className="relative w-full h-80 mx-2 sm:mx-0 mb-6"
-                style={{ perspective: 1000 }}
-              >
-                <div
-                  className={`relative w-full h-full transition-transform duration-700 transform ${
+                onClick={() =>
+                  !isFlipped &&
+                  navigate(`/dashboard/business/${biz.business_id}`)
+                }
+                style={{
+                  top: 0,
+                  zIndex: index,
+                }}
+                className={`sticky sm:static sm:top-auto sm:z-auto transition-all duration-500 ease-in-out 
+                  flex flex-col bg-white rounded-3xl shadow-xl overflow-hidden transform hover:scale-[1.01] 
+                  cursor-pointer mx-2 sm:mx-0 mb-6 relative ${
                     isFlipped ? "rotate-y-180" : ""
                   }`}
-                  style={{ transformStyle: "preserve-3d" }}
-                >
-                  {/* Front Face */}
-                  <div
-                    className="absolute w-full h-full bg-white rounded-3xl shadow-xl overflow-hidden"
-                    style={{ backfaceVisibility: "hidden" }}
-                    onClick={() =>
-                      navigate(`/dashboard/business/${biz.business_id}`)
-                    }
-                  >
-                    <div className="bg-gray-100 flex items-center justify-between p-4">
+              >
+
+                {!isFlipped ? (
+                  <>
+                    <div className="bg-gray-100 flex items-center justify-center p-6">
                       <img
                         src={biz.logoUrl}
                         alt={biz.name}
-                        className="w-24 h-24 object-contain rounded-xl"
+                        className="w-32 h-32 object-contain rounded-xl"
                       />
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setFlippedCardId(biz.business_id);
-                        }}
-                        className="text-xs px-2 py-1 bg-gray-200 rounded"
-                      >
-                        QR
-                      </button>
                     </div>
-                    <div className="p-4 flex flex-col gap-2">
-                      <h3 className="text-xl font-bold text-gray-800">
-                        {biz.name}
-                      </h3>
-                      <p className="text-gray-600 text-sm capitalize">
-                        {biz.business_type} Business
-                      </p>
+
+                    <div className="p-6 flex flex-col justify-between gap-4">
+                      <div>
+                        <p className="text-sm text-[var(--button)] font-semibold mb-1">
+                          Active
+                        </p>
+                        <div className="flex justify-between items-start">
+                          <h3 className="text-2xl font-extrabold text-gray-800 mb-2">
+                            {biz.name}
+                          </h3>
+                          <button
+                            onClick={(e) => toggleCardFlip(biz.business_id, e)}
+                            className="bg-gray-200 p-2 rounded-full hover:bg-gray-300 ml-2"
+                          >
+                            <QrCode size={18} />
+                          </button>
+                        </div>
+                        <p className="text-gray-600 text-sm">
+                          {biz.business_type.charAt(0).toUpperCase() +
+                            biz.business_type.slice(1)}{" "}
+                          Business
+                        </p>
+                      </div>
+
                       {biz.hasMenu ? (
-                        <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full w-fit">
-                          Has Menu
-                        </span>
+                        <button className="mt-2 px-5 py-2 rounded-full text-white font-semibold bg-gradient-to-r from-[var(--button)] to-[var(--button-hover)] shadow hover:shadow-lg transition w-fit">
+                          Manage Business
+                        </button>
                       ) : (
-                        <span className="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-full w-fit">
-                          No Menu Yet
-                        </span>
+                        <div className="flex flex-col gap-1">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(
+                                `/dashboard/business/${biz.business_id}/menu`
+                              );
+                            }}
+                            className="px-5 py-2 rounded-full text-white font-semibold bg-[var(--button)] hover:bg-[var(--button-hover)] shadow-md w-fit"
+                          >
+                            + Add Menu
+                          </button>
+                        </div>
                       )}
                     </div>
+                  </>
+                ) : (
+                  <div className="flex items-center justify-center h-full p-6 bg-white">
+                    <QRCode value={qrUrl} size={128} />
                   </div>
-
-                  {/* Back Face */}
-                  <div
-                    className="absolute w-full h-full bg-white rounded-3xl shadow-xl flex flex-col items-center justify-center p-6"
-                    style={{
-                      backfaceVisibility: "hidden",
-                      transform: "rotateY(180deg)",
-                    }}
-                  >
-                    <QRCode
-                      value={`https://menu-genie-front-end.vercel.app/chat-with-menu/${biz.business_id}`}
-                      size={128}
-                    />
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setFlippedCardId(null);
-                      }}
-                      className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-800 text-sm font-medium rounded-full shadow hover:bg-gray-200 transition"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M15 19l-7-7 7-7"
-                        />
-                      </svg>
-                      Back to Card
-                    </button>
-                  </div>
-                </div>
+                )}
               </li>
             );
           })}
