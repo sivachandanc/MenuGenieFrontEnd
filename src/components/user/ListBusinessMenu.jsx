@@ -118,11 +118,14 @@ function ListBusinessMenu() {
             </div>
           </div>
         </div>
-        <div className="h-full overflow-y-auto p-4 pt-0 bg-white border border-gray-200 rounded-2xl shadow">
+        <div
+          className="max-h-[75vh]
+ overflow-y-auto p-0 bg-white border border-gray-200 rounded-2xl shadow"
+        >
           {selectedTab === "menu" && (
             <>
               <div className="sticky top-0 bg-white z-20 pb-2">
-                <h2 className="text-lg font-semibold text-gray-800 pt-2">
+                <h2 className="text-lg font-semibold text-gray-800 p-2">
                   Menu Items of{" "}
                   <span className="text-[var(--button)]">{businessName}</span>
                 </h2>
