@@ -15,6 +15,7 @@ import { supabaseClient } from "../../supabase-utils/SupaBaseClient";
 import { DeleteMenuItem } from "../../supabase-utils/delete-menu-item/DeleteMenuItem.jsx";
 import AddMenuItemCafeForm from "./AddMenuItems/AddMenuItemCafe.jsx";
 import ImageUploader from "./AddMenuItems/ImageUploader.jsx";
+import EditMenuItemCafeForm from "./EditMenuItems/EditCafeMenuItem.jsx";
 
 function ListBusinessMenu() {
   const { businessID } = useParams();
@@ -29,6 +30,7 @@ function ListBusinessMenu() {
   const [itemToDelete, setItemToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
   const [selectedTab, setSelectedTab] = useState("menu");
+  const [editingItem, setEditingItem] = useState(null);
 
   const fetchMenuItems = async () => {
     setLoading(true);
@@ -129,7 +131,8 @@ function ListBusinessMenu() {
 
               {showSuccess && (
                 <div className="flex items-center gap-2 text-green-600 text-sm mb-3 bg-green-50 border border-green-200 px-3 py-2 rounded-md animate-pulse">
-                  <CheckCircle className="w-4 h-4" /> Menu item added successfully!
+                  <CheckCircle className="w-4 h-4" /> Menu item added
+                  successfully!
                 </div>
               )}
 
@@ -138,7 +141,10 @@ function ListBusinessMenu() {
                   {Array(5)
                     .fill(0)
                     .map((_, idx) => (
-                      <li key={idx} className="h-4 w-full bg-gray-200 rounded" />
+                      <li
+                        key={idx}
+                        className="h-4 w-full bg-gray-200 rounded"
+                      />
                     ))}
                 </ul>
               ) : menuItems.length === 0 ? (
@@ -156,7 +162,13 @@ function ListBusinessMenu() {
                       className="relative border border-gray-100 p-4 bg-[var(--background)] rounded-2xl shadow hover:shadow-md transition-transform hover:scale-[1.01] cursor-pointer"
                     >
                       <div className="absolute top-3 right-3 flex gap-2 z-10">
-                        <button className="text-gray-500 hover:text-blue-600 transition">
+                        <button
+                          className="text-gray-500 hover:text-blue-600 transition"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingItem(item);
+                          }}
+                        >
                           <Pencil size={16} />
                         </button>
                         <button
@@ -185,9 +197,9 @@ function ListBusinessMenu() {
                           {item.size_options
                             .map(
                               (s) =>
-                                `${s.size || "?"} ($${parseFloat(s.price).toFixed(
-                                  2
-                                )})`
+                                `${s.size || "?"} ($${parseFloat(
+                                  s.price
+                                ).toFixed(2)})`
                             )
                             .join(" · ")}
                         </p>
@@ -235,6 +247,18 @@ function ListBusinessMenu() {
           )}
         </div>
       </div>
+
+      {/* Edit Modal */}
+      {editingItem && (
+        <EditMenuItemCafeForm
+          item={editingItem}
+          onClose={() => setEditingItem(null)}
+          onItemUpdated={() => {
+            setEditingItem(null);
+            fetchMenuItems();
+          }}
+        />
+      )}
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && itemToDelete && (
