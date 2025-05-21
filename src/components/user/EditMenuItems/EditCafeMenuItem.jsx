@@ -75,7 +75,37 @@ function EditMenuItemCafeForm({ item, onClose, onItemUpdated }) {
     setIsSubmitting(true);
     setError(null);
 
+    const context = [
+      `name: ${form.name}`,
+      `category: ${form.category}`,
+      `description: ${form.description}`,
+      `size_options: ${JSON.stringify(form.size_price_pairs)}`,
+      `dairy_options: ${JSON.stringify(form.dairy_options)}`,
+      `tags: ${JSON.stringify(form.tags)}`,
+      `form_options: ${JSON.stringify(form.form_options)}`,
+      `available: ${form.available}`,
+    ].join("\n");
+
     try {
+      const response = await fetch(
+        `${import.meta.env.VITE_EMBEDDING_BACKEND_URL}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify([{ context }]),
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Embedding API failed for Menu: ${errorText}`);
+      }
+
+      const { embeddings } = await response.json();
+      if (!Array.isArray(embeddings)) {
+        throw new Error("Invalid embedding response (menu item) from API.");
+      }
+
       const { error } = await supabaseClient
         .from("menu_item_cafe")
         .update({
@@ -89,9 +119,20 @@ function EditMenuItemCafeForm({ item, onClose, onItemUpdated }) {
           available: form.available,
           updated_at: new Date(),
         })
-        .eq("id", item.id);
+        .eq("item_id", item.item_id);
+
+      const { error: contextError } = await supabaseClient
+        .from("menu_context")
+        .update({
+          context: context,
+          embedding: embeddings[0],
+          updated_at: new Date(),
+        })
+        .eq("item_id", item.item_id);
 
       if (error) throw error;
+      if (contextError) throw contextError;
+
       onItemUpdated();
     } catch (err) {
       setError(err.message);
