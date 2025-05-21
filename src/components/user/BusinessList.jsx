@@ -3,7 +3,7 @@ import { supabaseClient } from "../../supabase-utils/SupaBaseClient";
 import SkeletonCard from "../util-components/SkeletonCard";
 import { useNavigate } from "react-router-dom";
 import QRCode from "react-qr-code";
-import { QrCode, ArrowRight } from "lucide-react";
+import { QrCode, Utensils } from "lucide-react";
 
 function BusinessList() {
   const [businesses, setBusinesses] = useState([]);
@@ -160,10 +160,10 @@ function BusinessList() {
 
                       {biz.hasMenu ? (
                         <button onClick={() =>{ navigate(`business/${biz.business_id}`)}} className="mt-2 px-5 py-2 rounded-full text-white font-semibold bg-gradient-to-r from-[var(--button)] to-[var(--button-hover)] shadow hover:shadow-lg transition w-fit">
-                          Manage Business
+                          <Utensils size={18}/>
                         </button>
                       ) : (
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-row gap-1">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -171,10 +171,13 @@ function BusinessList() {
                                 `/dashboard/business/${biz.business_id}/menu`
                               );
                             }}
-                            className="px-5 py-2 rounded-full text-white font-semibold bg-[var(--button)] hover:bg-[var(--button-hover)] shadow-md w-fit"
+                            className="mt-2 px-5 py-2 rounded-full text-white font-semibold bg-gradient-to-r from-[var(--button)] to-[var(--button-hover)] shadow hover:shadow-lg transition w-fit"
                           >
                             + Add Menu
                           </button>
+                          <button onClick={() =>{ navigate(`business/${biz.business_id}`)}} className="mt-2 px-5 py-2 rounded-full text-white font-semibold bg-gradient-to-r from-[var(--button)] to-[var(--button-hover)] shadow hover:shadow-lg transition w-fit">
+                          <Utensils size={18}/>
+                        </button>
                         </div>
                       )}
                     </div>
