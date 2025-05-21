@@ -113,9 +113,7 @@ function BusinessList() {
             return (
               <li
                 key={biz.business_id}
-                onClick={() =>
-                  !isFlipped &&
-                  navigate(`/dashboard/business/${biz.business_id}`)
+                onClick={(e) => toggleCardFlip(biz.business_id, e)
                 }
                 style={{
                   top: 0,
