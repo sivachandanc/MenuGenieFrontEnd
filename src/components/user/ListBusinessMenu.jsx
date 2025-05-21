@@ -29,7 +29,6 @@ function ListBusinessMenu() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
-
   const [selectedTab, setSelectedTab] = useState("menu");
 
   const fetchMenuItems = async () => {
@@ -81,25 +80,20 @@ function ListBusinessMenu() {
   };
 
   return (
-    <div className="w-full mx-auto p-4">
-      <div className="flex flex-col  gap-4">
-        
-        <div className="flex flex-row space-x-2">
+    <div className="w-full mx-auto p-4 h-[calc(100vh-2rem)] flex flex-col gap-4">
+      {/* Sticky Back + Tabs */}
+      <div className="sticky top-0 z-40 pt-2 pb-3">
+        <div className="flex flex-row space-x-2 items-center">
+          <button
+            onClick={() => navigate(`/dashboard/business/${businessID}`)}
+            className="px-5 py-2 rounded-full text-white font-semibold bg-[var(--button)] hover:bg-[var(--button-hover)] transition shadow"
+          >
+            <div className="flex flex-row space-x-1 items-center">
+              <CircleArrowLeft size={20} />
+            </div>
+          </button>
 
-          {/* GO Back to Business*/}
-          <div className="flex justify-start">
-            <button
-              onClick={() => navigate(`/dashboard/business/${businessID}`)}
-              className="px-5 py-2 rounded-full text-white font-semibold bg-[var(--button)] hover:bg-[var(--button-hover)] transition shadow"
-            >
-              <div className="flex flex-row space-x-1 items-center rounded-full">
-                <CircleArrowLeft size={20} />
-              </div>
-            </button>
-          </div>
-
-          {/* Tabs */}
-          <div className="flex flex-wrap justify-center bg-[var(--tabs-color)] p-1 m-0 rounded-md w-1/3">
+          <div className="flex flex-wrap justify-center bg-[var(--tabs-color)] p-1 rounded-md w-fit ml-auto mr-auto">
             {[
               { id: "menu", label: "Menu", icon: <Utensils size={14} /> },
               { id: "add", label: "Add Item", icon: <Plus size={14} /> },
@@ -119,18 +113,12 @@ function ListBusinessMenu() {
               </button>
             ))}
           </div>
-
-          {/* Navigate button */}
         </div>
+      </div>
 
-        {/* Tab Panel */}
-        <div
-          className={`p-4 ${
-            selectedTab !== "ai"
-              ? "bg-white border border-gray-200 rounded-2xl shadow"
-              : ""
-          }`}
-        >
+      {/* Scrollable Tab Container */}
+      <div className="flex-1 overflow-hidden">
+        <div className="h-full overflow-y-auto p-4 bg-white border border-gray-200 rounded-2xl shadow">
           {selectedTab === "menu" && (
             <>
               <h2 className="text-lg font-semibold text-gray-800 mb-4">
@@ -150,10 +138,7 @@ function ListBusinessMenu() {
                   {Array(5)
                     .fill(0)
                     .map((_, idx) => (
-                      <li
-                        key={idx}
-                        className="h-4 w-full bg-gray-200 rounded"
-                      />
+                      <li key={idx} className="h-4 w-full bg-gray-200 rounded" />
                     ))}
                 </ul>
               ) : menuItems.length === 0 ? (
@@ -200,9 +185,9 @@ function ListBusinessMenu() {
                           {item.size_options
                             .map(
                               (s) =>
-                                `${s.size || "?"} ($${parseFloat(
-                                  s.price
-                                ).toFixed(2)})`
+                                `${s.size || "?"} ($${parseFloat(s.price).toFixed(
+                                  2
+                                )})`
                             )
                             .join(" · ")}
                         </p>
@@ -249,60 +234,60 @@ function ListBusinessMenu() {
             />
           )}
         </div>
+      </div>
 
-        {/* Delete Confirmation Modal */}
-        {showDeleteConfirm && itemToDelete && (
-          <div className="fixed inset-0 bg-opacity-30 backdrop-blur-sm z-50 flex items-center justify-center">
-            <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
-              <h2 className="text-lg font-semibold text-gray-800 mb-3">
-                Confirm Deletion
-              </h2>
-              <p className="text-sm text-gray-600 mb-4">
-                Are you sure you want to delete{" "}
-                <strong>{itemToDelete.name}</strong>?
-              </p>
-              <div className="flex justify-end space-x-3">
-                <button
-                  onClick={() => setShowDeleteConfirm(false)}
-                  className="px-4 py-1 text-sm text-gray-700 hover:underline"
-                  disabled={deleting}
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleDeleteItem}
-                  disabled={deleting}
-                  className="px-4 py-1 text-sm text-white bg-red-600 hover:bg-red-700 rounded flex items-center gap-2"
-                >
-                  {deleting ? (
-                    <svg
-                      className="w-4 h-4 animate-spin text-white"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 100 16 8 8 0 01-8-8z"
-                      ></path>
-                    </svg>
-                  ) : (
-                    "Delete"
-                  )}
-                </button>
-              </div>
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && itemToDelete && (
+        <div className="fixed inset-0 bg-opacity-30 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
+            <h2 className="text-lg font-semibold text-gray-800 mb-3">
+              Confirm Deletion
+            </h2>
+            <p className="text-sm text-gray-600 mb-4">
+              Are you sure you want to delete{" "}
+              <strong>{itemToDelete.name}</strong>?
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="px-4 py-1 text-sm text-gray-700 hover:underline"
+                disabled={deleting}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteItem}
+                disabled={deleting}
+                className="px-4 py-1 text-sm text-white bg-red-600 hover:bg-red-700 rounded flex items-center gap-2"
+              >
+                {deleting ? (
+                  <svg
+                    className="w-4 h-4 animate-spin text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 100 16 8 8 0 01-8-8z"
+                    ></path>
+                  </svg>
+                ) : (
+                  "Delete"
+                )}
+              </button>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
