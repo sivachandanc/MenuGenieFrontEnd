@@ -13,8 +13,7 @@
   --button: oklch(72.61% 0.150 162.55);
   --button-hover: oklch(77.61% 0.150 162.55);
   --label: oklch(72.61% 0.150 162.55);
-  /* --button: oklch(0.8807 0.1244 219.13);
-  --button-hover: oklch(0.9307 0.1244 219.13); */
+  --tabs-color: oklch(89.60% 0.078 135.95);
   --background: oklch(0.97 0.015 75);
   --card: oklch(86.05% 0.181 143.81);
   --accent: oklch(0.8807 0.1244 219.13);
