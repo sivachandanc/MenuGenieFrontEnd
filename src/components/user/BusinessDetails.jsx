@@ -25,11 +25,11 @@ import {
   Bot,
   Smile,
   AlertTriangle,
-  Utensils,
   Trash2,
   Pencil,
 } from "lucide-react";
 import EditableBusinessField from "./EditableBusinessField";
+import toast from "react-hot-toast";
 
 function BusinessDetails() {
   const { businessID } = useParams();
@@ -50,7 +50,7 @@ function BusinessDetails() {
         .single();
 
       if (error) {
-        console.error("Error fetching business details:", error.message);
+        toast.error("Failed to fetch business details.");
         return;
       }
 
@@ -79,8 +79,8 @@ function BusinessDetails() {
           .limit(1);
 
         setHasMenu(menuItems && menuItems.length > 0);
-      } catch (err) {
-        console.warn(`Failed to query menu table "${menuTable}":`, err.message);
+      } catch{
+        toast.error("Failed to fetch menu info");
         setHasMenu(false);
       }
 
@@ -94,11 +94,11 @@ function BusinessDetails() {
     setDeleting(true);
     try {
       await DeleteBusiness(business.business_id, business.business_type);
+      toast.success("Business deleted successfully");
       navigate("/dashboard");
-    } catch (err) {
-      console.error("Failed to delete business:", err);
+    } catch {
+      toast.error("Failed to delete business. Please try again.");
       setDeleting(false);
-      alert("Failed to delete business. Please try again.");
     }
   };
 
@@ -106,9 +106,9 @@ function BusinessDetails() {
     try {
       await UpdateBusinessDescription(businessID, newValue, business);
       setBusiness((prev) => ({ ...prev, description: newValue }));
-    } catch (err) {
-      alert("Failed to update description with embedding. Check console.");
-      console.error(err);
+      toast.success("Description updated");
+    } catch {
+      toast.error("Failed to update description");
     }
   };
 
@@ -116,9 +116,9 @@ function BusinessDetails() {
     try {
       await UpdateBusinessLocation(businessID, newValue, business);
       setBusiness((prev) => ({ ...prev, location: newValue }));
-    } catch (err) {
-      alert("Failed to update Location with embedding. Check console.");
-      console.error(err);
+      toast.success("Location updated");
+    } catch {
+      toast.error("Failed to update location");
     }
   };
 
@@ -126,9 +126,9 @@ function BusinessDetails() {
     try {
       await UpdateBusinessEmail(businessID, newValue, business);
       setBusiness((prev) => ({ ...prev, email: newValue }));
-    } catch (err) {
-      alert("Failed to update Email with embedding. Check console.");
-      console.error(err);
+      toast.success("Email updated");
+    } catch {
+      toast.error("Failed to update email");
     }
   };
 
@@ -136,9 +136,9 @@ function BusinessDetails() {
     try {
       await UpdateBusinessWebSite(businessID, newValue, business);
       setBusiness((prev) => ({ ...prev, website: newValue }));
-    } catch (err) {
-      alert("Failed to update Website with embedding. Check console.");
-      console.error(err);
+      toast.success("Website updated");
+    } catch {
+      toast.error("Failed to update website");
     }
   };
 
@@ -146,9 +146,9 @@ function BusinessDetails() {
     try {
       await UpdateBusinessPhoneNumber(businessID, newValue, business);
       setBusiness((prev) => ({ ...prev, phone: newValue }));
-    } catch (err) {
-      alert("Failed to update Phone with embedding. Check console.");
-      console.error(err);
+      toast.success("Phone updated");
+    } catch {
+      toast.error("Failed to update phone");
     }
   };
 
@@ -156,9 +156,9 @@ function BusinessDetails() {
     try {
       await UpdateBusinessOpeningTime(businessID, newValue, business);
       setBusiness((prev) => ({ ...prev, opening_time: newValue }));
-    } catch (err) {
-      alert("Failed to update Opening Time with embedding. Check console.");
-      console.error(err);
+      toast.success("Opening time updated");
+    } catch {
+      toast.error("Failed to update opening time");
     }
   };
 
@@ -166,27 +166,29 @@ function BusinessDetails() {
     try {
       await UpdateBusinessClosingTime(businessID, newValue, business);
       setBusiness((prev) => ({ ...prev, closing_time: newValue }));
-    } catch (err) {
-      alert("Failed to update Closing Time with embedding. Check console.");
-      console.error(err);
+      toast.success("Closing time updated");
+    } catch {
+      toast.error("Failed to update closing time");
     }
   };
+
   const handleBusinessNameUpdate = async (newValue) => {
     try {
       await UpdateBusinessName(businessID, newValue, business);
       setBusiness((prev) => ({ ...prev, name: newValue }));
-    } catch (err) {
-      alert("Failed to update Business Name with embedding. Check console.");
-      console.error(err);
+      toast.success("Business name updated");
+    } catch {
+      toast.error("Failed to update business name");
     }
   };
+
   const handleBusinessTagsUpdate = async (newValue) => {
     try {
       await UpdateBusinessTags(businessID, newValue);
       setBusiness((prev) => ({ ...prev, ownership_tags: newValue }));
-    } catch (err) {
-      alert("Failed to update Business Tags with embedding. Check console.");
-      console.error(err);
+      toast.success("Tags updated");
+    } catch {
+      toast.error("Failed to update tags");
     }
   };
 
@@ -194,9 +196,9 @@ function BusinessDetails() {
     try {
       await UpdateBotName(businessID, newValue);
       setBusiness((prev) => ({ ...prev, bot_name: newValue }));
-    } catch (err) {
-      alert("Failed to update Business Tags with embedding. Check console.");
-      console.error(err);
+      toast.success("Bot name updated");
+    } catch {
+      toast.error("Failed to update bot name");
     }
   };
 
@@ -204,9 +206,9 @@ function BusinessDetails() {
     try {
       await UpdateBotPersonality(businessID, newValue);
       setBusiness((prev) => ({ ...prev, bot_personality: newValue }));
-    } catch (err) {
-      alert("Failed to update Business Tags with embedding. Check console.");
-      console.error(err);
+      toast.success("Bot personality updated");
+    } catch {
+      toast.error("Failed to update bot personality");
     }
   };
 
@@ -214,7 +216,7 @@ function BusinessDetails() {
     const file = e.target.files?.[0];
     if (!file || !business) return;
 
-    setLogoUploading(true); // Start spinner
+    setLogoUploading(true);
 
     const image = new Image();
     const reader = new FileReader();
@@ -231,7 +233,7 @@ function BusinessDetails() {
         canvas.toBlob(
           async (blob) => {
             if (!blob) {
-              alert("Failed to convert image to PNG");
+              toast.error("Failed to convert image to PNG");
               setLogoUploading(false);
               return;
             }
@@ -246,8 +248,7 @@ function BusinessDetails() {
               });
 
             if (uploadError) {
-              console.error("Logo upload failed:", uploadError.message);
-              alert("Failed to upload logo");
+              toast.error("Logo upload failed");
               setLogoUploading(false);
               return;
             }
@@ -261,7 +262,8 @@ function BusinessDetails() {
               logoUrl: urlData.publicUrl,
             }));
 
-            setLogoUploading(false); // End spinner
+            toast.success("Logo uploaded successfully");
+            setLogoUploading(false);
           },
           "image/png",
           1.0
@@ -269,7 +271,7 @@ function BusinessDetails() {
       };
 
       image.onerror = () => {
-        alert("Failed to load image. Please try another file.");
+        toast.error("Failed to load image. Please try another file.");
         setLogoUploading(false);
       };
 
