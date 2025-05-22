@@ -3,7 +3,7 @@ import { supabaseClient } from "../../supabase-utils/SupaBaseClient";
 import SkeletonCard from "../util-components/SkeletonCard";
 import { useNavigate } from "react-router-dom";
 import QRCode from "react-qr-code";
-import { QrCode, Utensils } from "lucide-react";
+import { QrCode, Utensils, Share } from "lucide-react";
 
 function BusinessList() {
   const [businesses, setBusinesses] = useState([]);
@@ -80,6 +80,27 @@ function BusinessList() {
     setFlippedCardId((prev) => (prev === businessId ? null : businessId));
   };
 
+  const handleShare = async (url, businessName) => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${businessName} on MenuGenie`,
+          text: `Check out ${businessName} on MenuGenie!`,
+          url,
+        });
+      } catch (err) {
+        console.error("Share cancelled or failed:", err);
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(url);
+        alert("Link copied to clipboard!");
+      } catch {
+        alert("Unable to share. Please copy the link manually.");
+      }
+    }
+  };
+
   return (
     <div>
       <h2 className="text-xl font-bold mb-4">Your Businesses</h2>
@@ -113,8 +134,7 @@ function BusinessList() {
             return (
               <li
                 key={biz.business_id}
-                onClick={(e) => toggleCardFlip(biz.business_id, e)
-                }
+                onClick={(e) => toggleCardFlip(biz.business_id, e)}
                 style={{
                   top: 0,
                   zIndex: index,
@@ -159,8 +179,13 @@ function BusinessList() {
                       </div>
 
                       {biz.hasMenu ? (
-                        <button onClick={() =>{ navigate(`business/${biz.business_id}`)}} className="mt-2 px-5 py-2 rounded-full text-white font-semibold bg-gradient-to-r from-[var(--button)] to-[var(--button-hover)] shadow hover:shadow-lg transition w-fit">
-                          <Utensils size={18}/>
+                        <button
+                          onClick={() => {
+                            navigate(`business/${biz.business_id}`);
+                          }}
+                          className="mt-2 px-5 py-2 rounded-full text-white font-semibold bg-gradient-to-r from-[var(--button)] to-[var(--button-hover)] shadow hover:shadow-lg transition w-fit"
+                        >
+                          <Utensils size={18} />
                         </button>
                       ) : (
                         <div className="flex flex-row gap-1">
@@ -175,9 +200,14 @@ function BusinessList() {
                           >
                             + Add Menu
                           </button>
-                          <button onClick={() =>{ navigate(`business/${biz.business_id}`)}} className="mt-2 px-5 py-2 rounded-full text-white font-semibold bg-gradient-to-r from-[var(--button)] to-[var(--button-hover)] shadow hover:shadow-lg transition w-fit">
-                          <Utensils size={18}/>
-                        </button>
+                          <button
+                            onClick={() => {
+                              navigate(`business/${biz.business_id}`);
+                            }}
+                            className="mt-2 px-5 py-2 rounded-full text-white font-semibold bg-gradient-to-r from-[var(--button)] to-[var(--button-hover)] shadow hover:shadow-lg transition w-fit"
+                          >
+                            <Utensils size={18} />
+                          </button>
                         </div>
                       )}
                     </div>
@@ -189,9 +219,15 @@ function BusinessList() {
                   >
                     <div className="flex flex-col items-center space-y-4">
                       <QRCode value={qrUrl} size={128} />
-                      <span className="text-sm text-gray-500">
-                        Tap to return
-                      </span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation(); // prevent card from unflipping
+                          handleShare(qrUrl, biz.name);
+                        }}
+                        className="mt-2 px-4 py-1.5 text-sm bg-[var(--button)] hover:bg-[var(--button-hover)] text-white rounded-full shadow"
+                      >
+                        <Share/>
+                      </button>
                     </div>
                   </div>
                 )}
