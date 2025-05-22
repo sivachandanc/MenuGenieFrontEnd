@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import { supabaseClient } from "../../../supabase-utils/SupaBaseClient";
-
+import toast from "react-hot-toast";
 const cafeCategories = [
   "Coffee",
   "Tea",
@@ -10,13 +10,7 @@ const cafeCategories = [
   "Smoothies",
   "Juices",
 ];
-const tagOptions = [
-  "vegan",
-  "gluten-free",
-  "caffeinated",
-  "popular",
-  "seasonal",
-];
+const tagOptions = ["vegan", "gluten-free", "caffeinated", "popular", "seasonal"];
 const dairyOptions = [
   "Oat Milk",
   "Almond Milk",
@@ -133,9 +127,11 @@ function EditMenuItemCafeForm({ item, onClose, onItemUpdated }) {
       if (error) throw error;
       if (contextError) throw contextError;
 
+      toast.success("Menu item updated successfully!");
       onItemUpdated();
     } catch (err) {
       setError(err.message);
+      toast.error(err.message || "Failed to update item");
     } finally {
       setIsSubmitting(false);
     }
