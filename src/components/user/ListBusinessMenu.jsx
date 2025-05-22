@@ -31,6 +31,47 @@ function ListBusinessMenu() {
   const [deleting, setDeleting] = useState(false);
   const [selectedTab, setSelectedTab] = useState("menu");
   const [editingItem, setEditingItem] = useState(null);
+  const [selecteMenuItems, setSelecteMenuItems] = useState([]);
+
+  const [bulkDelete, setBulkDelete] = useState(false);
+
+  const confirmBulkDelete = () => {
+    setBulkDelete(true);
+    setShowDeleteConfirm(true);
+  };
+
+  const handleBulkDelete = async () => {
+    setDeleting(true);
+    try {
+      const menuTable = `menu_item_${businessType}`;
+      let failedCount = 0;
+
+      for (const itemId of selecteMenuItems) {
+        try {
+          await DeleteMenuItem(menuTable, itemId);
+        } catch (err) {
+          console.error(`Failed to delete item ${itemId}:`, err.message);
+          failedCount++;
+        }
+      }
+
+      if (failedCount === 0) {
+        toast.success("All selected items deleted");
+      } else {
+        toast.error(`${failedCount} item(s) failed to delete`);
+      }
+
+      setSelecteMenuItems([]);
+      fetchMenuItems();
+    } catch (err) {
+      console.error("Bulk delete failed:", err.message);
+      toast.error("Bulk deletion failed");
+    } finally {
+      setShowDeleteConfirm(false);
+      setBulkDelete(false);
+      setDeleting(false);
+    }
+  };
 
   const fetchMenuItems = async () => {
     setLoading(true);
@@ -132,6 +173,22 @@ function ListBusinessMenu() {
                 </h2>
               </div>
 
+              {selecteMenuItems.length > 0 && (
+                <div className="bg-blue-50 border border-blue-200 p-2 rounded mb-2 flex justify-between items-center text-sm">
+                  <span>{selecteMenuItems.length} item(s) selected</span>
+                  <button
+                    onClick={confirmBulkDelete}
+                    disabled={deleting}
+                    className={`text-red-600 font-semibold ${
+                      deleting
+                        ? "opacity-50 cursor-not-allowed"
+                        : "hover:underline"
+                    }`}
+                  >
+                    {deleting ? "Deleting..." : "Delete Selected"}
+                  </button>
+                </div>
+              )}
 
               {loading ? (
                 <ul className="space-y-3 animate-pulse">
@@ -156,6 +213,24 @@ function ListBusinessMenu() {
                   <table className="min-w-full border border-gray-200 rounded-md overflow-hidden text-sm">
                     <thead className="bg-gray-100 text-gray-700 font-semibold">
                       <tr>
+                        <th className="px-4 py-2 text-left">
+                          <input
+                            type="checkbox"
+                            checked={
+                              selecteMenuItems.length === menuItems.length &&
+                              menuItems.length > 0
+                            }
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelecteMenuItems(
+                                  menuItems.map((item) => item.item_id)
+                                );
+                              } else {
+                                setSelecteMenuItems([]);
+                              }
+                            }}
+                          />
+                        </th>
                         <th className="px-4 py-2 text-left">Menu Item</th>
                         <th className="px-4 py-2 text-left">Type</th>
                         <th className="px-4 py-2 text-center">Actions</th>
@@ -164,6 +239,24 @@ function ListBusinessMenu() {
                     <tbody className="divide-y divide-gray-100">
                       {menuItems.map((item) => (
                         <tr key={item.item_id} className="hover:bg-gray-50">
+                          <td className="px-4 py-2">
+                            <input
+                              type="checkbox"
+                              checked={selecteMenuItems.includes(item.item_id)}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setSelecteMenuItems((prev) => [
+                                    ...prev,
+                                    item.item_id,
+                                  ]);
+                                } else {
+                                  setSelecteMenuItems((prev) =>
+                                    prev.filter((id) => id !== item.item_id)
+                                  );
+                                }
+                              }}
+                            />
+                          </td>
                           <td className="px-4 py-2">
                             <div className="font-medium text-gray-900">
                               {item.name}
@@ -260,26 +353,31 @@ function ListBusinessMenu() {
         />
       )}
 
-      {showDeleteConfirm && itemToDelete && (
+      {showDeleteConfirm && (
         <div className="fixed inset-0 bg-opacity-30 backdrop-blur-sm z-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
             <h2 className="text-lg font-semibold text-gray-800 mb-3">
               Confirm Deletion
             </h2>
             <p className="text-sm text-gray-600 mb-4">
-              Are you sure you want to delete{" "}
-              <strong>{itemToDelete.name}</strong>?
+              {bulkDelete
+                ? `Are you sure you want to delete ${selecteMenuItems.length} item(s)?`
+                : `Are you sure you want to delete "${itemToDelete?.name}"?`}
             </p>
             <div className="flex justify-end space-x-3">
               <button
-                onClick={() => setShowDeleteConfirm(false)}
+                onClick={() => {
+                  setShowDeleteConfirm(false);
+                  setBulkDelete(false);
+                  setItemToDelete(null);
+                }}
                 className="px-4 py-1 text-sm text-gray-700 hover:underline"
                 disabled={deleting}
               >
                 Cancel
               </button>
               <button
-                onClick={handleDeleteItem}
+                onClick={bulkDelete ? handleBulkDelete : handleDeleteItem}
                 disabled={deleting}
                 className="px-4 py-1 text-sm text-white bg-red-600 hover:bg-red-700 rounded flex items-center gap-2"
               >
@@ -296,7 +394,7 @@ function ListBusinessMenu() {
                       r="10"
                       stroke="currentColor"
                       strokeWidth="4"
-                    ></circle>
+                    />
                     <path
                       className="opacity-75"
                       fill="currentColor"
