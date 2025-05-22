@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { XCircle, CheckCircle, AlertTriangle, Loader2 } from "lucide-react";
 import { supabaseClient } from "../../../supabase-utils/SupaBaseClient";
 import { insertMenuItem } from "../../../supabase-utils/InsertMenuService";
+import toast from "react-hot-toast";
 
 function ImageUploader({
   imageUploaderTitle,
@@ -12,8 +13,6 @@ function ImageUploader({
   const [uploads, setUploads] = useState([]);
   const [generating, setGenerating] = useState(false);
   const [extractionDone, setExtractionDone] = useState(false);
-  const [itemsAddedCount, setItemsAddedCount] = useState(null);
-  const [dbStatus, setDbStatus] = useState("");
   const fileInputRef = useRef(null);
   const MAX_SIZE_MB = 5;
 
@@ -45,20 +44,19 @@ function ImageUploader({
   const generateMenuByAI = async () => {
     setGenerating(true);
     setExtractionDone(false);
-    setItemsAddedCount(null);
-    setDbStatus("");
-
+  
     const { data: sessionData, error: sessionError } =
       await supabaseClient.auth.getSession();
-
+  
     if (sessionError || !sessionData?.session?.user?.id) {
-      console.error("User not authenticated");
+      toast.error("User not authenticated");
+      setGenerating(false);
       return;
     }
-
+  
     const userId = sessionData.session.user.id;
     let totalItemsAdded = 0;
-
+  
     for (const upload of uploads) {
       const fileToBase64 = (file) =>
         new Promise((resolve, reject) => {
@@ -67,54 +65,71 @@ function ImageUploader({
           reader.onerror = reject;
           reader.readAsDataURL(file);
         });
-
+  
       const base64 = await fileToBase64(upload.file);
       const edgeFunction = `gemini-${businessType}-menu-generation`;
-
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/${edgeFunction}`,
-        {
-          method: "POST",
-          mode: "cors",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${
-              (
-                await supabaseClient.auth.getSession()
-              ).data?.session?.access_token
-            }`,
-          },
-          body: JSON.stringify({
-            base64,
-            mimeType: upload.file.type,
-          }),
+  
+      const edgeToastId = toast.loading(`Extracting menu from ${upload.name}...`);
+  
+      let result;
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/${edgeFunction}`,
+          {
+            method: "POST",
+            mode: "cors",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${
+                (
+                  await supabaseClient.auth.getSession()
+                ).data?.session?.access_token
+              }`,
+            },
+            body: JSON.stringify({
+              base64,
+              mimeType: upload.file.type,
+            }),
+          }
+        );
+  
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(errorText);
         }
-      );
-
-      const result = await response.json();
-      setExtractionDone(true);
-
+  
+        result = await response.json();
+        toast.success(`Menu extracted from ${upload.name}`, { id: edgeToastId });
+        setExtractionDone(true);
+      } catch (err) {
+        toast.error(`❌ Failed to extract menu from ${upload.name}`, { id: edgeToastId });
+        console.error(err);
+        continue; // skip to next upload
+      }
+  
       for (const call of result) {
         try {
-          await insertMenuItem(
-            call.arguments,
-            userId,
-            businessID,
-            businessType
-          );
+          await insertMenuItem(call.arguments, userId, businessID, businessType);
           totalItemsAdded++;
+          toast.success(`Inserted item: ${call.arguments.name || "Unnamed"}`);
         } catch (err) {
           console.error("Insert failed:", err.message);
-          setDbStatus("❌ Some inserts failed");
+          toast.error(`❌ Failed to insert: ${call.arguments.name || "Unnamed"}`);
         }
       }
     }
-
-    setItemsAddedCount(totalItemsAdded);
-    setDbStatus("✅ Items successfully added to DB");
+  
+    if (totalItemsAdded > 0) {
+      toast.success(`🎉 Successfully added ${totalItemsAdded} item(s) to the menu`);
+    } else {
+      toast.error("No items were added to the menu.");
+    }
+  
     setGenerating(false);
     if (onItemAdded) onItemAdded();
   };
+  
+  
   return (
     <div className="w-full h-full flex justify-center items-center">
       <div className="w-full max-w-lg p-6 bg-white  rounded-xl ">
@@ -220,17 +235,6 @@ function ImageUploader({
               </div>
             )}
 
-            {itemsAddedCount !== null && (
-              <div className="text-sm text-blue-600 font-medium">
-                {itemsAddedCount} item(s) added to menu.
-              </div>
-            )}
-
-            {dbStatus && (
-              <div className="text-sm text-green-600 font-medium">
-                {dbStatus}
-              </div>
-            )}
           </div>
         )}
       </div>

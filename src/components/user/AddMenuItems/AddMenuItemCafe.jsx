@@ -59,37 +59,99 @@ function AddMenuItemCafeForm({ businessID, onClose, onItemAdded }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const {
-      data: { session },
-      error: sessionError,
-    } = await supabaseClient.auth.getSession();
-
-    if (sessionError || !session?.user?.id) {
-      console.error("User not authenticated");
-      return;
+  
+    try {
+      // Step 1: Get session
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabaseClient.auth.getSession();
+  
+      if (sessionError || !session?.user?.id) {
+        console.error("User not authenticated", sessionError);
+        return;
+      }
+  
+      const userId = session.user.id;
+  
+      // Step 2: Construct menu payload
+      const payload = {
+        user_id: userId,
+        business_id: businessID,
+        name: form.name,
+        category: form.category,
+        description: form.description,
+        size_options: form.size_price_pairs,
+        dairy_options: form.dairy_options,
+        tags: form.tags,
+        form_options: form.form_options,
+        available: form.available,
+      };
+  
+      // Step 3: Generate context
+      const context = [
+        `name: ${form.name}`,
+        `category: ${form.category}`,
+        `description: ${form.description}`,
+        `size_options: ${JSON.stringify(form.size_price_pairs)}`,
+        `dairy_options: ${JSON.stringify(form.dairy_options)}`,
+        `tags: ${JSON.stringify(form.tags)}`,
+        `form_options: ${JSON.stringify(form.form_options)}`,
+        `available: ${form.available}`,
+      ].join("\n");
+  
+      // Step 4: Call embedding API
+      const embeddingRes = await fetch(`${import.meta.env.VITE_EMBEDDING_BACKEND_URL}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify([{ context }]),
+      });
+  
+      if (!embeddingRes.ok) {
+        const errorText = await embeddingRes.text();
+        throw new Error(`Embedding API failed: ${errorText}`);
+      }
+  
+      const { embeddings } = await embeddingRes.json();
+      if (!Array.isArray(embeddings) || !embeddings.length) {
+        throw new Error("Invalid or empty embeddings returned.");
+      }
+  
+      // Step 5: Insert menu item
+      const { data: inserted, error: insertError } = await supabaseClient
+        .from("menu_item_cafe")
+        .insert([payload])
+        .select()
+        .single();
+  
+      if (insertError) throw new Error(`Failed to insert menu item: ${insertError.message}`);
+  
+      // Step 6: Insert context + embedding
+      const contextPayload = {
+        user_id: userId,
+        business_id: businessID,
+        item_id: inserted.id, // or inserted.item_id depending on your schema
+        context,
+        type: "menu_item",
+        embedding: embeddings[0],
+      };
+  
+      const { error: contextError } = await supabaseClient
+        .from("menu_context")
+        .insert([contextPayload]);
+  
+      if (contextError) {
+        throw new Error(`Failed to insert into menu_context: ${contextError.message}`);
+      }
+  
+      // Step 7: UI update
+      onItemAdded?.();
+      onClose?.();
+    } catch (err) {
+      console.error("Error in handleSubmit:", err);
     }
-
-    const userId = session.user.id;
-
-    const payload = {
-      user_id: userId,
-      business_id: businessID,
-      name: form.name,
-      category: form.category,
-      description: form.description,
-      size_options: form.size_price_pairs,
-      dairy_options: form.dairy_options,
-      tags: form.tags,
-      form_options: form.form_options,
-      available: form.available,
-    };
-
-    const { error } = await supabaseClient.from("menu_item_cafe").insert([payload]);
-    if (error) return console.error("Failed to add item:", error.message);
-
-    if (onItemAdded) onItemAdded();
-    if (onClose) onClose();
   };
+  
 
   const labelStyle =
     "text-sm font-semibold text-white bg-[var(--label)] px-3 py-1 rounded mb-2 inline-block";
