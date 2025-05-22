@@ -150,8 +150,8 @@ function ListBusinessMenu() {
                     ))}
                 </ul>
               ) : menuItems.length === 0 ? (
-                <div className="text-sm text-yellow-700 bg-yellow-50 border border-yellow-200 px-3 py-2 rounded-md">
-                  <div className="flex items-center gap-2 mb-1">
+                <div className="text-sm text-yellow-700 bg-yellow-50 border border-yellow-200 px-3 py-2 rounded-md p-2">
+                  <div className="flex justify-center gap-2 mb-1">
                     <AlertTriangle className="w-4 h-4 text-yellow-500" />
                     <span>No menu items found.</span>
                   </div>
