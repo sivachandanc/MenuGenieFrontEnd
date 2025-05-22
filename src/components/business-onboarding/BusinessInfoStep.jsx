@@ -72,10 +72,10 @@ function BusinessInfoStep({ data, onUpdate, onNext }) {
             required
           >
             <option value="">Select type</option>
-            <option value="restaurant">Restaurant</option>
+            {/* <option value="restaurant">Restaurant</option> */}
             <option value="cafe">Café</option>
-            <option value="food_truck">Food Truck</option>
-            <option value="bakery">Bakery</option>
+            {/* <option value="food_truck">Food Truck</option> */}
+            {/* <option value="bakery">Bakery</option> */}
           </select>
         </div>
 
