@@ -218,7 +218,11 @@ function BusinessList() {
                     className="flex items-center justify-center h-full p-6 bg-white cursor-pointer"
                   >
                     <div className="flex flex-col items-center space-y-4">
-                      <QRCode value={qrUrl} size={128} />
+                      <div className="p-[2px] rounded-2xl bg-gradient-to-r from-[var(--button)] to-[var(--button-hover)]">
+                        <div className="bg-white rounded-xl p-2">
+                          <QRCode value={qrUrl} size={128} />
+                        </div>
+                      </div>
                       <button
                         onClick={(e) => {
                           e.stopPropagation(); // prevent card from unflipping
@@ -226,7 +230,7 @@ function BusinessList() {
                         }}
                         className="mt-2 px-4 py-1.5 text-sm bg-[var(--button)] hover:bg-[var(--button-hover)] text-white rounded-full shadow"
                       >
-                        <Share/>
+                        <Share />
                       </button>
                     </div>
                   </div>
