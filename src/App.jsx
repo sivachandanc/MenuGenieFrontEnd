@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"; // ✅ import Navigate
 import { useAuth } from "./context/AuthContext";
 import NavBar from "./components/navbar/navbar.jsx";
 import HeroSection from "./components/hero-section/HeroSection.jsx";
@@ -10,7 +10,8 @@ import BusinessList from "./components/user/BusinessList.jsx";
 import OnBoardingWizard from "./components/business-onboarding/OnBoardingWizard.jsx";
 import BusinessDetails from "./components/user/BusinessDetails.jsx";
 import ListBusinessMenu from "./components/user/ListBusinessMenu.jsx";
-import { Toaster } from 'react-hot-toast';
+import NotFoundPage from "./components/user-chat/NotFoundPage.jsx";
+import { Toaster } from "react-hot-toast";
 import PublicRoute from "./routes/PublicRoute";
 import PrivateRoute from "./routes/PrivateRoute";
 
@@ -22,7 +23,7 @@ function App() {
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-[var(--background)]">
-      <Toaster position="top-center" />
+        <Toaster position="top-center" />
         {!chatMode && !user && <NavBar />}
         <Routes>
           {/* Public Routes */}
@@ -63,14 +64,21 @@ function App() {
             <Route index element={<BusinessList />} />
             <Route path="onboarding" element={<OnBoardingWizard />} />
             <Route path="business/:businessID" element={<BusinessDetails />} />
-            <Route path="business/:businessID/menu" element={<ListBusinessMenu />} />
+            <Route
+              path="business/:businessID/menu"
+              element={<ListBusinessMenu />}
+            />
           </Route>
 
-          {/* Chat route can be public or private depending on use case */}
+          {/* Chat route */}
           <Route
             path="/chat-with-menu/:businessID"
             element={<ChatWindow setChatMode={setChatMode} />}
           />
+
+          {/* 404 handling */}
+          <Route path="/404" element={<NotFoundPage />} />
+          <Route path="*" element={<Navigate to="/404" replace />} />
         </Routes>
       </div>
     </BrowserRouter>

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import SendIcon from "../../assets/send.svg";
 import ReactMarkdown from "react-markdown";
 import { supabaseClient } from "../../supabase-utils/SupaBaseClient";
@@ -7,6 +7,7 @@ import { supabaseClient } from "../../supabase-utils/SupaBaseClient";
 function ChatWindow({ setChatMode }) {
   setChatMode(true);
   const { businessID } = useParams();
+  const navigate = useNavigate();
   const [messages, setMessages] = useState([]);
   const [botTyping, setBotTyping] = useState(false);
   const inputRef = useRef(null);
@@ -40,32 +41,33 @@ function ChatWindow({ setChatMode }) {
         .eq("business_id", businessID)
         .single();
 
-      if (!error && data) {
-        const filePath = `business_logo/${businessID}.png`;
-
-        const {
-          data: { publicUrl },
-        } = supabaseClient.storage.from("business").getPublicUrl(filePath);
-
-        const res = await fetch(publicUrl, { method: "HEAD" });
-        const finalUrl = res.ok
-          ? publicUrl
-          : supabaseClient.storage
-              .from("business")
-              .getPublicUrl("menu_genie_logo_default.png").data.publicUrl;
-
-        setBusinessInfo({
-          name: data.name,
-          bot_name: data.bot_name,
-          logoUrl: finalUrl,
-        });
-      } else {
-        console.error("Failed to fetch business info:", error);
+      if (error || !data) {
+        console.error("Business not found:", error);
+        navigate("/404", { replace: true });
+        return;
       }
+
+      const filePath = `business_logo/${businessID}.png`;
+      const {
+        data: { publicUrl },
+      } = supabaseClient.storage.from("business").getPublicUrl(filePath);
+
+      const res = await fetch(publicUrl, { method: "HEAD" });
+      const finalUrl = res.ok
+        ? publicUrl
+        : supabaseClient.storage
+            .from("business")
+            .getPublicUrl("menu_genie_logo_default.png").data.publicUrl;
+
+      setBusinessInfo({
+        name: data.name,
+        bot_name: data.bot_name,
+        logoUrl: finalUrl,
+      });
     };
 
     fetchBusinessInfo();
-  }, [businessID]);
+  }, [businessID, navigate]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
