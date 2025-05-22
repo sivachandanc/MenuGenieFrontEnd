@@ -10,7 +10,7 @@ import BusinessList from "./components/user/BusinessList.jsx";
 import OnBoardingWizard from "./components/business-onboarding/OnBoardingWizard.jsx";
 import BusinessDetails from "./components/user/BusinessDetails.jsx";
 import ListBusinessMenu from "./components/user/ListBusinessMenu.jsx";
-
+import { Toaster } from 'react-hot-toast';
 import PublicRoute from "./routes/PublicRoute";
 import PrivateRoute from "./routes/PrivateRoute";
 
@@ -22,6 +22,7 @@ function App() {
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-[var(--background)]">
+      <Toaster position="top-center" />
         {!chatMode && !user && <NavBar />}
         <Routes>
           {/* Public Routes */}

@@ -4,6 +4,8 @@ import ContactHoursStep from "./ContactHoursStep";
 import EnhancementsStep from "./EnhancementsStep";
 import BotCustomizationStep from "./BotCustomizationStep";
 import ReviewSubmitStep from "./ReviewSubmitStep";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 import { insertBusinessAndEmbed } from "../../supabase-utils/InsertBusinessAndEmbed";
 
 const steps = [
@@ -15,6 +17,7 @@ const steps = [
 ];
 
 function OnBoardingWizard() {
+  const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [formData, setFormData] = useState({});
   const [error, setError] = useState("");
@@ -28,26 +31,57 @@ function OnBoardingWizard() {
   };
 
   const handleFinish = async () => {
-    console.log("Final submission:", formData);
-
     try {
       setError("");
-      const { business, inserted_contexts } = await insertBusinessAndEmbed(formData);
+
+      const { business, inserted_contexts } = await toast.promise(
+        insertBusinessAndEmbed(formData),
+        {
+          loading: "Submitting your business...",
+          success: "Business successfully onboarded!",
+          error: (err) =>
+            err.message || "Something went wrong. Please try again.",
+        }
+      );
+
       console.log("Business inserted:", business);
       console.log("Context embeddings stored:", inserted_contexts);
-      window.location.href = "/dashboard";
+
+      // Let toast show for 1 sec, then navigate
+      setTimeout(() => {
+        navigate("/dashboard", { replace: true }); // replace prevents back to review step
+      }, 1000);
     } catch (err) {
-      console.error("Submission error:", err);
       setError(err.message || "Something went wrong. Please try again.");
     }
   };
-
   const StepComponent = [
     <BusinessInfoStep data={formData} onNext={next} onUpdate={updateData} />,
-    <ContactHoursStep data={formData} onNext={next} onBack={back} onUpdate={updateData} />,
-    <EnhancementsStep data={formData} onNext={next} onBack={back} onUpdate={updateData} />,
-    <BotCustomizationStep data={formData} onNext={next} onBack={back} onUpdate={updateData} />,
-    <ReviewSubmitStep data={formData} onBack={back} onEdit={goToStep} onFinish={handleFinish} error={error} />,
+    <ContactHoursStep
+      data={formData}
+      onNext={next}
+      onBack={back}
+      onUpdate={updateData}
+    />,
+    <EnhancementsStep
+      data={formData}
+      onNext={next}
+      onBack={back}
+      onUpdate={updateData}
+    />,
+    <BotCustomizationStep
+      data={formData}
+      onNext={next}
+      onBack={back}
+      onUpdate={updateData}
+    />,
+    <ReviewSubmitStep
+      data={formData}
+      onBack={back}
+      onEdit={goToStep}
+      onFinish={handleFinish}
+      error={error}
+    />,
   ][step];
 
   return (

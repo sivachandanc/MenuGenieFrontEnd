@@ -10,6 +10,7 @@ import {
   Pencil,
   Trash,
 } from "lucide-react";
+import toast from "react-hot-toast";
 
 import { supabaseClient } from "../../supabase-utils/SupaBaseClient";
 import { DeleteMenuItem } from "../../supabase-utils/delete-menu-item/DeleteMenuItem.jsx";
@@ -25,7 +26,6 @@ function ListBusinessMenu() {
   const [loading, setLoading] = useState(true);
   const [businessName, setBusinessName] = useState("");
   const [businessType, setBusinessType] = useState("");
-  const [showSuccess, setShowSuccess] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
@@ -72,9 +72,10 @@ function ListBusinessMenu() {
       setShowDeleteConfirm(false);
       setItemToDelete(null);
       fetchMenuItems();
+      toast.success("Menu item deleted");
     } catch (error) {
       console.error("Delete failed:", error.message);
-      alert(`Failed to delete item: ${error.message}`);
+      toast.error("Failed to delete item: " + error.message);
     } finally {
       setDeleting(false);
     }
@@ -131,12 +132,6 @@ function ListBusinessMenu() {
                 </h2>
               </div>
 
-              {showSuccess && (
-                <div className="flex items-center gap-2 text-green-600 text-sm mb-3 bg-green-50 border border-green-200 px-3 py-2 rounded-md animate-pulse">
-                  <CheckCircle className="w-4 h-4" /> Menu item added
-                  successfully!
-                </div>
-              )}
 
               {loading ? (
                 <ul className="space-y-3 animate-pulse">
@@ -236,9 +231,8 @@ function ListBusinessMenu() {
               businessID={businessID}
               onClose={() => {}}
               onItemAdded={() => {
-                setShowSuccess(true);
+                toast.success("Item added successfully!");
                 fetchMenuItems();
-                setTimeout(() => setShowSuccess(false), 2000);
                 setSelectedTab("menu");
               }}
             />
