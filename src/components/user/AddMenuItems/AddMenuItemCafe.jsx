@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { supabaseClient } from "../../../supabase-utils/SupaBaseClient";
 import { X } from "lucide-react";
+import toast from "react-hot-toast";
 
 const cafeCategories = [
   "Coffee",
@@ -59,22 +60,21 @@ function AddMenuItemCafeForm({ businessID, onClose, onItemAdded }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const loadingToastId = toast.loading("🔄 Generating item embedding...");
   
     try {
-      // Step 1: Get session
       const {
         data: { session },
         error: sessionError,
       } = await supabaseClient.auth.getSession();
   
       if (sessionError || !session?.user?.id) {
-        console.error("User not authenticated", sessionError);
+        toast.error("❌ User not authenticated", { id: loadingToastId });
         return;
       }
   
       const userId = session.user.id;
   
-      // Step 2: Construct menu payload
       const payload = {
         user_id: userId,
         business_id: businessID,
@@ -88,7 +88,6 @@ function AddMenuItemCafeForm({ businessID, onClose, onItemAdded }) {
         available: form.available,
       };
   
-      // Step 3: Generate context
       const context = [
         `name: ${form.name}`,
         `category: ${form.category}`,
@@ -100,7 +99,6 @@ function AddMenuItemCafeForm({ businessID, onClose, onItemAdded }) {
         `available: ${form.available}`,
       ].join("\n");
   
-      // Step 4: Call embedding API
       const embeddingRes = await fetch(`${import.meta.env.VITE_EMBEDDING_BACKEND_URL}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -117,7 +115,6 @@ function AddMenuItemCafeForm({ businessID, onClose, onItemAdded }) {
         throw new Error("Invalid or empty embeddings returned.");
       }
   
-      // Step 5: Insert menu item
       const { data: inserted, error: insertError } = await supabaseClient
         .from("menu_item_cafe")
         .insert([payload])
@@ -126,11 +123,10 @@ function AddMenuItemCafeForm({ businessID, onClose, onItemAdded }) {
   
       if (insertError) throw new Error(`Failed to insert menu item: ${insertError.message}`);
   
-      // Step 6: Insert context + embedding
       const contextPayload = {
         user_id: userId,
         business_id: businessID,
-        item_id: inserted.id, // or inserted.item_id depending on your schema
+        item_id: inserted.item_id,
         context,
         type: "menu_item",
         embedding: embeddings[0],
@@ -144,13 +140,16 @@ function AddMenuItemCafeForm({ businessID, onClose, onItemAdded }) {
         throw new Error(`Failed to insert into menu_context: ${contextError.message}`);
       }
   
-      // Step 7: UI update
+      toast.success(`"${form.name}" added to menu`, { id: loadingToastId });
       onItemAdded?.();
       onClose?.();
     } catch (err) {
       console.error("Error in handleSubmit:", err);
+      toast.error(`❌ ${err.message || "Something went wrong"}`, { id: loadingToastId });
     }
   };
+  
+  
   
 
   const labelStyle =
