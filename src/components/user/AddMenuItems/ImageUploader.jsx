@@ -117,7 +117,7 @@ function ImageUploader({
   };
   return (
     <div className="w-full h-full flex justify-center items-center">
-      <div className="w-full max-w-lg p-6 bg-white border border-gray-200 rounded-xl shadow-md">
+      <div className="w-full max-w-lg p-6 bg-white  rounded-xl ">
         <h3 className="text-xl font-semibold text-gray-800 mb-2">
           {imageUploaderTitle || "Upload Menu Image"}
         </h3>
