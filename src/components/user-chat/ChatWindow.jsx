@@ -13,6 +13,7 @@ function ChatWindow({ setChatMode }) {
   const inputRef = useRef(null);
   const messagesEndRef = useRef(null);
   const sessionUUIDRef = useRef(null);
+  const wsRef = useRef(null);
 
   const [businessInfo, setBusinessInfo] = useState({
     name: "",
@@ -69,42 +70,65 @@ function ChatWindow({ setChatMode }) {
     fetchBusinessInfo();
   }, [businessID, navigate]);
 
+  // WebSocket connection setup
+  useEffect(() => {
+    if (!businessID || !sessionUUIDRef.current) return;
+
+    const socket = new WebSocket(
+      `${
+        import.meta.env.VITE_USER_CHAT_BACKEND_WS
+      }/chat/${businessID}?session=${sessionUUIDRef.current}`
+    );
+
+    wsRef.current = socket;
+
+    socket.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.text) {
+          setMessages((prev) => [
+            ...prev,
+            { text: data.text, sender: "bot", time: new Date() },
+          ]);
+        }
+      } catch (err) {
+        console.error("WebSocket message parse error:", err);
+      } finally {
+        setBotTyping(false);
+      }
+    };
+
+    socket.onerror = (err) => {
+      console.error("WebSocket error:", err);
+    };
+
+    socket.onclose = () => {
+      console.log("WebSocket closed");
+    };
+
+    return () => socket.close();
+  }, [businessID]);
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, botTyping]);
 
-  const sendMessage = async () => {
+  const sendMessage = () => {
     const text = inputRef.current?.value?.trim();
-    if (!text || !businessID) return;
+    if (
+      !text ||
+      !businessID ||
+      !wsRef.current ||
+      wsRef.current.readyState !== WebSocket.OPEN
+    )
+      return;
 
     const userMessage = { text, sender: "user", time: new Date() };
     setMessages((prev) => [...prev, userMessage]);
     inputRef.current.value = "";
     setBotTyping(true);
 
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_USER_CHAT_BACKEND}/chat/${businessID}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Session-ID": sessionUUIDRef.current,
-          },
-          body: JSON.stringify({ text }),
-        }
-      );
-
-      const botReply = await res.json();
-      setMessages((prev) => [
-        ...prev,
-        { ...botReply, sender: "bot", time: new Date() },
-      ]);
-    } catch (err) {
-      console.error("Failed to get bot response:", err);
-    } finally {
-      setBotTyping(false);
-    }
+    wsRef.current.send(JSON.stringify({ text }));
   };
 
   return (
