@@ -14,6 +14,7 @@ import NotFoundPage from "./components/user-chat/NotFoundPage.jsx";
 import { Toaster } from "react-hot-toast";
 import PublicRoute from "./routes/PublicRoute";
 import PrivateRoute from "./routes/PrivateRoute";
+import UploadMenuCopy from "./components/user/AddMenuCopy/UploadMenuCopy.jsx";
 
 import { useState } from "react";
 
@@ -67,6 +68,10 @@ function App() {
             <Route
               path="business/:businessID/menu"
               element={<ListBusinessMenu />}
+            />
+            <Route
+              path="business/:businessID/menu-upload"
+              element={<UploadMenuCopy />}
             />
           </Route>
 

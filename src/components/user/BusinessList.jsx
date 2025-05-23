@@ -120,7 +120,7 @@ function BusinessList() {
           </p>
           <button
             onClick={() => navigate("/dashboard/onboarding")}
-            className="px-5 py-2 rounded-full bg-[var(--button)] text-black font-semibold hover:bg-[var(--button-hover)] transition"
+            className="px-5 py-2 rounded-full  text-black font-semibold bg-[var(--button)] hover:bg-[var(--button-hover)] transition"
           >
             Add Business
           </button>
