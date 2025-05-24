@@ -92,10 +92,9 @@ function UploadMenuCopy() {
     setDeleting(null);
   };
 
+  // Cache-busting public URL generator
   const publicUrl = (filename) =>
-    `${
-      import.meta.env.VITE_SUPABASE_URL
-    }/storage/v1/object/public/business/business_menu/${businessID}/${filename}`;
+    `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/business/business_menu/${businessID}/${filename}?t=${Date.now()}`;
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">

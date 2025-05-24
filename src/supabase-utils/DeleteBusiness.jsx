@@ -41,13 +41,41 @@ export async function DeleteBusiness(businessId, businessType) {
     }
 
     // Step 3: Delete associated image from Supabase storage
-    const { error: storageError } = await supabaseClient
-      .storage
+    const { error: storageError } = await supabaseClient.storage
       .from("business")
       .remove([`business_logo/${businessId}.png`]);
 
     if (storageError) {
-      throw new Error(`Failed to delete business image: ${storageError.message}`);
+      throw new Error(
+        `Failed to delete business image: ${storageError.message}`
+      );
+    }
+
+    // Deleteing the Business Menu Images
+    const { data: files, error: listError } = await supabaseClient.storage
+      .from("business")
+      .list(`business_menu/${businessId}/`);
+
+    if (listError) {
+      throw new Error(
+        `Failed to list business menu images: ${listError.message}`
+      );
+    }
+
+    if (files && files.length > 0) {
+      const pathsToDelete = files.map(
+        (file) => `business_menu/${businessId}/${file.name}`
+      );
+
+      const { error: deleteFilesError } = await supabaseClient.storage
+        .from("business")
+        .remove(pathsToDelete);
+
+      if (deleteFilesError) {
+        throw new Error(
+          `Failed to delete business menu files: ${deleteFilesError.message}`
+        );
+      }
     }
   } catch (err) {
     console.error("DeleteBusiness error:", err.message);
