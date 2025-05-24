@@ -21,6 +21,11 @@ function ChatWindow({ setChatMode }) {
     logoUrl: "",
   });
 
+  const [menuImages, setMenuImages] = useState([]);
+  const [showMenuModal, setShowMenuModal] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [imageLoading, setImageLoading] = useState(true);
+
   useEffect(() => {
     const existingUUID = localStorage.getItem("sessionUUID");
     if (existingUUID) {
@@ -38,7 +43,7 @@ function ChatWindow({ setChatMode }) {
 
       const { data, error } = await supabaseClient
         .from("business_chat_info")
-        .select("name, bot_name, user_id")
+        .select("name, bot_name")
         .eq("business_id", businessID)
         .single();
 
@@ -48,14 +53,14 @@ function ChatWindow({ setChatMode }) {
         return;
       }
 
-      const filePath = `business_logo/${businessID}.png`;
+      const logoPath = `business_logo/${businessID}.png`;
       const {
-        data: { publicUrl },
-      } = supabaseClient.storage.from("business").getPublicUrl(filePath);
+        data: { publicUrl: logoUrl },
+      } = supabaseClient.storage.from("business").getPublicUrl(logoPath);
 
-      const res = await fetch(publicUrl, { method: "HEAD" });
-      const finalUrl = res.ok
-        ? publicUrl
+      const logoExists = await fetch(logoUrl, { method: "HEAD" });
+      const finalLogoUrl = logoExists.ok
+        ? logoUrl
         : supabaseClient.storage
             .from("business")
             .getPublicUrl("menu_genie_logo_default.png").data.publicUrl;
@@ -63,14 +68,36 @@ function ChatWindow({ setChatMode }) {
       setBusinessInfo({
         name: data.name,
         bot_name: data.bot_name,
-        logoUrl: finalUrl,
+        logoUrl: finalLogoUrl,
       });
     };
 
+    const fetchMenuImages = async () => {
+      const { data, error } = await supabaseClient.storage
+        .from("business")
+        .list(`business_menu/${businessID}/`);
+
+      if (error) return;
+
+      const images = data
+        .filter((f) => f.name.startsWith("menu_"))
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map(
+          (file) =>
+            `${
+              import.meta.env.VITE_SUPABASE_URL
+            }/storage/v1/object/public/business/business_menu/${businessID}/${
+              file.name
+            }`
+        );
+
+      setMenuImages(images);
+    };
+
     fetchBusinessInfo();
+    fetchMenuImages();
   }, [businessID, navigate]);
 
-  // WebSocket connection setup
   useEffect(() => {
     if (!businessID || !sessionUUIDRef.current) return;
 
@@ -98,13 +125,8 @@ function ChatWindow({ setChatMode }) {
       }
     };
 
-    socket.onerror = (err) => {
-      console.error("WebSocket error:", err);
-    };
-
-    socket.onclose = () => {
-      console.log("WebSocket closed");
-    };
+    socket.onerror = (err) => console.error("WebSocket error:", err);
+    socket.onclose = () => console.log("WebSocket closed");
 
     return () => socket.close();
   }, [businessID]);
@@ -123,38 +145,51 @@ function ChatWindow({ setChatMode }) {
     )
       return;
 
-    const userMessage = { text, sender: "user", time: new Date() };
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages((prev) => [
+      ...prev,
+      { text, sender: "user", time: new Date() },
+    ]);
     inputRef.current.value = "";
     setBotTyping(true);
-
     wsRef.current.send(JSON.stringify({ text }));
   };
 
   return (
     <div className="fixed inset-0 flex flex-col bg-[#f0f0f0] max-w-xl mx-auto">
       {/* Top Banner */}
-      <div className="bg-[#075E54] text-white px-4 py-3 flex items-center shadow-md sticky top-0 z-10 gap-3">
-        {businessInfo.logoUrl && (
-          <img
-            src={businessInfo.logoUrl}
-            alt="Business Logo"
-            className="w-8 h-8 rounded-full border border-white object-cover"
-          />
-        )}
-        <div className="flex flex-col">
-          <span className="text-base font-semibold">
-            {businessInfo.bot_name} from {businessInfo.name}
-          </span>
-          {botTyping && (
-            <span className="text-xs text-green-200 animate-pulse">
-              typing...
-            </span>
+      <div className="bg-[#075E54] text-white px-4 py-3 flex items-center justify-between shadow-md sticky top-0 z-10">
+        <div className="flex items-center gap-3">
+          {businessInfo.logoUrl && (
+            <img
+              src={businessInfo.logoUrl}
+              alt="Business Logo"
+              className="w-8 h-8 rounded-full border object-cover"
+            />
           )}
+          <div className="flex flex-col">
+            <span className="text-base font-semibold">
+              {businessInfo.bot_name} from {businessInfo.name}
+            </span>
+            {botTyping && (
+              <span className="text-xs text-green-200 animate-pulse">
+                typing...
+              </span>
+            )}
+          </div>
         </div>
+        <button
+          onClick={() => {
+            setShowMenuModal(true);
+            setActiveIndex(0);
+            setImageLoading(true);
+          }}
+          className="text-sm bg-white text-[#075E54] px-3 py-1 rounded-full font-medium hover:bg-gray-100 transition"
+        >
+          View Menu
+        </button>
       </div>
 
-      {/* Messages Area */}
+      {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
         {messages.length === 0 && !botTyping && (
           <div className="text-center text-gray-500 mt-8">
@@ -162,7 +197,6 @@ function ChatWindow({ setChatMode }) {
             <span className="font-medium">{businessInfo.bot_name}</span>
           </div>
         )}
-
         {messages.map((msg, index) => (
           <div
             key={index}
@@ -189,7 +223,6 @@ function ChatWindow({ setChatMode }) {
             </div>
           </div>
         ))}
-
         {botTyping && (
           <div className="flex gap-1 ml-1 mt-1">
             <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:0s]" />
@@ -197,11 +230,10 @@ function ChatWindow({ setChatMode }) {
             <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:0.4s]" />
           </div>
         )}
-
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Area */}
+      {/* Input */}
       <div className="bg-white px-3 py-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] flex items-center gap-2 border-t">
         <input
           ref={inputRef}
@@ -220,6 +252,74 @@ function ChatWindow({ setChatMode }) {
           <img src={SendIcon} alt="Send" className="w-5 h-5" />
         </button>
       </div>
+
+      {/* Menu Modal */}
+      {showMenuModal && (
+        <div className="fixed inset-0 bg-opacity-30 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="relative w-full h-full flex flex-col items-center justify-center">
+            {/* Pills */}
+            <div className="absolute top-4 flex gap-2 z-20">
+              {menuImages.map((_, i) => (
+                <span
+                  key={i}
+                  className={`h-2 w-8 rounded-full transition ${
+                    i === activeIndex ? "bg-white" : "bg-gray-500 bg-opacity-50"
+                  }`}
+                />
+              ))}
+            </div>
+
+            {/* Desktop Arrows */}
+            {activeIndex > 0 && (
+              <button
+                onClick={() => {
+                  setActiveIndex((prev) => prev - 1);
+                  setImageLoading(true);
+                }}
+                className="hidden md:flex absolute left-4 text-white bg-[#075E54] text-3xl z-20 p-2 hover:bg-black/30 rounded-full"
+              >
+                ‹
+              </button>
+            )}
+            {activeIndex < menuImages.length - 1 && (
+              <button
+                onClick={() => {
+                  setActiveIndex((prev) => prev + 1);
+                  setImageLoading(true);
+                }}
+                className="hidden md:flex absolute right-4 text-white bg-[#075E54] text-3xl z-20 p-2 hover:bg-black/30 rounded-full"
+              >
+                ›
+              </button>
+            )}
+
+            {/* Fullscreen Image with Spinner */}
+            <div className="relative flex items-center justify-center w-full h-full">
+              {imageLoading && (
+                <div className="absolute inset-0 flex items-center justify-center z-10">
+                  <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin" />
+                </div>
+              )}
+              <img
+                src={`${menuImages[activeIndex]}?t=${Date.now()}`}
+                alt={`Menu ${activeIndex + 1}`}
+                className={`max-h-[90vh] max-w-[90vw] object-contain rounded shadow transition-opacity duration-300 ${
+                  imageLoading ? "opacity-0" : "opacity-100"
+                }`}
+                onLoad={() => setImageLoading(false)}
+              />
+            </div>
+
+            {/* Close */}
+            <button
+              onClick={() => setShowMenuModal(false)}
+              className="absolute top-4 right-4 text-white text-2xl font-bold bg-black bg-opacity-50 rounded-full px-2 hover:bg-opacity-80 z-20"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
