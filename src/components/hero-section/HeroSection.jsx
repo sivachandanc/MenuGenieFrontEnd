@@ -7,7 +7,7 @@ function HeroSection() {
     <section className="relative min-h-[90vh] px-4 sm:px-6 py-16 bg-[var(--background)] overflow-hidden">
       {/* Floating Badge */}
       <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-30 bg-yellow-400 text-black px-3 py-1 rounded-full shadow font-semibold text-xs sm:text-sm animate-bounce">
-        New ✨ AI Chatbot
+        In Beta ✨ AI Chatbot
       </div>
 
       {/* Responsive Layout */}
@@ -66,7 +66,7 @@ function HeroSection() {
             </li>
             <li className="flex items-center gap-2">
               <span className="inline-block h-3 w-3 bg-green-500 rounded-full"></span>
-              Works on your website & WhatsApp
+              Sharble QR
             </li>
           </ul>
         </div>

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"; // ✅ import Navigate
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 import NavBar from "./components/navbar/navbar.jsx";
 import HeroSection from "./components/hero-section/HeroSection.jsx";
@@ -15,12 +15,14 @@ import { Toaster } from "react-hot-toast";
 import PublicRoute from "./routes/PublicRoute";
 import PrivateRoute from "./routes/PrivateRoute";
 import UploadMenuCopy from "./components/user/AddMenuCopy/UploadMenuCopy.jsx";
+import AboutPage from "./components/about-page/AboutPage.jsx"; // ✅ NEW IMPORT
 
 import { useState } from "react";
 
 function App() {
   const { user } = useAuth();
   const [chatMode, setChatMode] = useState(false);
+
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-[var(--background)]">
@@ -49,6 +51,14 @@ function App() {
             element={
               <PublicRoute>
                 <LoginForm />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/about"
+            element={
+              <PublicRoute>
+                <AboutPage />
               </PublicRoute>
             }
           />
