@@ -27,6 +27,7 @@ import {
   AlertTriangle,
   Trash2,
   Pencil,
+  List
 } from "lucide-react";
 import EditableBusinessField from "./EditableBusinessField";
 import toast from "react-hot-toast";
@@ -79,7 +80,7 @@ function BusinessDetails() {
           .limit(1);
 
         setHasMenu(menuItems && menuItems.length > 0);
-      } catch{
+      } catch {
         toast.error("Failed to fetch menu info");
         setHasMenu(false);
       }
@@ -346,39 +347,51 @@ function BusinessDetails() {
           {business.business_type}
         </p>
 
-        {hasMenu ? (
-          <button
-            onClick={() =>
-              (window.location.href = `/dashboard/business/${businessID}/menu`)
-            }
-            className="mt-6 px-5 py-2 rounded-full text-white font-semibold bg-[var(--button)] hover:bg-[var(--button-hover)] transition shadow"
-          >
-            <button>
-              <div className="flex flex-row items-center space-x-2">
-                <img
-                  src={MenuIcon}
-                  alt="menu icon"
-                  className="w-6 h-6 object-contain"
-                />
-                <span>View Menu</span>
-              </div>
-            </button>
-          </button>
-        ) : (
-          <div className="mt-6 flex flex-col items-center gap-2">
-            <p className="text-sm text-yellow-700 flex items-center gap-1">
-              <AlertTriangle size={16} /> No Menu Added
-            </p>
+        <div className="mt-6 flex flex-col items-center space-y-3 w-full">
+          {hasMenu ? (
             <button
               onClick={() =>
                 (window.location.href = `/dashboard/business/${businessID}/menu`)
               }
-              className="text-sm font-medium bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md transition shadow"
+              className="px-5 py-2 rounded-full text-white font-semibold bg-[var(--button)] hover:bg-[var(--button-hover)] transition shadow w-full"
             >
-              + Add Menu
+              <div className="flex flex-row justify-center items-center space-x-2">
+                <List/>
+                <span>View Menu Items</span>
+              </div>
             </button>
-          </div>
-        )}
+          ) : (
+            <div className="flex flex-col items-center gap-2">
+              <p className="text-sm text-yellow-700 flex items-center gap-1">
+                <AlertTriangle size={16} /> No Menu Added
+              </p>
+              <button
+                onClick={() =>
+                  (window.location.href = `/dashboard/business/${businessID}/menu`)
+                }
+                className="text-sm font-medium bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md transition shadow"
+              >
+                + Add Menu Items
+              </button>
+            </div>
+          )}
+
+          <button
+            onClick={() =>
+              navigate(`/dashboard/business/${businessID}/menu-upload`)
+            }
+            className="px-5 py-2 rounded-full text-white font-semibold bg-[var(--button)] hover:bg-[var(--button-hover)] transition shadow w-full"
+          >
+            <div className="flex flex-row justify-center items-center space-x-2">
+              <img
+                src={MenuIcon}
+                alt="menu icon"
+                className="w-5 h-5 object-contain"
+              />
+              <span>View Menu Copy</span>
+            </div>
+          </button>
+        </div>
       </div>
 
       {/* Business Info */}

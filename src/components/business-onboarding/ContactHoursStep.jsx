@@ -1,18 +1,24 @@
 import { useState } from "react";
-import ErrorMessage from "../util-components/ErrorMessage";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import TimePicker from "react-time-picker";
-import "react-time-picker/dist/TimePicker.css";
-import "react-clock/dist/Clock.css";
+import ErrorMessage from "../util-components/ErrorMessage";
 
 function ContactHoursStep({ data, onUpdate, onNext, onBack }) {
   const [email, setEmail] = useState(data.email || "");
   const [phone, setPhone] = useState(data.phone || "");
   const [website, setWebsite] = useState(data.website || "");
-  const [openingTime, setOpeningTime] = useState(data.openingTime || "");
-  const [closingTime, setClosingTime] = useState(data.closingTime || "");
+  const [openingTime, setOpeningTime] = useState(data.openingTime ? new Date(`1970-01-01T${data.openingTime}`) : null);
+  const [closingTime, setClosingTime] = useState(data.closingTime ? new Date(`1970-01-01T${data.closingTime}`) : null);
   const [error, setError] = useState("");
+
+  const formatTime = (dateObj) => {
+    if (!dateObj) return "";
+    const hours = dateObj.getHours().toString().padStart(2, "0");
+    const minutes = dateObj.getMinutes().toString().padStart(2, "0");
+    return `${hours}:${minutes}`;
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -45,7 +51,13 @@ function ContactHoursStep({ data, onUpdate, onNext, onBack }) {
     }
 
     setError("");
-    onUpdate({ email, phone, website: finalWebsite, openingTime, closingTime });
+    onUpdate({
+      email,
+      phone,
+      website: finalWebsite,
+      openingTime: formatTime(openingTime),
+      closingTime: formatTime(closingTime),
+    });
     onNext();
   };
 
@@ -64,7 +76,7 @@ function ContactHoursStep({ data, onUpdate, onNext, onBack }) {
 
         <div className="sm:col-span-2">
           <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-          <div className="focus-within:ring-2 focus-within:ring-blue-600 focus-within:border-blue-600 rounded-lg transition">
+          <div className="focus-within:ring-2 focus-within:ring-blue-600 rounded-lg transition">
             <PhoneInput
               country={"us"}
               value={phone}
@@ -75,7 +87,6 @@ function ContactHoursStep({ data, onUpdate, onNext, onBack }) {
                 border: "none",
                 fontSize: "1rem",
                 paddingLeft: "48px",
-                outline: "none",
               }}
               buttonStyle={{
                 border: "none",
@@ -88,10 +99,7 @@ function ContactHoursStep({ data, onUpdate, onNext, onBack }) {
                 border: "1px solid #d1d5db",
                 borderRadius: "0.5rem",
                 backgroundColor: "white",
-                display: "flex",
-                alignItems: "center",
               }}
-              inputClass="focus:outline-none"
             />
           </div>
         </div>
@@ -110,22 +118,30 @@ function ContactHoursStep({ data, onUpdate, onNext, onBack }) {
         <div className="sm:col-span-2">
           <label className="block text-sm font-medium text-gray-700 mb-1">Operating Hours</label>
           <div className="flex gap-4">
-            <div className="flex-1 focus-within:ring-2 focus-within:ring-blue-600 focus-within:border-blue-600 rounded-lg transition">
-              <TimePicker
-                onChange={setOpeningTime}
-                value={openingTime}
-                className="w-full"
-                clearIcon={null}
-                disableClock
+            <div className="flex-1">
+              <DatePicker
+                selected={openingTime}
+                onChange={(date) => setOpeningTime(date)}
+                showTimeSelect
+                showTimeSelectOnly
+                timeIntervals={15}
+                timeCaption="Opening"
+                dateFormat="HH:mm"
+                placeholderText="Opening Time"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm"
               />
             </div>
-            <div className="flex-1 focus-within:ring-2 focus-within:ring-blue-600 focus-within:border-blue-600 rounded-lg transition">
-              <TimePicker
-                onChange={setClosingTime}
-                value={closingTime}
-                className="w-full"
-                clearIcon={null}
-                disableClock
+            <div className="flex-1">
+              <DatePicker
+                selected={closingTime}
+                onChange={(date) => setClosingTime(date)}
+                showTimeSelect
+                showTimeSelectOnly
+                timeIntervals={15}
+                timeCaption="Closing"
+                dateFormat="HH:mm"
+                placeholderText="Closing Time"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm"
               />
             </div>
           </div>

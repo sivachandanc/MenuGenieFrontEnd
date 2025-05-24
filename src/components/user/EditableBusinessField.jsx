@@ -3,8 +3,8 @@ import { Pencil } from "lucide-react";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import TimePicker from "react-time-picker";
-import "react-time-picker/dist/TimePicker.css";
-import "react-clock/dist/Clock.css";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import CustomSpinner from "../util-components/Spinner";
 
 const BOT_PERSONALITIES = ["friendly", "professional", "funny"];
@@ -133,11 +133,22 @@ function EditableBusinessField({
           )}
 
           {type === "time" && (
-            <TimePicker
-              onChange={setFieldValue}
-              value={fieldValue}
-              className="w-full border border-gray-300 rounded"
-              disableClock={true}
+            <DatePicker
+              selected={
+                fieldValue ? new Date(`1970-01-01T${fieldValue}`) : null
+              }
+              onChange={(date) => {
+                const hours = date.getHours().toString().padStart(2, "0");
+                const minutes = date.getMinutes().toString().padStart(2, "0");
+                setFieldValue(`${hours}:${minutes}`);
+              }}
+              showTimeSelect
+              showTimeSelectOnly
+              timeIntervals={15}
+              timeCaption="Time"
+              dateFormat="HH:mm"
+              placeholderText="Select time"
+              className="w-full px-2 py-1 border border-gray-300 rounded"
             />
           )}
 
