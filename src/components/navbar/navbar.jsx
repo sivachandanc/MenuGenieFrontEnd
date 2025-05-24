@@ -15,8 +15,8 @@ function NavBar() {
 
   const navBarItems = [
     { name: "About", path: "/about" },
-    { name: "Features", path: "#features" },
-    { name: "Contact", path: "#contact" },
+    { name: "Features", path: "/features" },
+    { name: "Contact", path: "/contact" },
   ];
 
   return (

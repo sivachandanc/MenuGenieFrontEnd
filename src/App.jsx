@@ -15,7 +15,9 @@ import { Toaster } from "react-hot-toast";
 import PublicRoute from "./routes/PublicRoute";
 import PrivateRoute from "./routes/PrivateRoute";
 import UploadMenuCopy from "./components/user/AddMenuCopy/UploadMenuCopy.jsx";
-import AboutPage from "./components/about-page/AboutPage.jsx"; // ✅ NEW IMPORT
+import AboutPage from "./components/about-page/AboutPage.jsx";
+import FeaturesSection from "./components/features-page/FeaturesSection.jsx";
+import ContactSection from "./components/contact-me/ContactSection.jsx";
 
 import { useState } from "react";
 
@@ -59,6 +61,23 @@ function App() {
             element={
               <PublicRoute>
                 <AboutPage />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/features"
+            element={
+              <PublicRoute>
+                <FeaturesSection />
+              </PublicRoute>
+            }
+          />
+
+          <Route
+            path="/contact"
+            element={
+              <PublicRoute>
+                <ContactSection />
               </PublicRoute>
             }
           />

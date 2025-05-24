@@ -22,7 +22,8 @@ function HeroSection() {
           >
             Your Restaurant’s
             <br />
-            <span className="text-[var(--textMain)]">AI-Powered Genie</span> is Here
+            <span className="text-[var(--textMain)]">AI-Powered Genie</span> is
+            Here
           </motion.h1>
 
           <motion.p
@@ -31,7 +32,8 @@ function HeroSection() {
             transition={{ delay: 0.3, duration: 0.5 }}
             className="text-base sm:text-lg md:text-xl text-[var(--textSecondary)] font-inter mb-6"
           >
-            Turn menus into smart conversations. Let customers order, ask, and explore — all through your custom chatbot.
+            Turn menus into smart conversations. Let customers ask, and explore
+            — all through your custom chatbot.
           </motion.p>
 
           {/* CTA Buttons */}
@@ -58,15 +60,28 @@ function HeroSection() {
           <ul className="text-[var(--textMain)] space-y-3 text-sm sm:text-base">
             <li className="flex items-center gap-2">
               <span className="inline-block h-3 w-3 bg-green-500 rounded-full"></span>
-              Menu-aware AI chatbot
+              Menu-aware AI chatbot that understands every menu item
             </li>
             <li className="flex items-center gap-2">
               <span className="inline-block h-3 w-3 bg-green-500 rounded-full"></span>
-              Fully customizable
+              Instantly share via QR code — no app required
             </li>
             <li className="flex items-center gap-2">
               <span className="inline-block h-3 w-3 bg-green-500 rounded-full"></span>
-              Sharble QR
+              Add detailed info to each menu item: sizes, tags, dietary notes &
+              more
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="inline-block h-3 w-3 bg-green-500 rounded-full"></span>
+              Fully customizable bot name, personality & look
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="inline-block h-3 w-3 bg-green-500 rounded-full"></span>
+              Designed for cafes, restaurants, food trucks, and ghost kitchens
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="inline-block h-3 w-3 bg-green-500 rounded-full"></span>
+              Setup in minutes with drag-and-drop image & text upload
             </li>
           </ul>
         </div>
@@ -83,6 +98,14 @@ function HeroSection() {
 
       {/* Glow backdrop */}
       <div className="absolute right-[10%] top-[25%] w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] bg-[radial-gradient(circle,_rgba(255,255,255,0.08)_0%,_transparent_80%)] blur-3xl rounded-full z-0" />
+
+      {/* Beta Banner */}
+      <div className="mt-10 text-center">
+        <div className="inline-block px-4 py-2 bg-[var(--button)] text-white rounded-full font-medium shadow-sm text-sm sm:text-base">
+          🚀 Menu Genie is currently in <strong>Beta</strong> — and{" "}
+          <span className="underline">completely free</span> to use!
+        </div>
+      </div>
     </section>
   );
 }
