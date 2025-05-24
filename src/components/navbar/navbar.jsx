@@ -14,10 +14,9 @@ function NavBar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const navBarItems = [
-    { name: "About", href: "#about" },
-    { name: "Features", href: "#features" },
-    { name: "Pricing", href: "#pricing" },
-    { name: "Contact", href: "#contact" },
+    { name: "About", path: "/about" },
+    { name: "Features", path: "#features" },
+    { name: "Contact", path: "#contact" },
   ];
 
   return (
@@ -48,13 +47,13 @@ function NavBar() {
         >
           {navBarItems.map((item) => (
             <NavbarItem key={item.name} className="relative group">
-              <a
-                href={item.href}
+              <Link
+                to={item.path}
                 className="text-[var(--text-main)] text-lg font-medium transition-colors duration-300 hover:text-black"
               >
                 {item.name}
                 <span className="absolute left-0 -bottom-1 h-0.5 w-0 bg-[#fff7ec]/90 transition-all duration-300 group-hover:w-full"></span>
-              </a>
+              </Link>
             </NavbarItem>
           ))}
         </NavbarContent>
@@ -98,14 +97,14 @@ function NavBar() {
       {menuOpen && (
         <div className="sm:hidden mt-2 p-4 rounded-xl shadow-md bg-[var(--button)] text-black space-y-3 font-inter">
           {navBarItems.map((item) => (
-            <a
+            <Link
               key={item.name}
-              href={item.href}
+              to={item.path}
               className="block text-lg font-medium transition-colors duration-300 hover:text-black"
               onClick={() => setMenuOpen(false)}
             >
               {item.name}
-            </a>
+            </Link>
           ))}
           <hr />
           <div className="flex flex-col gap-3">
