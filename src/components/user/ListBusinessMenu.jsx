@@ -3,12 +3,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import {
   Plus,
   AlertTriangle,
-  CheckCircle,
   Bot,
   Utensils,
   CircleArrowLeft,
   Pencil,
   Trash,
+  HelpCircle,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -233,6 +233,7 @@ function ListBusinessMenu() {
                           />
                         </th>
                         <th className="px-4 py-2 text-left">Menu Item</th>
+                        <th className="px-4 py-2 text-left">Item Score</th>
                         <th className="px-4 py-2 text-left">Type</th>
                         <th className="px-4 py-2 text-center">Actions</th>
                       </tr>
@@ -261,19 +262,6 @@ function ListBusinessMenu() {
                           <td className="px-4 py-2">
                             <div className="font-medium text-gray-900">
                               {item.name}
-                              {businessType === "cafe" && (
-    <span
-      className={`text-xs font-semibold ml-2 ${
-        CalculateCafeItemScore(item) >= 80
-          ? "text-green-600"
-          : CalculateCafeItemScore(item) >= 50
-          ? "text-yellow-600"
-          : "text-red-600"
-      }`}
-    >
-      {CalculateCafeItemScore(item)}%
-    </span>
-  )}
                             </div>
                             <div className="text-xs text-gray-600 italic">
                               {Array.isArray(item.size_options)
@@ -298,6 +286,21 @@ function ListBusinessMenu() {
                                   </span>
                                 ))}
                               </div>
+                            )}
+                          </td>
+                          <td>
+                            {businessType === "cafe" && (
+                              <span
+                                className={`text-xs font-semibold ml-2 ${
+                                  CalculateCafeItemScore(item) >= 80
+                                    ? "text-green-600"
+                                    : CalculateCafeItemScore(item) >= 50
+                                    ? "text-yellow-600"
+                                    : "text-red-600"
+                                }`}
+                              >
+                                {CalculateCafeItemScore(item)}%
+                              </span>
                             )}
                           </td>
                           <td className="px-4 py-2">{item.category}</td>
