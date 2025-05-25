@@ -8,7 +8,7 @@ import { QrCode, Utensils, Share } from "lucide-react";
 function BusinessList() {
   const [businesses, setBusinesses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [flippedCardId, setFlippedCardId] = useState(null); // Track which card is flipped
+  const [flippedCardId, setFlippedCardId] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -76,7 +76,7 @@ function BusinessList() {
   }, []);
 
   const toggleCardFlip = (businessId, e) => {
-    e.stopPropagation(); // Prevent card click
+    e.stopPropagation();
     setFlippedCardId((prev) => (prev === businessId ? null : businessId));
   };
 
@@ -120,7 +120,7 @@ function BusinessList() {
           </p>
           <button
             onClick={() => navigate("/dashboard/onboarding")}
-            className="px-5 py-2 rounded-full  text-black font-semibold bg-[var(--button)] hover:bg-[var(--button-hover)] transition"
+            className="px-5 py-2 rounded-full text-black font-semibold bg-[var(--button)] hover:bg-[var(--button-hover)] transition"
           >
             Add Business
           </button>
@@ -129,16 +129,13 @@ function BusinessList() {
         <ul className="relative flex flex-col sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-4">
           {businesses.map((biz, index) => {
             const isFlipped = flippedCardId === biz.business_id;
-            const qrUrl = `https://menu-genie-front-end.vercel.app/chat-with-menu/${biz.business_id}`;
+            const qrUrl = `https://menugenie.io/chat-with-menu/${biz.business_id}`;
 
             return (
               <li
                 key={biz.business_id}
                 onClick={(e) => toggleCardFlip(biz.business_id, e)}
-                style={{
-                  top: 0,
-                  zIndex: index,
-                }}
+                style={{ top: 0, zIndex: index }}
                 className={`sticky sm:static sm:top-auto sm:z-auto transition-all duration-500 ease-in-out 
                   flex flex-col bg-white rounded-3xl shadow-xl overflow-hidden transform hover:scale-[1.01] 
                   cursor-pointer mx-2 sm:mx-0 mb-6 relative ${
@@ -171,10 +168,8 @@ function BusinessList() {
                             <QrCode size={18} />
                           </button>
                         </div>
-                        <p className="text-gray-600 text-sm">
-                          {biz.business_type.charAt(0).toUpperCase() +
-                            biz.business_type.slice(1)}{" "}
-                          Business
+                        <p className="text-gray-600 text-sm capitalize">
+                          {biz.business_type} business
                         </p>
                       </div>
 
@@ -220,12 +215,19 @@ function BusinessList() {
                     <div className="flex flex-col items-center space-y-4">
                       <div className="p-[2px] rounded-2xl bg-gradient-to-r from-[var(--button)] to-[var(--button-hover)]">
                         <div className="bg-white rounded-xl p-2">
-                          <QRCode value={qrUrl} size={128} />
+                          <div className="relative w-[128px] h-[128px]">
+                            <QRCode value={qrUrl} size={128} />
+                            {/* <img
+                              src={biz.logoUrl}
+                              alt={`${biz.name} Logo`}
+                              className="absolute top-1/2 left-1/2 w-10 h-10 rounded bg-white p-1 transform -translate-x-1/2 -translate-y-1/2 shadow object-contain"
+                            /> */}
+                          </div>
                         </div>
                       </div>
                       <button
                         onClick={(e) => {
-                          e.stopPropagation(); // prevent card from unflipping
+                          e.stopPropagation();
                           handleShare(qrUrl, biz.name);
                         }}
                         className="mt-2 px-4 py-1.5 text-sm bg-[var(--button)] hover:bg-[var(--button-hover)] text-white rounded-full shadow"
