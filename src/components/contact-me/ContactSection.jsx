@@ -26,7 +26,7 @@ function ContactSection() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            to: "sivachandan1996@gmail.com",
+            to: import.meta.env.VITE_CONTACT_EMAIL,
             subject,
             text,
           }),

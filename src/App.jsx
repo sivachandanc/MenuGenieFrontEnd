@@ -18,6 +18,7 @@ import UploadMenuCopy from "./components/user/AddMenuCopy/UploadMenuCopy.jsx";
 import AboutPage from "./components/about-page/AboutPage.jsx";
 import FeaturesSection from "./components/features-page/FeaturesSection.jsx";
 import ContactSection from "./components/contact-me/ContactSection.jsx";
+import ResetPasswordForm from "./components/login/ResetPasswordForm.jsx";
 
 import { useState } from "react";
 
@@ -37,6 +38,14 @@ function App() {
             element={
               <PublicRoute>
                 <HeroSection />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/reset-password"
+            element={
+              <PublicRoute forceAllow={true}>
+                <ResetPasswordForm />
               </PublicRoute>
             }
           />

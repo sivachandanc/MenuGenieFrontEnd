@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 import ErrorMessage from "../util-components/ErrorMessage";
 import { useAuth } from "../../context/AuthContext";
-import bg from "../../assets/bg-illustration.png"
-
+import { supabaseClient } from "../../supabase-utils/SupaBaseClient";
+import bg from "../../assets/bg-illustration.png";
 
 function LoginForm() {
   const { signIn } = useAuth();
@@ -31,6 +32,28 @@ function LoginForm() {
     login();
   };
 
+  const handlePasswordReset = async () => {
+    if (!userEmail) {
+      setErrorMessage("Please enter your email above to receive a reset link.");
+      return;
+    }
+
+    const toastId = toast.loading("Sending password reset email...");
+
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(
+      userEmail, {
+        redirectTo: import.meta.env.VITE_PASSWORD_RESET_URL,
+      }
+    );
+
+    if (error) {
+      console.error("Password reset error:", error.message);
+      toast.error("Failed to send reset link", { id: toastId });
+    } else {
+      toast.success("Password reset link sent!", { id: toastId });
+    }
+  };
+
   return (
     <div className="relative min-h-screen bg-[#f7f3ed] flex items-start justify-center px-4 py-12 overflow-hidden">
       <img
@@ -44,7 +67,7 @@ function LoginForm() {
           Agent Login
         </h2>
         <p className="text-sm text-center text-gray-600 mb-6">
-          Hey, Enter your details to get sign in to your account
+          Hey, Enter your details to sign in to your account
         </p>
         <form className="space-y-4" onSubmit={handleLogin}>
           <div>
@@ -54,7 +77,7 @@ function LoginForm() {
               onChange={(e) => setUserEmail(e.target.value)}
               value={userEmail}
               className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[var(--button)] text-sm"
-              placeholder="Enter Email / Phone No"
+              placeholder="Enter Email"
               required
             />
           </div>
@@ -72,8 +95,15 @@ function LoginForm() {
 
           {errorMessage && <ErrorMessage errorMessage={errorMessage} />}
 
-          <div className="text-right text-sm text-[var(--textSecondary)] mb-2">
-            Having trouble in sign in?
+          <div className="flex justify-between items-center text-sm text-[var(--textSecondary)] mb-2">
+            <span>Having trouble signing in?</span>
+            <button
+              type="button"
+              className="text-blue-600 hover:underline"
+              onClick={handlePasswordReset}
+            >
+              Forgot Password?
+            </button>
           </div>
 
           <button
@@ -109,7 +139,7 @@ function LoginForm() {
           </button>
 
           <div className="text-center mt-6 text-sm text-gray-600">
-            Don't have an account? {" "}
+            Don't have an account?{" "}
             <Link
               to="/signup"
               className="text-[var(--button)] hover:underline transition-colors duration-300"
