@@ -108,22 +108,6 @@ function LoginForm() {
             </div>
           </button>
 
-          <div className="text-center text-gray-400 text-sm mt-4">
-            Or Sign in with
-          </div>
-
-          <div className="flex justify-center gap-4 mt-2">
-            <button className="flex-1 border border-gray-200 rounded-lg py-2 text-sm font-medium hover:shadow">
-              Google
-            </button>
-            <button className="flex-1 border border-gray-200 rounded-lg py-2 text-sm font-medium hover:shadow">
-              Apple ID
-            </button>
-            <button className="flex-1 border border-gray-200 rounded-lg py-2 text-sm font-medium hover:shadow">
-              Facebook
-            </button>
-          </div>
-
           <div className="text-center mt-6 text-sm text-gray-600">
             Don't have an account? {" "}
             <Link

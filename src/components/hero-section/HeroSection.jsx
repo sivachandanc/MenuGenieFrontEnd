@@ -44,16 +44,10 @@ function HeroSection() {
             className="flex flex-col sm:flex-row gap-4 sm:gap-6 mb-6 order-2"
           >
             <a
-              href="#demo"
-              className="w-full sm:w-auto text-center px-6 py-3 rounded-full bg-[var(--button)] text-black font-semibold shadow-md hover:shadow-lg hover:brightness-105 transition-all duration-200"
+              href="/signup"
+              className="inline-block px-6 py-3 rounded-full bg-[var(--button)] text-black font-semibold hover:bg-[var(--button-hover)] transition"
             >
-              Try Demo
-            </a>
-            <a
-              href="#book"
-              className="w-full sm:w-auto text-center px-6 py-3 rounded-full border border-[var(--button)] text-[var(--textMain)] font-semibold hover:bg-[var(--button)] hover:text-black transition-all duration-200"
-            >
-              Book a Call
+              Get Started for Free
             </a>
           </motion.div>
 

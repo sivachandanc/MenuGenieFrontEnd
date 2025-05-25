@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { motion } from "framer-motion";
+import toast from "react-hot-toast";
 
 function ContactSection() {
   const formRef = useRef();
@@ -12,32 +13,43 @@ function ContactSection() {
     const email = form.email.value;
     const message = form.message.value;
 
-    setStatus("sending");
-
     const subject = `Contact Form - ${name}`;
     const text = `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`;
 
+    const loadingToast = toast.loading("Sending message...");
+    setStatus("sending");
+
     try {
-      const response = await fetch("https://kqweqqqwovofuvjvrwwk.supabase.co/functions/v1/send-email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          to: "sivachandan@proton.me", // Replace with your receiving email
-          subject,
-          text,
-        }),
-      });
+      const response = await fetch(
+        "https://kqweqqqwovofuvjvrwwk.supabase.co/functions/v1/send-email",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            to: "sivachandan1996@gmail.com",
+            subject,
+            text,
+          }),
+        }
+      );
 
       if (response.ok) {
-        setStatus("sent");
+        toast.success("Message sent! We'll get back to you soon.", {
+          id: loadingToast,
+        });
         form.reset();
+        setStatus("sent");
       } else {
+        toast.error("Something went wrong. Please try again.", {
+          id: loadingToast,
+        });
         setStatus("error");
       }
     } catch (err) {
       console.error("Email send error:", err);
+      toast.error("Network error. Please try again later.", {
+        id: loadingToast,
+      });
       setStatus("error");
     }
   };
@@ -59,7 +71,8 @@ function ContactSection() {
           transition={{ delay: 0.2, duration: 0.5 }}
           className="text-lg text-[var(--textSecondary)]"
         >
-          We'd love to hear from you! Reach out with any questions, feedback, or partnership ideas.
+          We'd love to hear from you! Reach out with any questions, feedback, or
+          partnership ideas.
         </motion.p>
       </div>
 
@@ -112,8 +125,6 @@ function ContactSection() {
             >
               {status === "sending" ? "Sending..." : "Send Message"}
             </button>
-            {status === "sent" && <p className="text-green-600 mt-2">✅ Message sent!</p>}
-            {status === "error" && <p className="text-red-600 mt-2">❌ Failed to send message.</p>}
           </div>
         </form>
       </div>
