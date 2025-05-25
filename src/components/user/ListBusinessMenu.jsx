@@ -17,6 +17,7 @@ import { DeleteMenuItem } from "../../supabase-utils/delete-menu-item/DeleteMenu
 import AddMenuItemCafeForm from "./AddMenuItems/AddMenuItemCafe.jsx";
 import ImageUploader from "./AddMenuItems/ImageUploader.jsx";
 import EditMenuItemCafeForm from "./EditMenuItems/EditCafeMenuItem.jsx";
+import { CalculateCafeItemScore } from "./MenuQualityScoring/CalculateCafeQualityScore.jsx";
 
 function ListBusinessMenu() {
   const { businessID } = useParams();
@@ -260,6 +261,19 @@ function ListBusinessMenu() {
                           <td className="px-4 py-2">
                             <div className="font-medium text-gray-900">
                               {item.name}
+                              {businessType === "cafe" && (
+    <span
+      className={`text-xs font-semibold ml-2 ${
+        CalculateCafeItemScore(item) >= 80
+          ? "text-green-600"
+          : CalculateCafeItemScore(item) >= 50
+          ? "text-yellow-600"
+          : "text-red-600"
+      }`}
+    >
+      {CalculateCafeItemScore(item)}%
+    </span>
+  )}
                             </div>
                             <div className="text-xs text-gray-600 italic">
                               {Array.isArray(item.size_options)

@@ -12,37 +12,16 @@
  * @param {Array<Object>} items - List of menu items
  * @returns {number} - Score between 0 and 100
  */
-export function calculateCafeQualityScore(items) {
-    if (!Array.isArray(items) || items.length === 0) return 0;
+export function CalculateCafeItemScore(item) {
+    let total = 5;
+    let score = 0;
   
-    let total = 0;
-    const maxScorePerItem = 6;
+    if (item.name) score++;
+    if (item.description) score++;
+    if (Array.isArray(item.size_options) && item.size_options.length > 0) score++;
+    if (Array.isArray(item.dairy_options) && item.dairy_options.length > 0) score++;
+    if (Array.isArray(item.tags) && item.tags.length > 0) score++;
   
-    for (const item of items) {
-      if (item.name) total += 1;
-      if (item.description) total += 1;
-      if (item.category) total += 1;
-  
-      if (
-        Array.isArray(item.size_options) &&
-        item.size_options.some((s) => s.size && s.price)
-      ) {
-        total += 1;
-      }
-  
-      if (Array.isArray(item.form_options) && item.form_options.length > 0) {
-        total += 0.5;
-      }
-  
-      if (Array.isArray(item.dairy_options) && item.dairy_options.length > 0) {
-        total += 0.5;
-      }
-  
-      if (Array.isArray(item.tags) && item.tags.length > 0) {
-        total += 1;
-      }
-    }
-  
-    return Math.round((total / (items.length * maxScorePerItem)) * 100);
+    return Math.round((score / total) * 100);
   }
   
