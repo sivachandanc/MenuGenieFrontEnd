@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabaseClient } from "../../supabase-utils/SupaBaseClient";
+import { useAuth } from "../../context/AuthContext";
 import toast from "react-hot-toast";
 import bg from "../../assets/bg-illustration.png";
 
 function ResetPasswordForm() {
   const navigate = useNavigate();
+  const { clearPasswordRecovery } = useAuth();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -46,9 +48,10 @@ function ResetPasswordForm() {
       toast.error(`Reset failed: ${error.message}`);
     } else {
       toast.success("Password reset successfully. Please login.");
-
-      // 👇 Force logout after password reset
       await supabaseClient.auth.signOut();
+
+      // ✅ Clear recovery flag
+      clearPasswordRecovery();
 
       navigate("/login");
     }
