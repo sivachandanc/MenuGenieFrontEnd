@@ -26,6 +26,33 @@ function ChatWindow({ setChatMode }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [imageLoading, setImageLoading] = useState(true);
 
+  const touchStartX = useRef(null);
+  const touchEndX = useRef(null);
+
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchMove = (e) => {
+    touchEndX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    const minSwipeDistance = 50;
+    const distance = touchStartX.current - touchEndX.current;
+
+    if (distance > minSwipeDistance && activeIndex < menuImages.length - 1) {
+      setActiveIndex((prev) => prev + 1);
+      setImageLoading(true);
+    } else if (distance < -minSwipeDistance && activeIndex > 0) {
+      setActiveIndex((prev) => prev - 1);
+      setImageLoading(true);
+    }
+
+    touchStartX.current = null;
+    touchEndX.current = null;
+  };
+
   useEffect(() => {
     const existingUUID = localStorage.getItem("sessionUUID");
     if (existingUUID) {
@@ -269,7 +296,7 @@ function ChatWindow({ setChatMode }) {
               ))}
             </div>
 
-            {/* Desktop Arrows */}
+            {/* Arrows (desktop only) */}
             {activeIndex > 0 && (
               <button
                 onClick={() => {
@@ -293,8 +320,13 @@ function ChatWindow({ setChatMode }) {
               </button>
             )}
 
-            {/* Fullscreen Image with Spinner */}
-            <div className="relative flex items-center justify-center w-full h-full">
+            {/* Fullscreen Image with Swipe Support */}
+            <div
+              className="relative flex items-center justify-center w-full h-full"
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            >
               {imageLoading && (
                 <div className="absolute inset-0 flex items-center justify-center z-10">
                   <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin" />
@@ -310,7 +342,7 @@ function ChatWindow({ setChatMode }) {
               />
             </div>
 
-            {/* Close */}
+            {/* Close Button */}
             <button
               onClick={() => setShowMenuModal(false)}
               className="absolute top-4 right-4 text-white text-2xl font-bold bg-black bg-opacity-50 rounded-full px-2 hover:bg-opacity-80 z-20"

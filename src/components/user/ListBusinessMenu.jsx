@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import {
   Plus,
   AlertTriangle,
-  CheckCircle,
   Bot,
   Utensils,
   CircleArrowLeft,
@@ -17,6 +16,7 @@ import { DeleteMenuItem } from "../../supabase-utils/delete-menu-item/DeleteMenu
 import AddMenuItemCafeForm from "./AddMenuItems/AddMenuItemCafe.jsx";
 import ImageUploader from "./AddMenuItems/ImageUploader.jsx";
 import EditMenuItemCafeForm from "./EditMenuItems/EditCafeMenuItem.jsx";
+import { CalculateCafeItemScore } from "./MenuQualityScoring/CalculateCafeQualityScore.jsx";
 
 function ListBusinessMenu() {
   const { businessID } = useParams();
@@ -232,6 +232,7 @@ function ListBusinessMenu() {
                           />
                         </th>
                         <th className="px-4 py-2 text-left">Menu Item</th>
+                        <th className="px-4 py-2 text-left">Item Score</th>
                         <th className="px-4 py-2 text-left">Type</th>
                         <th className="px-4 py-2 text-center">Actions</th>
                       </tr>
@@ -284,6 +285,21 @@ function ListBusinessMenu() {
                                   </span>
                                 ))}
                               </div>
+                            )}
+                          </td>
+                          <td>
+                            {businessType === "cafe" && (
+                              <span
+                                className={`text-xs font-semibold ml-2 ${
+                                  CalculateCafeItemScore(item) >= 80
+                                    ? "text-green-600"
+                                    : CalculateCafeItemScore(item) >= 50
+                                    ? "text-yellow-600"
+                                    : "text-red-600"
+                                }`}
+                              >
+                                {CalculateCafeItemScore(item)}%
+                              </span>
                             )}
                           </td>
                           <td className="px-4 py-2">{item.category}</td>
