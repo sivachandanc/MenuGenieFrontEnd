@@ -44,7 +44,7 @@ function App() {
           <Route
             path="/reset-password"
             element={
-              <PublicRoute forceAllow={true}>
+              <PublicRoute>
                 <ResetPasswordForm />
               </PublicRoute>
             }
