@@ -14,9 +14,12 @@ import toast from "react-hot-toast";
 import { supabaseClient } from "../../supabase-utils/SupaBaseClient";
 import { DeleteMenuItem } from "../../supabase-utils/delete-menu-item/DeleteMenuItem.jsx";
 import AddMenuItemCafeForm from "./AddMenuItems/AddMenuItemCafe.jsx";
+import AddMenuItemRestaurant from "./AddMenuItems/AddMenuItemRestaurant.jsx";
 import ImageUploader from "./AddMenuItems/ImageUploader.jsx";
 import EditMenuItemCafeForm from "./EditMenuItems/EditCafeMenuItem.jsx";
+import EditMenuItemRestaurant from "./EditMenuItems/EditMenuItemRestaurant.jsx";
 import { CalculateCafeItemScore } from "./MenuQualityScoring/CalculateCafeQualityScore.jsx";
+import { CalculateRestaurantItemScore } from "./MenuQualityScoring/CalculateRestaurantQualityScore.jsx";
 
 function ListBusinessMenu() {
   const { businessID } = useParams();
@@ -34,6 +37,18 @@ function ListBusinessMenu() {
   const [selecteMenuItems, setSelecteMenuItems] = useState([]);
 
   const [bulkDelete, setBulkDelete] = useState(false);
+
+  const getItemScore = (item) => {
+    if (businessType === "cafe") return CalculateCafeItemScore(item);
+    if (businessType === "restaurant") return CalculateRestaurantItemScore(item);
+    return 0;
+  };
+
+  const getScoreColor = (score) => {
+    if (score >= 80) return "text-green-600";
+    if (score >= 50) return "text-yellow-600";
+    return "text-red-600";
+  };
 
   const confirmBulkDelete = () => {
     setBulkDelete(true);
@@ -288,19 +303,13 @@ function ListBusinessMenu() {
                             )}
                           </td>
                           <td>
-                            {businessType === "cafe" && (
-                              <span
-                                className={`text-xs font-semibold ml-2 ${
-                                  CalculateCafeItemScore(item) >= 80
-                                    ? "text-green-600"
-                                    : CalculateCafeItemScore(item) >= 50
-                                    ? "text-yellow-600"
-                                    : "text-red-600"
-                                }`}
-                              >
-                                {CalculateCafeItemScore(item)}%
-                              </span>
-                            )}
+                            <span
+                              className={`text-xs font-semibold ml-2 ${getScoreColor(
+                                getItemScore(item)
+                              )}`}
+                            >
+                              {getItemScore(item)}%
+                            </span>
                           </td>
                           <td className="px-4 py-2">{item.category}</td>
                           <td className="px-4 py-2 text-center">
@@ -347,6 +356,18 @@ function ListBusinessMenu() {
             />
           )}
 
+          {selectedTab === "add" && businessType === "restaurant" && (
+            <AddMenuItemRestaurant
+              businessID={businessID}
+              onClose={() => {}}
+              onItemAdded={() => {
+                toast.success("Item added successfully!");
+                fetchMenuItems();
+                setSelectedTab("menu");
+              }}
+            />
+          )}
+
           {selectedTab === "ai" && (
             <ImageUploader
               businessID={businessID}
@@ -358,8 +379,19 @@ function ListBusinessMenu() {
         </div>
       </div>
 
-      {editingItem && (
+      {editingItem && businessType === "cafe" && (
         <EditMenuItemCafeForm
+          item={editingItem}
+          onClose={() => setEditingItem(null)}
+          onItemUpdated={() => {
+            setEditingItem(null);
+            fetchMenuItems();
+          }}
+        />
+      )}
+
+      {editingItem && businessType === "restaurant" && (
+        <EditMenuItemRestaurant
           item={editingItem}
           onClose={() => setEditingItem(null)}
           onItemUpdated={() => {
