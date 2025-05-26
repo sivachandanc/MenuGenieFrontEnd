@@ -19,7 +19,20 @@ function buildMenuItemPayload(args, userId, businessID, businessType) {
     };
   }
 
-  // Add other business types as needed
+  if (businessType === "restaurant") {
+    return {
+      user_id: userId,
+      business_id: businessID,
+      name: args.name,
+      category: args.category,
+      description: args.description,
+      price: args.price,
+      cuisine_type: args.cuisine_type,
+      tags: args.tags,
+      available: true,
+    };
+  }
+
   throw new Error(`Unsupported business type: ${businessType}`);
 }
 
@@ -38,7 +51,19 @@ function buildMenuEmbeddingPayload(insertedMenu, businessType) {
     return context;
   }
 
-  // Add other business types as needed
+  if (businessType === "restaurant") {
+    const context = [
+      `name: ${insertedMenu.name}`,
+      `category: ${insertedMenu.category}`,
+      `description: ${insertedMenu.description}`,
+      `price: ${insertedMenu.price}`,
+      `cuisine_type: ${insertedMenu.cuisine_type}`,
+      `tags: ${JSON.stringify(insertedMenu.tags)}`,
+      `available: ${insertedMenu.available}`,
+    ].join("\n");
+    return context;
+  }
+
   throw new Error(`Unsupported business type: ${businessType}`);
 }
 
@@ -48,11 +73,9 @@ function buildMenuEmbeddingPayload(insertedMenu, businessType) {
 export async function insertMenuItem(args, userId, businessID, businessType) {
   const payload = buildMenuItemPayload(args, userId, businessID, businessType);
 
-  // Map business type to table name
   const tableMap = {
     cafe: "menu_item_cafe",
-    // restaurant: "menu_item_restaurant",
-    // Add other types as needed
+    restaurant: "menu_item_restaurant",
   };
 
   const table = tableMap[businessType];
@@ -65,22 +88,22 @@ export async function insertMenuItem(args, userId, businessID, businessType) {
   if (insertError || !insertedMenuItems || insertedMenuItems.length === 0) {
     throw new Error("Failed to insert business data.");
   }
+
   for (const insertedMenu of insertedMenuItems) {
     const context = buildMenuEmbeddingPayload(insertedMenu, businessType);
-    const response = await fetch(
-      `${import.meta.env.VITE_EMBEDDING_BACKEND_URL}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify([{ context: context }]),
-      }
-    );
+    const response = await fetch(`${import.meta.env.VITE_EMBEDDING_BACKEND_URL}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify([{ context }]),
+    });
+
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(`Embedding API failed for Menu: ${errorText}`);
     }
+
     const { embeddings } = await response.json();
     if (!Array.isArray(embeddings)) {
       throw new Error("Invalid embedding response(menu item) from API.");
@@ -90,13 +113,13 @@ export async function insertMenuItem(args, userId, businessID, businessType) {
       user_id: userId,
       business_id: businessID,
       item_id: insertedMenu.item_id,
-      context: context,
+      context,
       type: "menu_item",
       embedding: embeddings[0],
     };
-    console.log("embedding_payload:")
-    console.log(contextPayload)
 
+    console.log("embedding_payload:");
+    console.log(contextPayload);
 
     const { error: contextInsertError } = await supabaseClient
       .from("menu_context")
