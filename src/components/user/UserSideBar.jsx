@@ -1,9 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import { Utensils, Plus, X } from "lucide-react";
+import { Utensils, Plus, ChartNoAxesCombined, X } from "lucide-react";
 
 const navItems = [
   { icon: <Utensils />, label: "My Businesses", path: "/dashboard" },
   { icon: <Plus />, label: "Add Business", path: "/dashboard/onboarding" },
+  { icon: <ChartNoAxesCombined />, label: "User Analytics", path: "/dashboard/analytics" },
 ];
 
 function Sidebar({ onClose, isDesktop, expanded }) {
