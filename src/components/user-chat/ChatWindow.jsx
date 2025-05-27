@@ -249,6 +249,16 @@ function ChatWindow({ setChatMode }) {
             <span className="text-base font-semibold">
               {businessInfo.bot_name} from {businessInfo.name}
             </span>
+            <div className="flex items-center gap-2 mt-0.5">
+              <span
+                className={`h-2 w-2 rounded-full ${
+                  socketClosed ? "bg-gray-400" : "bg-green-400"
+                }`}
+              />
+              <span className="text-xs text-white">
+                {socketClosed ? "away" : "online"}
+              </span>
+            </div>
             {botTyping && (
               <span className="text-xs text-green-200 animate-pulse">
                 typing...
