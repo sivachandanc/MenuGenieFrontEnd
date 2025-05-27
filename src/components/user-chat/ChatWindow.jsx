@@ -14,6 +14,7 @@ function ChatWindow({ setChatMode }) {
   const messagesEndRef = useRef(null);
   const sessionUUIDRef = useRef(null);
   const wsRef = useRef(null);
+  const [socketClosed, setSocketClosed] = useState(false);
 
   const [businessInfo, setBusinessInfo] = useState({
     name: "",
@@ -153,9 +154,15 @@ function ChatWindow({ setChatMode }) {
     };
 
     socket.onerror = (err) => console.error("WebSocket error:", err);
-    socket.onclose = () => console.log("WebSocket closed");
+    socket.onclose = () => {
+      console.warn("WebSocket closed");
+      setSocketClosed(true);
+    };
 
-    return () => socket.close();
+    return () => {
+      socket.onclose = null;
+      socket.close();
+    };
   }, [businessID]);
 
   useEffect(() => {
@@ -181,8 +188,53 @@ function ChatWindow({ setChatMode }) {
     wsRef.current.send(JSON.stringify({ text }));
   };
 
+  const reconnectSocket = () => {
+    setSocketClosed(false); // hide banner
+
+    const socket = new WebSocket(
+      `${
+        import.meta.env.VITE_USER_CHAT_BACKEND_WS
+      }/chat/${businessID}?session=${sessionUUIDRef.current}`
+    );
+    wsRef.current = socket;
+
+    socket.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.text) {
+          setMessages((prev) => [
+            ...prev,
+            { text: data.text, sender: "bot", time: new Date() },
+          ]);
+        }
+      } catch (err) {
+        console.error("WebSocket message parse error:", err);
+      } finally {
+        setBotTyping(false);
+      }
+    };
+
+    socket.onerror = (err) => console.error("WebSocket error:", err);
+    socket.onclose = () => {
+      console.warn("WebSocket closed again");
+      setSocketClosed(true); // show banner again if reconnect fails
+    };
+  };
+
   return (
     <div className="fixed inset-0 flex flex-col bg-[#f0f0f0] max-w-xl mx-auto">
+      {socketClosed && (
+        <div className="bg-yellow-100 text-yellow-900 px-4 py-3 text-sm text-center border-b border-yellow-300 shadow z-50">
+          {businessInfo.bot_name || "Bot"} is away.
+          <button
+            onClick={reconnectSocket}
+            className="underline text-[#075E54] font-medium ml-1"
+          >
+            Ring her in?
+          </button>
+        </div>
+      )}
+
       {/* Top Banner */}
       <div className="bg-[#075E54] text-white px-4 py-3 flex items-center justify-between shadow-md sticky top-0 z-10">
         <div className="flex items-center gap-3">
@@ -197,6 +249,16 @@ function ChatWindow({ setChatMode }) {
             <span className="text-base font-semibold">
               {businessInfo.bot_name} from {businessInfo.name}
             </span>
+            <div className="flex items-center gap-2 mt-0.5">
+              <span
+                className={`h-2 w-2 rounded-full ${
+                  socketClosed ? "bg-gray-400" : "bg-green-400"
+                }`}
+              />
+              <span className="text-xs text-white">
+                {socketClosed ? "away" : "online"}
+              </span>
+            </div>
             {botTyping && (
               <span className="text-xs text-green-200 animate-pulse">
                 typing...
