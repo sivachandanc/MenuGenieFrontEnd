@@ -229,7 +229,7 @@ function ChatWindow({ setChatMode }) {
   };
 
   return (
-    <div className="fixed inset-0 flex flex-col bg-[#f0f0f0] max-w-xl mx-auto">
+    <div className="h-[100dvh] flex flex-col bg-[#f0f0f0] max-w-xl mx-auto overflow-hidden">
       {socketClosed && (
         <div className="bg-yellow-100 text-yellow-900 px-4 py-3 text-sm text-center border-b border-yellow-300 shadow z-50">
           {businessInfo.bot_name || "Bot"} is away.
