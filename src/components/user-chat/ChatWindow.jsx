@@ -4,6 +4,7 @@ import SendIcon from "../../assets/send.svg";
 import ReactMarkdown from "react-markdown";
 import { supabaseClient } from "../../supabase-utils/SupaBaseClient";
 import MenuImagePreviewStack from "./MenuImagePreviewStack";
+import { motion, AnimatePresence } from "framer-motion";
 
 function ChatWindow({ setChatMode }) {
   setChatMode(true);
@@ -16,6 +17,9 @@ function ChatWindow({ setChatMode }) {
   const sessionUUIDRef = useRef(null);
   const wsRef = useRef(null);
   const [socketClosed, setSocketClosed] = useState(false);
+  const [isInputFocused, setIsInputFocused] = useState(false);
+  const [hasSentMessage, setHasSentMessage] = useState(false);
+  const [highlightViewMenu, setHighlightViewMenu] = useState(false);
 
   const [businessInfo, setBusinessInfo] = useState({
     name: "",
@@ -184,6 +188,8 @@ function ChatWindow({ setChatMode }) {
       ...prev,
       { text, sender: "user", time: new Date() },
     ]);
+    setHasSentMessage(true);
+    setHighlightViewMenu(true);
     inputRef.current.value = "";
     setBotTyping(true);
     wsRef.current.send(JSON.stringify({ text }));
@@ -267,23 +273,44 @@ function ChatWindow({ setChatMode }) {
             )}
           </div>
         </div>
-        <button
+        <motion.button
+          animate={
+            highlightViewMenu
+              ? {
+                  backgroundColor: ["#ffffff", "#bef264", "#ffffff"], // white → lime-400 → white
+                  color: ["#075E54", "#000000", "#075E54"], // text color adjusts for contrast
+                }
+              : {
+                  backgroundColor: "#ffffff",
+                  color: "#075E54",
+                }
+          }
+          transition={
+            highlightViewMenu
+              ? {
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }
+              : { duration: 0.3 }
+          }
           onClick={() => {
             setShowMenuModal(true);
             setActiveIndex(0);
             setImageLoading(true);
+            setHighlightViewMenu(false); // stop pulsing after click
           }}
-          className="text-sm bg-white text-[#075E54] px-3 py-1 rounded-full font-medium hover:bg-gray-100 transition"
+          className="text-sm px-3 py-1 rounded-full font-semibold hover:brightness-105 transition-all"
         >
           View Menu
-        </button>
+        </motion.button>
       </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
         {messages.length === 0 && !botTyping && (
           <div className="text-center text-gray-500 mt-8">
-            Any Questions on the menu? ask {" "}
+            Any Questions on the menu? ask{" "}
             <span className="font-medium">{businessInfo.bot_name}</span>
           </div>
         )}
@@ -321,16 +348,32 @@ function ChatWindow({ setChatMode }) {
           </div>
         )}
 
-        {menuImages.length > 0 && (
-          <MenuImagePreviewStack
-            menuImages={menuImages}
-            onClickPreview={() => {
-              setShowMenuModal(true);
-              setActiveIndex(0);
-              setImageLoading(true);
-            }}
-          />
-        )}
+        <AnimatePresence>
+          {!hasSentMessage && !isInputFocused && menuImages.length > 0 && (
+            <motion.div
+              key="preview"
+              initial={{ opacity: 1, scale: 1, x: 0, y: 0 }}
+              animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
+              exit={{
+                opacity: 0,
+                scale: 0.3,
+                x: 160, // adjust for button alignment
+                y: -80,
+                transition: { duration: 0.5, ease: "easeInOut" },
+              }}
+              className="flex justify-center"
+            >
+              <MenuImagePreviewStack
+                menuImages={menuImages}
+                onClickPreview={() => {
+                  setShowMenuModal(true);
+                  setActiveIndex(0);
+                  setImageLoading(true);
+                }}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div ref={messagesEndRef} />
       </div>
@@ -340,10 +383,16 @@ function ChatWindow({ setChatMode }) {
         <input
           ref={inputRef}
           type="text"
+          onFocus={() => {
+            setIsInputFocused(true);
+            setHighlightViewMenu(true); // trigger animation on focus
+          }}
+          onBlur={() => setIsInputFocused(false)}
           className="flex-1 px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#075E54] bg-gray-50"
           placeholder="Type a message..."
           onKeyDown={(e) => e.key === "Enter" && sendMessage()}
         />
+
         <button
           onClick={sendMessage}
           disabled={botTyping}
