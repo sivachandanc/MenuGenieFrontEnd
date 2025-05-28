@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import SendIcon from "../../assets/send.svg";
 import ReactMarkdown from "react-markdown";
 import { supabaseClient } from "../../supabase-utils/SupaBaseClient";
+import MenuImagePreviewStack from "./MenuImagePreviewStack";
 
 function ChatWindow({ setChatMode }) {
   setChatMode(true);
@@ -282,7 +283,7 @@ function ChatWindow({ setChatMode }) {
       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
         {messages.length === 0 && !botTyping && (
           <div className="text-center text-gray-500 mt-8">
-            Start a conversation with{" "}
+            Any Questions on the menu? ask {" "}
             <span className="font-medium">{businessInfo.bot_name}</span>
           </div>
         )}
@@ -319,6 +320,18 @@ function ChatWindow({ setChatMode }) {
             <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:0.4s]" />
           </div>
         )}
+
+        {menuImages.length > 0 && (
+          <MenuImagePreviewStack
+            menuImages={menuImages}
+            onClickPreview={() => {
+              setShowMenuModal(true);
+              setActiveIndex(0);
+              setImageLoading(true);
+            }}
+          />
+        )}
+
         <div ref={messagesEndRef} />
       </div>
 
