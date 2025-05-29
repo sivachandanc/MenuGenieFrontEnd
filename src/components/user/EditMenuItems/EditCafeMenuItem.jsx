@@ -10,7 +10,13 @@ const cafeCategories = [
   "Smoothies",
   "Juices",
 ];
-const tagOptions = ["vegan", "gluten-free", "caffeinated", "popular", "seasonal"];
+const tagOptions = [
+  "vegan",
+  "gluten-free",
+  "caffeinated",
+  "popular",
+  "seasonal",
+];
 const dairyOptions = [
   "Oat Milk",
   "Almond Milk",
@@ -38,6 +44,8 @@ function EditMenuItemCafeForm({ item, onClose, onItemUpdated }) {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [showDescEditor, setShowDescEditor] = useState(false);
+  const [tempDescription, setTempDescription] = useState(form.description);
 
   const handleChange = (field, value) => {
     setForm({ ...form, [field]: value });
@@ -194,15 +202,21 @@ function EditMenuItemCafeForm({ item, onClose, onItemUpdated }) {
           </div>
 
           {/* Description */}
+          {/* Description Preview (Click to edit) */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Description
             </label>
             <textarea
+              readOnly
               value={form.description}
-              onChange={(e) => handleChange("description", e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--button)] focus:ring-[var(--button)]"
-              rows={3}
+              onClick={() => {
+                setTempDescription(form.description);
+                setShowDescEditor(true);
+              }}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm cursor-pointer bg-gray-50 focus:outline-none"
+              rows={2}
+              placeholder="Click to edit description"
             />
           </div>
 
@@ -346,6 +360,52 @@ function EditMenuItemCafeForm({ item, onClose, onItemUpdated }) {
           </div>
         </div>
       </form>
+      {showDescEditor && (
+        <div
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-[60]"
+          onClick={() => setShowDescEditor(false)}
+        >
+          <div
+            className="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Edit Description
+            </label>
+            <textarea
+              value={tempDescription}
+              onChange={(e) => setTempDescription(e.target.value)}
+              rows={8}
+              className="w-full p-3 border rounded-md focus:ring-[var(--button)] focus:border-[var(--button)]"
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === "Escape") setShowDescEditor(false);
+                if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+                  handleChange("description", tempDescription);
+                  setShowDescEditor(false);
+                }
+              }}
+            />
+            <div className="flex justify-end gap-3 mt-4">
+              <button
+                onClick={() => setShowDescEditor(false)}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  handleChange("description", tempDescription);
+                  setShowDescEditor(false);
+                }}
+                className="px-6 py-2 bg-[var(--button)] hover:bg-[var(--button-hover)] text-white font-semibold rounded"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
