@@ -4,8 +4,21 @@ import { X } from "lucide-react";
 import { supabaseClient } from "../../../supabase-utils/SupaBaseClient";
 import toast from "react-hot-toast";
 
-const restaurantCategories = ["Appetizer", "Main Course", "Dessert", "Beverage"];
-const tagOptions = ["spicy", "vegan", "gluten-free", "chef-special", "popular", "contains nuts", "dairy-free"];
+const restaurantCategories = [
+  "Appetizer",
+  "Main Course",
+  "Dessert",
+  "Beverage",
+];
+const tagOptions = [
+  "spicy",
+  "vegan",
+  "gluten-free",
+  "chef-special",
+  "popular",
+  "contains nuts",
+  "dairy-free",
+];
 
 function EditMenuItemRestaurant({ item, onClose, onItemUpdated }) {
   const [form, setForm] = useState({
@@ -20,6 +33,8 @@ function EditMenuItemRestaurant({ item, onClose, onItemUpdated }) {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [showDescEditor, setShowDescEditor] = useState(false);
+  const [tempDescription, setTempDescription] = useState(form.description);
 
   const handleChange = (field, value) => setForm({ ...form, [field]: value });
 
@@ -47,15 +62,19 @@ function EditMenuItemRestaurant({ item, onClose, onItemUpdated }) {
     ].join("\n");
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_EMBEDDING_BACKEND_URL}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify([{ context }]),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_EMBEDDING_BACKEND_URL}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify([{ context }]),
+        }
+      );
 
       if (!response.ok) throw new Error(await response.text());
       const { embeddings } = await response.json();
-      if (!Array.isArray(embeddings)) throw new Error("Invalid embedding response");
+      if (!Array.isArray(embeddings))
+        throw new Error("Invalid embedding response");
 
       const { error: updateError } = await supabaseClient
         .from("menu_item_restaurant")
@@ -94,7 +113,10 @@ function EditMenuItemRestaurant({ item, onClose, onItemUpdated }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-opacity-30 backdrop-blur-sm flex items-center justify-center p-4 z-50" onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div
+      className="fixed inset-0 bg-opacity-30 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
       <form
         onSubmit={handleSubmit}
         className="bg-white border rounded-lg p-6 pt-0 pb-0 shadow-lg space-y-4 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
@@ -117,7 +139,9 @@ function EditMenuItemRestaurant({ item, onClose, onItemUpdated }) {
 
         <div className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Name</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Name
+            </label>
             <input
               type="text"
               value={form.name}
@@ -128,7 +152,9 @@ function EditMenuItemRestaurant({ item, onClose, onItemUpdated }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Category</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Category
+            </label>
             <select
               value={form.category}
               onChange={(e) => handleChange("category", e.target.value)}
@@ -141,17 +167,26 @@ function EditMenuItemRestaurant({ item, onClose, onItemUpdated }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Description</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Description
+            </label>
             <textarea
+              readOnly
               value={form.description}
-              onChange={(e) => handleChange("description", e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--button)] focus:ring-[var(--button)]"
-              rows={3}
+              onClick={() => {
+                setTempDescription(form.description);
+                setShowDescEditor(true);
+              }}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm cursor-pointer bg-gray-50 focus:outline-none"
+              rows={2}
+              placeholder="Click to edit description"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Price</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Price
+            </label>
             <input
               type="number"
               step="0.01"
@@ -163,7 +198,9 @@ function EditMenuItemRestaurant({ item, onClose, onItemUpdated }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Cuisine Type</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Cuisine Type
+            </label>
             <input
               type="text"
               value={form.cuisine_type}
@@ -173,7 +210,9 @@ function EditMenuItemRestaurant({ item, onClose, onItemUpdated }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Tags</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Tags
+            </label>
             <div className="flex flex-wrap gap-2">
               {tagOptions.map((tag) => (
                 <button
@@ -199,7 +238,9 @@ function EditMenuItemRestaurant({ item, onClose, onItemUpdated }) {
               onChange={(e) => handleChange("available", e.target.checked)}
               className="h-4 w-4 text-[var(--button)] focus:ring-[var(--button)] border-gray-300 rounded"
             />
-            <label className="ml-2 block text-sm text-gray-900">Item is currently available</label>
+            <label className="ml-2 block text-sm text-gray-900">
+              Item is currently available
+            </label>
           </div>
 
           {error && <div className="text-red-600 text-sm">{error}</div>}
@@ -224,6 +265,52 @@ function EditMenuItemRestaurant({ item, onClose, onItemUpdated }) {
           </div>
         </div>
       </form>
+      {showDescEditor && (
+        <div
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-[60]"
+          onClick={() => setShowDescEditor(false)}
+        >
+          <div
+            className="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Edit Description
+            </label>
+            <textarea
+              value={tempDescription}
+              onChange={(e) => setTempDescription(e.target.value)}
+              rows={8}
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === "Escape") setShowDescEditor(false);
+                if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+                  handleChange("description", tempDescription);
+                  setShowDescEditor(false);
+                }
+              }}
+              className="w-full p-3 border rounded-md focus:ring-[var(--button)] focus:border-[var(--button)]"
+            />
+            <div className="flex justify-end gap-3 mt-4">
+              <button
+                onClick={() => setShowDescEditor(false)}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  handleChange("description", tempDescription);
+                  setShowDescEditor(false);
+                }}
+                className="px-6 py-2 bg-[var(--button)] hover:bg-[var(--button-hover)] text-white font-semibold rounded"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
