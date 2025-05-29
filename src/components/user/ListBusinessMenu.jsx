@@ -35,12 +35,14 @@ function ListBusinessMenu() {
   const [selectedTab, setSelectedTab] = useState("menu");
   const [editingItem, setEditingItem] = useState(null);
   const [selecteMenuItems, setSelecteMenuItems] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const [bulkDelete, setBulkDelete] = useState(false);
 
   const getItemScore = (item) => {
     if (businessType === "cafe") return CalculateCafeItemScore(item);
-    if (businessType === "restaurant") return CalculateRestaurantItemScore(item);
+    if (businessType === "restaurant")
+      return CalculateRestaurantItemScore(item);
     return 0;
   };
 
@@ -181,11 +183,19 @@ function ListBusinessMenu() {
         >
           {selectedTab === "menu" && (
             <>
-              <div className="sticky top-0 bg-white z-20 pb-2">
-                <h2 className="text-lg font-semibold text-gray-800 p-2">
+              <div className="sticky top-0 bg-white z-20 px-4 pt-4 pb-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <h2 className="text-lg font-semibold text-gray-800">
                   Menu Items of{" "}
                   <span className="text-[var(--button)]">{businessName}</span>
                 </h2>
+
+                <input
+                  type="text"
+                  placeholder="Search items..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full sm:w-72 px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-[var(--button)] focus:border-[var(--button)]"
+                />
               </div>
 
               {selecteMenuItems.length > 0 && (
@@ -253,90 +263,98 @@ function ListBusinessMenu() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                      {menuItems.map((item) => (
-                        <tr key={item.item_id} className="hover:bg-gray-50">
-                          <td className="px-4 py-2">
-                            <input
-                              type="checkbox"
-                              checked={selecteMenuItems.includes(item.item_id)}
-                              onChange={(e) => {
-                                if (e.target.checked) {
-                                  setSelecteMenuItems((prev) => [
-                                    ...prev,
-                                    item.item_id,
-                                  ]);
-                                } else {
-                                  setSelecteMenuItems((prev) =>
-                                    prev.filter((id) => id !== item.item_id)
-                                  );
-                                }
-                              }}
-                            />
-                          </td>
-                          <td className="px-4 py-2">
-                            <div className="font-medium text-gray-900">
-                              {item.name}
-                            </div>
-                            <div className="text-xs text-gray-600 italic">
-                              {Array.isArray(item.size_options)
-                                ? item.size_options
-                                    .map(
-                                      (s) =>
-                                        `${s.size || "?"} ($${parseFloat(
-                                          s.price
-                                        ).toFixed(2)})`
-                                    )
-                                    .join(" · ")
-                                : ""}
-                            </div>
-                            {item.tags?.length > 0 && (
-                              <div className="mt-1 flex flex-wrap gap-1">
-                                {item.tags.map((tag) => (
-                                  <span
-                                    key={tag}
-                                    className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full"
-                                  >
-                                    {tag}
-                                  </span>
-                                ))}
+                      {menuItems
+                        .filter((item) =>
+                          item.name
+                            ?.toLowerCase()
+                            .includes(searchTerm.toLowerCase())
+                        )
+                        .map((item) => (
+                          <tr key={item.item_id} className="hover:bg-gray-50">
+                            <td className="px-4 py-2">
+                              <input
+                                type="checkbox"
+                                checked={selecteMenuItems.includes(
+                                  item.item_id
+                                )}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setSelecteMenuItems((prev) => [
+                                      ...prev,
+                                      item.item_id,
+                                    ]);
+                                  } else {
+                                    setSelecteMenuItems((prev) =>
+                                      prev.filter((id) => id !== item.item_id)
+                                    );
+                                  }
+                                }}
+                              />
+                            </td>
+                            <td className="px-4 py-2">
+                              <div className="font-medium text-gray-900">
+                                {item.name}
                               </div>
-                            )}
-                          </td>
-                          <td>
-                            <span
-                              className={`text-xs font-semibold ml-2 ${getScoreColor(
-                                getItemScore(item)
-                              )}`}
-                            >
-                              {getItemScore(item)}%
-                            </span>
-                          </td>
-                          <td className="px-4 py-2">{item.category}</td>
-                          <td className="px-4 py-2 text-center">
-                            <div className="flex justify-center gap-3">
-                              <button
-                                className="text-gray-500 hover:text-blue-600"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setEditingItem(item);
-                                }}
+                              <div className="text-xs text-gray-600 italic">
+                                {Array.isArray(item.size_options)
+                                  ? item.size_options
+                                      .map(
+                                        (s) =>
+                                          `${s.size || "?"} ($${parseFloat(
+                                            s.price
+                                          ).toFixed(2)})`
+                                      )
+                                      .join(" · ")
+                                  : ""}
+                              </div>
+                              {item.tags?.length > 0 && (
+                                <div className="mt-1 flex flex-wrap gap-1">
+                                  {item.tags.map((tag) => (
+                                    <span
+                                      key={tag}
+                                      className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full"
+                                    >
+                                      {tag}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </td>
+                            <td>
+                              <span
+                                className={`text-xs font-semibold ml-2 ${getScoreColor(
+                                  getItemScore(item)
+                                )}`}
                               >
-                                <Pencil size={16} />
-                              </button>
-                              <button
-                                className="text-gray-500 hover:text-red-600"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setItemToDelete(item);
-                                  setShowDeleteConfirm(true);
-                                }}
-                              >
-                                <Trash size={16} />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
+                                {getItemScore(item)}%
+                              </span>
+                            </td>
+                            <td className="px-4 py-2">{item.category}</td>
+                            <td className="px-4 py-2 text-center">
+                              <div className="flex justify-center gap-3">
+                                <button
+                                  className="text-gray-500 hover:text-blue-600"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setEditingItem(item);
+                                  }}
+                                >
+                                  <Pencil size={16} />
+                                </button>
+                                <button
+                                  className="text-gray-500 hover:text-red-600"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setItemToDelete(item);
+                                    setShowDeleteConfirm(true);
+                                  }}
+                                >
+                                  <Trash size={16} />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
                     </tbody>
                   </table>
                 </div>
