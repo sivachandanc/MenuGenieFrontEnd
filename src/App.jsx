@@ -20,6 +20,7 @@ import FeaturesSection from "./components/features-page/FeaturesSection.jsx";
 import ContactSection from "./components/contact-me/ContactSection.jsx";
 import ResetPasswordForm from "./components/login/ResetPasswordForm.jsx";
 import BusinessAnalyticsDashboard from "./components/user/UserAnalytics/BusinessAnalyticsDashboard.jsx";
+import LandingPage from "./components/landing-page/LandingPage.jsx";
 
 import { useState } from "react";
 
@@ -38,7 +39,7 @@ function App() {
             path="/"
             element={
               <PublicRoute>
-                <HeroSection />
+                <LandingPage />
               </PublicRoute>
             }
           />
@@ -102,10 +103,7 @@ function App() {
             }
           >
             <Route index element={<BusinessList />} />
-            <Route
-              path="analytics"
-              element={<BusinessAnalyticsDashboard />}
-            />
+            <Route path="analytics" element={<BusinessAnalyticsDashboard />} />
             <Route path="onboarding" element={<OnBoardingWizard />} />
             <Route path="business/:businessID" element={<BusinessDetails />} />
             <Route
@@ -117,7 +115,6 @@ function App() {
               element={<UploadMenuCopy />}
             />
           </Route>
-          
 
           {/* Chat route */}
           <Route
