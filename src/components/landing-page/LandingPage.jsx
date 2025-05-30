@@ -5,17 +5,17 @@ import ContactSection from "../contact-me/ContactSection";
 
 function LandingPage() {
   return (
-    <div className="flex flex-col snap-mandatory snap-y">
-      <section className="snap-start snap-always">
+    <div className="h-screen overflow-y-scroll snap-mandatory snap-y scroll-smooth">
+      <section className="min-h-screen snap-start snap-always">
         <HeroSection />
       </section>
-      <section className="snap-start snap-always">
+      <section className="min-h-screen snap-start snap-always">
         <AboutPage />
       </section>
-      <section className="snap-start snap-always">
+      <section className="min-h-screen snap-start snap-always">
         <FeaturesSection />
       </section>
-      <section className="snap-start snap-always">
+      <section className="min-h-screen snap-start snap-always">
         <ContactSection />
       </section>
     </div>
