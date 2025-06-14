@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import ChatPreview from "./ChatPreview";
-import MenuGenieLogo from "../util-components/MenuGenieLogo";
 
 function HeroSection() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <section className="relative min-h-[90vh] px-4 sm:px-6 py-16 bg-[var(--background)] overflow-hidden">
       {/* Floating Badge */}
@@ -45,10 +47,18 @@ function HeroSection() {
           >
             <a
               href="/signup"
-              className="inline-block px-6 py-3 rounded-full bg-[var(--button)] text-black font-semibold hover:bg-[var(--button-hover)] transition"
+              className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-[var(--button)] text-black font-semibold hover:bg-[var(--button-hover)] transition"
             >
               Get Started for Free
             </a>
+
+            {/* DEMO BUTTON → opens modal */}
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="inline-block px-6 py-3 rounded-full bg-[var(--button)] text-black font-semibold hover:bg-[var(--button-hover)] transition"
+            >
+              View Demo
+            </button>
           </motion.div>
 
           <ul className="text-[var(--textMain)] space-y-3 text-sm sm:text-base">
@@ -100,6 +110,29 @@ function HeroSection() {
           <span className="underline">completely free</span> to use!
         </div>
       </div>
+
+      {/* Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm bg-opacity-75 z-50 px-4">
+          <div className="relative w-full max-w-3xl aspect-video">
+            <iframe
+              width="100%"
+              height="100%"
+              src="https://www.youtube.com/embed/2BYDqmtxc4g" // replace with your video ID
+              title="Menu Genie Demo"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className="absolute top-2 right-2 text-white text-xl font-bold bg-black bg-opacity-50 px-2 py-1 rounded"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
